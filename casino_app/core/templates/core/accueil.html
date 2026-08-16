@@ -1,67 +1,325 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
+{% block extra_css %}
+<style>
+/* Hero Section - Ultra Compact */
+.hero-section-compact {
+    max-height: 180px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+    padding: 1rem;
+}
+
+/* Games Grid - 2 Columns Compact */
+.games-section-compact {
+    padding: 1rem;
+    background: transparent;
+}
+
+/* Recent Wins Ticker - Horizontal Scrolling */
+.wins-ticker-section {
+    padding: 0.75rem 1rem;
+    background: rgba(15, 23, 42, 0.5);
+    border-top: 1px solid rgba(212, 175, 55, 0.1);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+    overflow: hidden;
+}
+
+.wins-ticker-container {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.wins-ticker-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #d4af37;
+    text-transform: uppercase;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.wins-ticker-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.wins-ticker-scroll {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.wins-ticker-content {
+    display: inline-flex;
+    animation: scroll 30s linear infinite;
+}
+
+.wins-ticker-item {
+    padding: 0 1.5rem;
+    font-size: 0.75rem;
+    color: #e0e0e0;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wins-ticker-item strong {
+    color: #ffffff;
+}
+
+.wins-ticker-item span {
+    color: #10b981;
+    font-weight: 600;
+}
+
+@keyframes scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.games-grid-compact {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.game-card-compact {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.9));
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    text-decoration: none;
+}
+
+.game-card-compact:hover {
+    border-color: rgba(212, 175, 55, 0.5);
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+    transform: translateY(-2px);
+}
+
+.game-card-compact:active {
+    transform: scale(0.98);
+}
+
+.game-image-compact {
+    height: 60%;
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #d4af37;
+}
+
+.game-info-compact {
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.game-name-compact {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+.game-status-compact {
+    font-size: 0.65rem;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.game-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.hero-carousel {
+    position: relative;
+    height: 100%;
+}
+
+.hero-slide {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.5rem;
+    animation: slideIn 0.5s ease;
+}
+
+.hero-slide.active {
+    display: flex;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.hero-badge {
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    color: #020617;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.hero-title-compact {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+}
+
+.btn-cta-compact {
+    background: linear-gradient(135deg, #d4af37, #f4d03f);
+    color: #020617;
+    padding: 0.5rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+}
+
+.hero-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.hero-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.hero-dot.active {
+    background: #d4af37;
+    transform: scale(1.2);
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid px-0">
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="hero-background">
-        <div class="floating-coins"></div>
-    </div>
-    <div class="hero-content container">
-        <h1 class="hero-title">
-            Découvrez le Casino <span class="highlight-gold">#1</span> en Afrique
-        </h1>
-        <p class="hero-subtitle">
-            Rejoignez les gagnants! Obtenez votre bonus 100% maintenant!
-        </p>
-        <a href="{% url 'wallet' %}" class="btn btn-offer">
-            <svg class="offer-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            <span>Profiter de l'Offre</span>
-        </a>
-        <p class="hero-proof">Approuvé par des milliers de joueurs</p>
-        <div class="hero-characters">
-            <div class="character" style="--gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
-            <div class="character" style="--gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
-            <div class="character" style="--gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
-            <div class="character" style="--gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
-            <div class="character" style="--gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%)"></div>
+<!-- Hero Section - Ultra Compact Mobile First -->
+<section class="hero-section-compact">
+    <div class="hero-carousel" id="heroCarousel">
+        <div class="hero-slide active">
+            <div class="hero-badge">Bonus 100% sur 1er dépôt</div>
+            <h2 class="hero-title-compact">Casino #1 en Afrique</h2>
+            <a href="{% url 'wallet' %}" class="btn btn-cta-compact">
+                <span>J'en profite</span>
+            </a>
         </div>
+        <div class="hero-slide">
+            <div class="hero-badge">Gagnez jusqu'à 500 000 FCFA</div>
+            <h2 class="hero-title-compact">Jeux en Direct</h2>
+            <a href="{% url 'jeux' %}" class="btn btn-cta-compact">
+                <span>Jouer maintenant</span>
+            </a>
+        </div>
+        <div class="hero-slide">
+            <div class="hero-badge">Paiements instantanés</div>
+            <h2 class="hero-title-compact">Retrait en 2 min</h2>
+            <a href="#" class="btn btn-cta-compact">
+                <span>Découvrir</span>
+            </a>
+        </div>
+    </div>
+    <div class="hero-dots">
+        <span class="hero-dot active" data-slide="0"></span>
+        <span class="hero-dot" data-slide="1"></span>
+        <span class="hero-dot" data-slide="2"></span>
     </div>
 </section>
 
-<!-- Games Section -->
-<section class="games-section">
-    <div class="container">
-        <div class="games-header">
-            <h2 class="games-title">Nos Jeux</h2>
-            <div class="games-nav-arrows">
-                <button class="arrow-btn prev-arrow" id="prevGames">‹</button>
-                <button class="arrow-btn next-arrow" id="nextGames">›</button>
+<!-- Games Section - Compact Grid -->
+<section class="games-section-compact">
+    <div class="games-grid-compact">
+        {% for game in games %}
+        <a href="{{ game.url }}" class="game-card-compact">
+            <div class="game-image-compact">
+                {{ game.icon|default:"🎮" }}
             </div>
-        </div>
-        <div class="games-container">
-            <div class="games-scroll" id="gamesScroll">
-                {% for game in games %}
-                <a href="{{ game.url }}" class="game-card-link">
-                    <div class="game-card">
-                        <div class="game-image">
-                            <div class="game-icon">
-                                {{ game.icon }}
-                            </div>
-                        </div>
-                        <div class="game-info">
-                            <h3 class="game-name">{{ game.name }}</h3>
-                            <p class="game-description">{{ game.description }}</p>
-                            <div class="game-players">
-                                <span class="player-dot"></span>
-                                <span class="player-count">{{ game.players }} joueurs</span>
-                            </div>
-                        </div>
-                    </div>
-                </a>
+            <div class="game-info-compact">
+                <h3 class="game-name-compact">{{ game.name }}</h3>
+                <div class="game-status-compact">
+                    <span class="game-status-dot"></span>
+                    <span>En direct • {{ game.players }} joueurs</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Recent Wins Ticker -->
+<section class="wins-ticker-section">
+    <div class="wins-ticker-container">
+        <div class="wins-ticker-label">Gains Récents</div>
+        <div class="wins-ticker-scroll">
+            <div class="wins-ticker-content">
+                {% for win in recent_wins_left %}
+                <div class="wins-ticker-item">
+                    <strong>{{ win.player }}</strong> a gagné <span>{{ win.amount }} {{ win.currency }}</span> sur {{ win.game|default:"Ludo" }}
+                </div>
+                {% endfor %}
+                {% for win in recent_wins_right %}
+                <div class="wins-ticker-item">
+                    <strong>{{ win.player }}</strong> a gagné <span>{{ win.amount }} {{ win.currency }}</span> sur {{ win.game|default:"Ludo" }}
+                </div>
+                {% endfor %}
+                <!-- Duplicate for seamless loop -->
+                {% for win in recent_wins_left %}
+                <div class="wins-ticker-item">
+                    <strong>{{ win.player }}</strong> a gagné <span>{{ win.amount }} {{ win.currency }}</span> sur {{ win.game|default:"Ludo" }}
+                </div>
+                {% endfor %}
+                {% for win in recent_wins_right %}
+                <div class="wins-ticker-item">
+                    <strong>{{ win.player }}</strong> a gagné <span>{{ win.amount }} {{ win.currency }}</span> sur {{ win.game|default:"Ludo" }}
+                </div>
                 {% endfor %}
             </div>
         </div>
@@ -70,22 +328,50 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Hero Carousel Auto-scroll
+    const heroCarousel = document.getElementById('heroCarousel');
+    const heroSlides = heroCarousel.querySelectorAll('.hero-slide');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let currentSlide = 0;
+    const slideInterval = 4000;
+
+    function showSlide(index) {
+        heroSlides.forEach((slide, i) => {
+            slide.classList.remove('active');
+            heroDots[i].classList.remove('active');
+        });
+        heroSlides[index].classList.add('active');
+        heroDots[index].classList.add('active');
+        currentSlide = index;
+    }
+
+    function nextSlide() {
+        const next = (currentSlide + 1) % heroSlides.length;
+        showSlide(next);
+    }
+
+    // Auto-scroll
+    let carouselInterval = setInterval(nextSlide, slideInterval);
+
+    // Dot clicks
+    heroDots.forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            clearInterval(carouselInterval);
+            showSlide(index);
+            carouselInterval = setInterval(nextSlide, slideInterval);
+        });
+    });
+
+    // Games Scroll
     const gamesScroll = document.getElementById('gamesScroll');
     const prevBtn = document.getElementById('prevGames');
     const nextBtn = document.getElementById('nextGames');
     
-    console.log('Elements found:', {
-        gamesScroll: !!gamesScroll,
-        prevBtn: !!prevBtn,
-        nextBtn: !!nextBtn
-    });
-    
     if (gamesScroll && prevBtn && nextBtn) {
-        const scrollAmount = 160; // Largeur d'une carte + gap
+        const scrollAmount = 160;
         
         prevBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Prev button clicked');
             gamesScroll.scrollBy({
                 left: -scrollAmount,
                 behavior: 'smooth'
@@ -94,17 +380,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         nextBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Next button clicked');
             gamesScroll.scrollBy({
                 left: scrollAmount,
                 behavior: 'smooth'
             });
         });
         
-        // Gérer l'état des boutons selon la position de défilement
         function updateArrowButtons() {
             const maxScroll = gamesScroll.scrollWidth - gamesScroll.clientWidth;
-            console.log('Scroll position:', gamesScroll.scrollLeft, 'Max scroll:', maxScroll);
             
             if (gamesScroll.scrollLeft <= 0) {
                 prevBtn.style.opacity = '0.5';
@@ -123,13 +406,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Mettre à jour au défilement
         gamesScroll.addEventListener('scroll', updateArrowButtons);
-        
-        // État initial après un petit délai pour s'assurer que tout est chargé
         setTimeout(updateArrowButtons, 100);
-        
-        // Forcer le recalcul après le chargement des images
         window.addEventListener('load', updateArrowButtons);
     }
 });
