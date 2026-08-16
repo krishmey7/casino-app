@@ -4,48 +4,320 @@
 {% block title %}Inscription - Bet'A Casino{% endblock %}
 
 {% block content %}
-<div class="auth-form-wrapper">
-    <!-- Form Header -->
-    <div class="auth-form-header">
-        <h1 class="auth-form-title">Rejoignez Bet'A</h1>
-        <p class="auth-form-subtitle">Créez votre compte gratuitement</p>
+<style>
+/* Modern Mobile First Design */
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 1rem;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.auth-card {
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem 0;
+}
+
+.auth-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Progress Dots */
+.progress-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5e7eb;
+    transition: all 0.3s ease;
+}
+
+.progress-dot.active {
+    background: #667eea;
+    transform: scale(1.2);
+}
+
+.progress-dot.completed {
+    background: #667eea;
+}
+
+/* Error Messages */
+.auth-messages {
+    margin-bottom: 1rem;
+}
+
+.auth-message {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-message.error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.auth-message.success {
+    background: #d1fae5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+/* Form Steps */
+.form-step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.form-step.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.step-header {
+    margin-bottom: 1rem;
+}
+
+.step-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem 0;
+}
+
+.step-subtitle {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.375rem;
+}
+
+.form-input-wrapper {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 1rem 0 2.5rem;
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #667eea;
+}
+
+.field-error {
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-input.error {
+    border-color: #dc2626;
+}
+
+.form-input.error + .field-error {
+    display: block;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-link {
+    background: none;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    display: block;
+    text-align: center;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.step-buttons {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.step-buttons .btn {
+    flex: 1;
+}
+
+.divider {
+    text-align: center;
+    margin: 1.25rem 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.divider-text {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0 0.75rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    position: relative;
+}
+</style>
+
+<div class="auth-card">
+    <div class="auth-header">
+        <h1 class="auth-title">Créer un compte</h1>
+        <p class="auth-subtitle">Rejoignez Bet'A Casino</p>
     </div>
 
-    <!-- Progress Indicator -->
-    <div class="step-progress">
-        <div class="step-indicator active" data-step="1">
-            <div class="step-number">1</div>
-            <div class="step-label">Nom</div>
-        </div>
-        <div class="step-indicator" data-step="2">
-            <div class="step-number">2</div>
-            <div class="step-label">Téléphone</div>
-        </div>
-        <div class="step-indicator" data-step="3">
-            <div class="step-number">3</div>
-            <div class="step-label">Mot de passe</div>
-        </div>
+    <!-- Progress Dots -->
+    <div class="progress-dots">
+        <div class="progress-dot active" data-step="1"></div>
+        <div class="progress-dot" data-step="2"></div>
+        <div class="progress-dot" data-step="3"></div>
     </div>
 
-    <!-- Messages System -->
+    <!-- Messages -->
     {% if messages %}
     <div class="auth-messages">
         {% for message in messages %}
-        <div class="auth-message {% if message.tags %}auth-message-{{ message.tags }}{% endif %}" role="alert">
-            <div class="message-icon">
-                {% if message.tags == 'error' %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                </svg>
-                {% else %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                {% endif %}
-            </div>
-            <span class="message-text">{{ message }}</span>
+        <div class="auth-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+            {{ message }}
         </div>
         {% endfor %}
     </div>
@@ -58,33 +330,23 @@
         <!-- Step 1: Name -->
         <div class="form-step active" data-step="1">
             <div class="step-header">
-                <h2 class="step-title">Comment vous appelez-vous ?</h2>
-                <p class="step-subtitle">Entrez votre prénom pour commencer</p>
+                <h2 class="step-title">Votre prénom</h2>
+                <p class="step-subtitle">Comment devrions-nous vous appeler ?</p>
             </div>
             <div class="form-group">
-                <label for="first_name" class="form-label">
-                    <span class="label-text">Prénom</span>
-                    <span class="label-hint">*</span>
-                </label>
+                <label for="first_name" class="form-label">Prénom</label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    <input 
-                        type="text" 
-                        name="first_name" 
-                        id="first_name" 
-                        class="form-input"
-                        placeholder="Jean"
-                        required
-                        autofocus
-                    >
+                    <input type="text" name="first_name" id="first_name" class="form-input" placeholder="Jean" required autofocus>
+                    <div class="field-error">Ce champ est requis</div>
                 </div>
             </div>
-            <button type="button" class="btn btn-step-next" data-next="2">
-                <span class="btn-text">Suivant</span>
-                <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <button type="button" class="btn btn-primary btn-step-next" data-next="2">
+                Suivant
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
@@ -94,41 +356,30 @@
         <!-- Step 2: Phone -->
         <div class="form-step" data-step="2">
             <div class="step-header">
-                <h2 class="step-title">Votre numéro de téléphone</h2>
-                <p class="step-subtitle">Nous l'utiliserons comme identifiant unique</p>
+                <h2 class="step-title">Votre téléphone</h2>
+                <p class="step-subtitle">Votre identifiant de connexion</p>
             </div>
             <div class="form-group">
-                <label for="phone" class="form-label">
-                    <span class="label-text">Numéro de téléphone</span>
-                    <span class="label-hint">*</span>
-                </label>
+                <label for="phone" class="form-label">Numéro de téléphone</label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
-                    <input 
-                        type="tel" 
-                        name="phone" 
-                        id="phone" 
-                        class="form-input"
-                        placeholder="+33 6 12 34 56 78"
-                        required
-                        pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
-                    >
+                    <input type="tel" name="phone" id="phone" class="form-input" placeholder="+33 6 12 34 56 78" required pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$">
+                    <div class="field-error">Numéro invalide</div>
                 </div>
-                <p class="field-hint">Format: +33 6 12 34 56 78</p>
             </div>
             <div class="step-buttons">
-                <button type="button" class="btn btn-step-back" data-prev="1">
-                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button type="button" class="btn btn-secondary btn-step-back" data-prev="1">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    <span class="btn-text">Retour</span>
+                    Retour
                 </button>
-                <button type="button" class="btn btn-step-next" data-next="3">
-                    <span class="btn-text">Suivant</span>
-                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button type="button" class="btn btn-primary btn-step-next" data-next="3">
+                    Suivant
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
@@ -139,277 +390,53 @@
         <!-- Step 3: Password -->
         <div class="form-step" data-step="3">
             <div class="step-header">
-                <h2 class="step-title">Créez un mot de passe fort</h2>
+                <h2 class="step-title">Mot de passe</h2>
                 <p class="step-subtitle">Minimum 8 caractères</p>
             </div>
             <div class="form-group">
-                <label for="password" class="form-label">
-                    <span class="label-text">Mot de passe</span>
-                    <span class="label-hint">*</span>
-                </label>
+                <label for="password" class="form-label">Mot de passe</label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
-                    <input 
-                        type="password" 
-                        name="password" 
-                        id="password" 
-                        class="form-input"
-                        placeholder="••••••••"
-                        required
-                        autocomplete="new-password"
-                        minlength="8"
-                    >
-                    <button type="button" class="toggle-password" id="togglePassword" title="Afficher/masquer le mot de passe">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <input type="password" name="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="new-password" minlength="8">
+                    <button type="button" class="toggle-password" id="togglePassword">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
                     </button>
+                    <div class="field-error">Minimum 8 caractères</div>
                 </div>
             </div>
             <div class="step-buttons">
-                <button type="button" class="btn btn-step-back" data-prev="2">
-                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button type="button" class="btn btn-secondary btn-step-back" data-prev="2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    <span class="btn-text">Retour</span>
+                    Retour
                 </button>
-                <button type="submit" class="btn btn-signup-primary">
-                    <span class="btn-text">Créer mon compte</span>
-                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
-                        <line x1="12" y1="12" x2="12" y2="18"></line>
-                        <line x1="9" y1="15" x2="15" y2="15"></line>
-                    </svg>
+                <button type="submit" class="btn btn-primary">
+                    Créer mon compte
                 </button>
             </div>
         </div>
     </form>
 
-    <!-- Divider -->
-    <div class="form-divider">
-        <span class="divider-text">Vous avez déjà un compte?</span>
+    <div class="divider">
+        <span class="divider-text">Déjà inscrit ?</span>
     </div>
 
-    <!-- Login Link -->
-    <a href="{% url 'connexion' %}" class="btn btn-login-secondary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-            <polyline points="12 5 19 12 12 19"></polyline>
-        </svg>
-        <span class="btn-text">Se connecter</span>
-    </a>
+    <a href="{% url 'connexion' %}" class="btn-link">Se connecter</a>
 </div>
-
-<style>
-/* Mobile First Design */
-.auth-form-wrapper {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
-
-.auth-form {
-    width: 100%;
-}
-
-.form-input {
-    width: 100%;
-    padding: 0.875rem 1rem 0.875rem 3rem;
-    font-size: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    transition: border-color 0.2s ease;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #4f46e5;
-}
-
-.btn {
-    width: 100%;
-    min-height: 48px;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-}
-
-.btn-signup-primary {
-    background: #4f46e5;
-    color: white;
-}
-
-.btn-signup-primary:hover {
-    background: #4338ca;
-}
-
-.btn-login-secondary {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-login-secondary:hover {
-    background: #e5e7eb;
-}
-
-.form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-}
-
-.field-hint {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-
-/* Prevent horizontal scroll */
-body {
-    overflow-x: hidden;
-}
-
-/* Step Progress */
-.step-progress {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2rem;
-    padding: 0 1rem;
-}
-
-.step-indicator {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-}
-
-.step-indicator.active {
-    opacity: 1;
-}
-
-.step-number {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #e0e0e0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-}
-
-.step-indicator.active .step-number {
-    background: #4f46e5;
-    color: white;
-}
-
-.step-label {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-weight: 500;
-}
-
-.step-indicator.active .step-label {
-    color: #4f46e5;
-}
-
-.form-step {
-    display: none;
-}
-
-.form-step.active {
-    display: block;
-}
-
-.step-header {
-    margin-bottom: 1.5rem;
-}
-
-.step-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 0.5rem;
-}
-
-.step-subtitle {
-    font-size: 0.875rem;
-    color: #6b7280;
-}
-
-.step-buttons {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
-}
-
-.btn-step-next,
-.btn-step-back {
-    flex: 1;
-    padding: 0.875rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-    min-height: 48px;
-}
-
-.btn-step-next {
-    background: #4f46e5;
-    color: white;
-}
-
-.btn-step-next:hover {
-    background: #4338ca;
-}
-
-.btn-step-back {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-step-back:hover {
-    background: #e5e7eb;
-}
-</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('signupForm');
     const steps = document.querySelectorAll('.form-step');
-    const indicators = document.querySelectorAll('.step-indicator');
+    const dots = document.querySelectorAll('.progress-dot');
     const nextButtons = document.querySelectorAll('.btn-step-next');
     const backButtons = document.querySelectorAll('.btn-step-back');
     let currentStep = 1;
@@ -422,10 +449,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        indicators.forEach(indicator => {
-            indicator.classList.remove('active');
-            if (parseInt(indicator.dataset.step) === stepNumber) {
-                indicator.classList.add('active');
+        dots.forEach(dot => {
+            const dotStep = parseInt(dot.dataset.step);
+            dot.classList.remove('active', 'completed');
+            if (dotStep === stepNumber) {
+                dot.classList.add('active');
+            } else if (dotStep < stepNumber) {
+                dot.classList.add('completed');
             }
         });
 
@@ -434,17 +464,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function validateCurrentStep() {
         const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-        const inputs = currentStepEl.querySelectorAll('input[required]');
+        const input = currentStepEl.querySelector('input');
         let isValid = true;
 
-        inputs.forEach(input => {
-            if (!input.value.trim()) {
-                isValid = false;
-                input.style.borderColor = '#ef4444';
-            } else {
-                input.style.borderColor = '';
-            }
-        });
+        if (input && !input.value.trim()) {
+            isValid = false;
+            input.classList.add('error');
+        } else if (input) {
+            input.classList.remove('error');
+        }
+
+        if (input && input.minLength && input.value.length < input.minLength) {
+            isValid = false;
+            input.classList.add('error');
+        }
 
         return isValid;
     }
@@ -468,13 +501,19 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('togglePassword')?.addEventListener('click', function() {
         const input = document.getElementById('password');
         input.type = input.type === 'password' ? 'text' : 'password';
-        this.classList.toggle('active');
     });
 
     form.addEventListener('submit', function(e) {
         if (!validateCurrentStep()) {
             e.preventDefault();
         }
+    });
+
+    // Remove error on input
+    document.querySelectorAll('.form-input').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
     });
 });
 </script>

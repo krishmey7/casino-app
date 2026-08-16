@@ -4,49 +4,293 @@
 {% block title %}Connexion - Bet'A Casino{% endblock %}
 
 {% block content %}
-<div class="auth-form-wrapper">
-    <!-- Form Header -->
-    <div class="auth-form-header">
-        <h1 class="auth-form-title">Bienvenue</h1>
-        <p class="auth-form-subtitle">Connectez-vous à votre compte</p>
+<style>
+/* Modern Mobile First Design */
+body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    margin: 0;
+    padding: 1rem;
+    overflow-x: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.auth-card {
+    width: 90%;
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 1.25rem;
+}
+
+.auth-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 0.25rem 0;
+}
+
+.auth-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+/* Error Messages */
+.auth-messages {
+    margin-bottom: 1rem;
+}
+
+.auth-message {
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.auth-message.error {
+    background: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.auth-message.success {
+    background: #d1fae5;
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.375rem;
+}
+
+.form-input-wrapper {
+    position: relative;
+}
+
+.form-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 1rem 0 2.5rem;
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input::placeholder {
+    color: #9ca3af;
+}
+
+.input-icon {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    pointer-events: none;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: #9ca3af;
+    transition: color 0.2s ease;
+}
+
+.toggle-password:hover {
+    color: #667eea;
+}
+
+.field-error {
+    font-size: 0.75rem;
+    color: #dc2626;
+    margin-top: 0.25rem;
+    display: none;
+}
+
+.form-input.error {
+    border-color: #dc2626;
+}
+
+.form-input.error + .field-error {
+    display: block;
+}
+
+/* Form Extras */
+.form-extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    color: #374151;
+}
+
+.checkbox-input {
+    width: 1.125rem;
+    height: 1.125rem;
+    accent-color: #667eea;
+}
+
+.forgot-link {
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.btn-link {
+    background: none;
+    color: #667eea;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.5rem;
+    margin-top: 1rem;
+    display: block;
+    text-align: center;
+}
+
+.btn-link:hover {
+    text-decoration: underline;
+}
+
+.divider {
+    text-align: center;
+    margin: 1.25rem 0;
+    position: relative;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+.divider-text {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0 0.75rem;
+    color: #9ca3af;
+    font-size: 0.875rem;
+    position: relative;
+}
+</style>
+
+<div class="auth-card">
+    <div class="auth-header">
+        <h1 class="auth-title">Connexion</h1>
+        <p class="auth-subtitle">Bienvenue sur Bet'A Casino</p>
     </div>
 
-    <!-- Messages System -->
+    <!-- Messages -->
     {% if messages %}
     <div class="auth-messages">
         {% for message in messages %}
-        <div class="auth-message {% if message.tags %}auth-message-{{ message.tags }}{% endif %}" role="alert">
-            <div class="message-icon">
-                {% if message.tags == 'error' %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="15" y1="9" x2="9" y2="15"></line>
-                    <line x1="9" y1="9" x2="15" y2="15"></line>
-                </svg>
-                {% else %}
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                {% endif %}
-            </div>
-            <span class="message-text">{{ message }}</span>
+        <div class="auth-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
+            {{ message }}
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
     <!-- Login Form -->
-    <form method="POST" class="auth-form" novalidate>
+    <form method="POST" class="auth-form" novalidate id="loginForm">
         {% csrf_token %}
 
         <!-- Phone Field -->
         <div class="form-group">
-            <label for="phone" class="form-label">
-                <span class="label-text">Numéro de téléphone</span>
-                <span class="label-hint">*</span>
-            </label>
+            <label for="phone" class="form-label">Numéro de téléphone</label>
             <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                 </svg>
                 <input 
@@ -59,18 +303,15 @@
                     autocomplete="tel"
                     pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
                 >
+                <div class="field-error">Numéro invalide</div>
             </div>
-            <p class="field-hint">Format: +33 6 12 34 56 78</p>
         </div>
 
         <!-- Password Field -->
         <div class="form-group">
-            <label for="password" class="form-label">
-                <span class="label-text">Mot de passe</span>
-                <span class="label-hint">*</span>
-            </label>
+            <label for="password" class="form-label">Mot de passe</label>
             <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                 </svg>
@@ -83,12 +324,13 @@
                     required
                     autocomplete="current-password"
                 >
-                <button type="button" class="toggle-password" id="togglePassword" title="Afficher/masquer le mot de passe">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button type="button" class="toggle-password" id="togglePassword">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
                 </button>
+                <div class="field-error">Mot de passe requis</div>
             </div>
         </div>
 
@@ -96,166 +338,52 @@
         <div class="form-extras">
             <label class="checkbox-label">
                 <input type="checkbox" name="remember" id="remember" class="checkbox-input">
-                <span class="checkbox-text">Se souvenir de moi</span>
+                Se souvenir de moi
             </label>
             <a href="#" class="forgot-link">Mot de passe oublié?</a>
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" class="btn btn-login-primary">
-            <span class="btn-text">Se connecter</span>
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
+        <button type="submit" class="btn btn-primary">
+            Se connecter
         </button>
     </form>
 
-    <!-- Divider -->
-    <div class="form-divider">
-        <span class="divider-text">Nouveau sur Bet'A?</span>
+    <div class="divider">
+        <span class="divider-text">Pas encore de compte ?</span>
     </div>
 
-    <!-- Sign Up Link -->
-    <a href="{% url 'inscription' %}" class="btn btn-signup-secondary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-            <circle cx="8.5" cy="7" r="4"></circle>
-            <line x1="20" y1="8" x2="20" y2="14"></line>
-            <line x1="23" y1="11" x2="17" y2="11"></line>
-        </svg>
-        <span class="btn-text">Créer un compte</span>
-    </a>
-
-    <!-- Footer Text -->
-    <p class="auth-footer-text">
-        En vous connectant, vous acceptez nos 
-        <a href="#" class="footer-link">conditions d'utilisation</a> et notre 
-        <a href="#" class="footer-link">politique de confidentialité</a>
-    </p>
+    <a href="{% url 'inscription' %}" class="btn-link">Créer un compte</a>
 </div>
-
-<style>
-/* Mobile First Design */
-.auth-form-wrapper {
-    width: 100%;
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 1.5rem;
-}
-
-.auth-form {
-    width: 100%;
-}
-
-.form-input {
-    width: 100%;
-    padding: 0.875rem 1rem 0.875rem 3rem;
-    font-size: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    transition: border-color 0.2s ease;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #4f46e5;
-}
-
-.btn {
-    width: 100%;
-    min-height: 48px;
-    padding: 0.875rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 600;
-    border-radius: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-}
-
-.btn-login-primary {
-    background: #4f46e5;
-    color: white;
-}
-
-.btn-login-primary:hover {
-    background: #4338ca;
-}
-
-.btn-signup-secondary {
-    background: #f3f4f6;
-    color: #374151;
-}
-
-.btn-signup-secondary:hover {
-    background: #e5e7eb;
-}
-
-.form-group {
-    margin-bottom: 1.25rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #374151;
-}
-
-.field-hint {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    color: #6b7280;
-}
-
-/* Prevent horizontal scroll */
-body {
-    overflow-x: hidden;
-}
-
-/* Touch-friendly spacing */
-.form-extras {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    font-size: 0.875rem;
-}
-
-.checkbox-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
-}
-
-.checkbox-input {
-    width: 1.25rem;
-    height: 1.25rem;
-    accent-color: #4f46e5;
-}
-
-.forgot-link {
-    color: #4f46e5;
-    text-decoration: none;
-}
-
-.forgot-link:hover {
-    text-decoration: underline;
-}
-</style>
 
 <script>
 document.getElementById('togglePassword')?.addEventListener('click', function() {
     const input = document.getElementById('password');
     input.type = input.type === 'password' ? 'text' : 'password';
-    this.classList.toggle('active');
+});
+
+// Remove error on input
+document.querySelectorAll('.form-input').forEach(input => {
+    input.addEventListener('input', function() {
+        this.classList.remove('error');
+    });
+});
+
+// Form validation
+document.getElementById('loginForm')?.addEventListener('submit', function(e) {
+    const inputs = this.querySelectorAll('input[required]');
+    let isValid = true;
+
+    inputs.forEach(input => {
+        if (!input.value.trim()) {
+            isValid = false;
+            input.classList.add('error');
+        }
+    });
+
+    if (!isValid) {
+        e.preventDefault();
+    }
 });
 </script>
 {% endblock %}
