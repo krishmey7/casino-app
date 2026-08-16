@@ -174,6 +174,10 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Authentication URLs
+LOGIN_URL = 'connexion'
+# Redirect after successful login
+LOGIN_REDIRECT_URL = 'accueil'
 # Désactive WhiteNoise en développement pour éviter les 304 et accélérer le chargement
 if DEBUG:
     STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
