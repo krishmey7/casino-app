@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+# CSRF Trusted Origins for Render deployment
+CSRF_TRUSTED_ORIGINS = [
+    'https://casino-app-7rts.onrender.com',
+    'https://*.onrender.com',
+]
+
 # URL de redirection pour les utilisateurs non authentifiés
 LOGIN_URL = '/connexion/'
 LOGIN_REDIRECT_URL = '/'  # après connexion
