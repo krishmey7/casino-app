@@ -39,27 +39,28 @@
     <form method="POST" class="auth-form" novalidate>
         {% csrf_token %}
 
-        <!-- Email/Username Field -->
+        <!-- Phone Field -->
         <div class="form-group">
-            <label for="email" class="form-label">
-                <span class="label-text">Email ou Nom d'utilisateur</span>
+            <label for="phone" class="form-label">
+                <span class="label-text">Numéro de téléphone</span>
                 <span class="label-hint">*</span>
             </label>
             <div class="form-input-wrapper">
                 <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22 6 12 13 2 6"></polyline>
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                 </svg>
                 <input 
-                    type="text" 
+                    type="tel" 
                     name="email" 
-                    id="email" 
+                    id="phone" 
                     class="form-input"
-                    placeholder="votreemail@exemple.com"
+                    placeholder="+33 6 12 34 56 78"
                     required
-                    autocomplete="username"
+                    autocomplete="tel"
+                    pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
                 >
             </div>
+            <p class="field-hint">Format: +33 6 12 34 56 78</p>
         </div>
 
         <!-- Password Field -->
@@ -133,6 +134,122 @@
         <a href="#" class="footer-link">politique de confidentialité</a>
     </p>
 </div>
+
+<style>
+/* Mobile First Design */
+.auth-form-wrapper {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.auth-form {
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+.btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-login-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-login-primary:hover {
+    background: #4338ca;
+}
+
+.btn-signup-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-signup-secondary:hover {
+    background: #e5e7eb;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.field-hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Prevent horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+
+/* Touch-friendly spacing */
+.form-extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-input {
+    width: 1.25rem;
+    height: 1.25rem;
+    accent-color: #4f46e5;
+}
+
+.forgot-link {
+    color: #4f46e5;
+    text-decoration: none;
+}
+
+.forgot-link:hover {
+    text-decoration: underline;
+}
+</style>
 
 <script>
 document.getElementById('togglePassword')?.addEventListener('click', function() {

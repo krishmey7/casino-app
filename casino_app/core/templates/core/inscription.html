@@ -207,6 +207,90 @@
 </div>
 
 <style>
+/* Mobile First Design */
+.auth-form-wrapper {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+.auth-form {
+    width: 100%;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    font-size: 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    transition: border-color 0.2s ease;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #4f46e5;
+}
+
+.btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-signup-primary {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-signup-primary:hover {
+    background: #4338ca;
+}
+
+.btn-login-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-login-secondary:hover {
+    background: #e5e7eb;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.field-hint {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Prevent horizontal scroll */
+body {
+    overflow-x: hidden;
+}
+
+/* Step Progress */
 .step-progress {
     display: flex;
     justify-content: space-between;
@@ -288,10 +372,10 @@
 .btn-step-next,
 .btn-step-back {
     flex: 1;
-    padding: 0.75rem 1.5rem;
+    padding: 0.875rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
-    font-size: 0.875rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -299,6 +383,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     border: none;
+    min-height: 48px;
 }
 
 .btn-step-next {
