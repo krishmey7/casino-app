@@ -11,6 +11,22 @@
         <p class="auth-form-subtitle">Créez votre compte gratuitement</p>
     </div>
 
+    <!-- Progress Indicator -->
+    <div class="step-progress">
+        <div class="step-indicator active" data-step="1">
+            <div class="step-number">1</div>
+            <div class="step-label">Nom</div>
+        </div>
+        <div class="step-indicator" data-step="2">
+            <div class="step-number">2</div>
+            <div class="step-label">Téléphone</div>
+        </div>
+        <div class="step-indicator" data-step="3">
+            <div class="step-number">3</div>
+            <div class="step-label">Mot de passe</div>
+        </div>
+    </div>
+
     <!-- Messages System -->
     {% if messages %}
     <div class="auth-messages">
@@ -36,11 +52,15 @@
     {% endif %}
 
     <!-- Signup Form -->
-    <form method="POST" class="auth-form" novalidate>
+    <form method="POST" class="auth-form" novalidate id="signupForm">
         {% csrf_token %}
 
-        <!-- Name Fields Row -->
-        <div class="form-row-grid">
+        <!-- Step 1: Name -->
+        <div class="form-step active" data-step="1">
+            <div class="step-header">
+                <h2 class="step-title">Comment vous appelez-vous ?</h2>
+                <p class="step-subtitle">Entrez votre prénom pour commencer</p>
+            </div>
             <div class="form-group">
                 <label for="first_name" class="form-label">
                     <span class="label-text">Prénom</span>
@@ -58,155 +78,117 @@
                         class="form-input"
                         placeholder="Jean"
                         required
+                        autofocus
                     >
                 </div>
             </div>
+            <button type="button" class="btn btn-step-next" data-next="2">
+                <span class="btn-text">Suivant</span>
+                <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Step 2: Phone -->
+        <div class="form-step" data-step="2">
+            <div class="step-header">
+                <h2 class="step-title">Votre numéro de téléphone</h2>
+                <p class="step-subtitle">Nous l'utiliserons comme identifiant unique</p>
+            </div>
             <div class="form-group">
-                <label for="last_name" class="form-label">
-                    <span class="label-text">Nom</span>
+                <label for="phone" class="form-label">
+                    <span class="label-text">Numéro de téléphone</span>
                     <span class="label-hint">*</span>
                 </label>
                 <div class="form-input-wrapper">
                     <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="12" cy="7" r="4"></circle>
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
                     <input 
-                        type="text" 
-                        name="last_name" 
-                        id="last_name" 
+                        type="tel" 
+                        name="phone" 
+                        id="phone" 
                         class="form-input"
-                        placeholder="Dupont"
+                        placeholder="+33 6 12 34 56 78"
                         required
+                        pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$"
                     >
                 </div>
+                <p class="field-hint">Format: +33 6 12 34 56 78</p>
             </div>
-        </div>
-
-        <!-- Email Field -->
-        <div class="form-group">
-            <label for="email" class="form-label">
-                <span class="label-text">Email</span>
-                <span class="label-hint">*</span>
-            </label>
-            <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                    <polyline points="22 6 12 13 2 6"></polyline>
-                </svg>
-                <input 
-                    type="email" 
-                    name="email" 
-                    id="email" 
-                    class="form-input"
-                    placeholder="votreemail@exemple.com"
-                    required
-                    autocomplete="email"
-                >
-            </div>
-        </div>
-
-        <!-- Username Field -->
-        <div class="form-group">
-            <label for="username" class="form-label">
-                <span class="label-text">Nom d'utilisateur</span>
-                <span class="label-hint">*</span>
-            </label>
-            <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="12" cy="7" r="4"></circle>
-                </svg>
-                <input 
-                    type="text" 
-                    name="username" 
-                    id="username" 
-                    class="form-input"
-                    placeholder="jeandupont123"
-                    required
-                    autocomplete="username"
-                >
-            </div>
-        </div>
-
-        <!-- Password Field -->
-        <div class="form-group">
-            <label for="password" class="form-label">
-                <span class="label-text">Mot de passe</span>
-                <span class="label-hint">*</span>
-            </label>
-            <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <input 
-                    type="password" 
-                    name="password" 
-                    id="password" 
-                    class="form-input"
-                    placeholder="••••••••"
-                    required
-                    autocomplete="new-password"
-                >
-                <button type="button" class="toggle-password" id="togglePassword" title="Afficher/masquer le mot de passe">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
+            <div class="step-buttons">
+                <button type="button" class="btn btn-step-back" data-prev="1">
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
+                    <span class="btn-text">Retour</span>
                 </button>
-            </div>
-            <p class="field-hint">Au moins 8 caractères, mélange de majuscules et chiffres</p>
-        </div>
-
-        <!-- Confirm Password Field -->
-        <div class="form-group">
-            <label for="password_confirm" class="form-label">
-                <span class="label-text">Confirmer le mot de passe</span>
-                <span class="label-hint">*</span>
-            </label>
-            <div class="form-input-wrapper">
-                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <input 
-                    type="password" 
-                    name="password_confirm" 
-                    id="password_confirm" 
-                    class="form-input"
-                    placeholder="••••••••"
-                    required
-                    autocomplete="new-password"
-                >
-                <button type="button" class="toggle-password" id="togglePasswordConfirm" title="Afficher/masquer le mot de passe">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                        <circle cx="12" cy="12" r="3"></circle>
+                <button type="button" class="btn btn-step-next" data-next="3">
+                    <span class="btn-text">Suivant</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
                 </button>
             </div>
         </div>
 
-        <!-- Terms Checkbox -->
-        <label class="checkbox-label checkbox-large">
-            <input type="checkbox" name="terms" id="terms" class="checkbox-input" required>
-            <span class="checkbox-text">
-                J'accepte les <a href="#" class="footer-link">conditions d'utilisation</a> et la 
-                <a href="#" class="footer-link">politique de confidentialité</a>
-            </span>
-        </label>
-
-        <!-- Submit Button -->
-        <button type="submit" class="btn btn-signup-primary">
-            <span class="btn-text">Créer mon compte</span>
-            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                <circle cx="12" cy="7" r="4"></circle>
-                <line x1="12" y1="12" x2="12" y2="18"></line>
-                <line x1="9" y1="15" x2="15" y2="15"></line>
-            </svg>
-        </button>
+        <!-- Step 3: Password -->
+        <div class="form-step" data-step="3">
+            <div class="step-header">
+                <h2 class="step-title">Créez un mot de passe fort</h2>
+                <p class="step-subtitle">Minimum 8 caractères</p>
+            </div>
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <span class="label-text">Mot de passe</span>
+                    <span class="label-hint">*</span>
+                </label>
+                <div class="form-input-wrapper">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="password" 
+                        class="form-input"
+                        placeholder="••••••••"
+                        required
+                        autocomplete="new-password"
+                        minlength="8"
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword" title="Afficher/masquer le mot de passe">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <div class="step-buttons">
+                <button type="button" class="btn btn-step-back" data-prev="2">
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    <span class="btn-text">Retour</span>
+                </button>
+                <button type="submit" class="btn btn-signup-primary">
+                    <span class="btn-text">Créer mon compte</span>
+                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                        <line x1="12" y1="12" x2="12" y2="18"></line>
+                        <line x1="9" y1="15" x2="15" y2="15"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
     </form>
 
     <!-- Divider -->
@@ -222,25 +204,193 @@
         </svg>
         <span class="btn-text">Se connecter</span>
     </a>
-
-    <!-- Footer Text -->
-    <p class="auth-footer-text">
-        Des questions? Consultez notre <a href="#" class="footer-link">centre d'aide</a> ou 
-        <a href="#" class="footer-link">contactez le support</a>
-    </p>
 </div>
 
-<script>
-document.getElementById('togglePassword')?.addEventListener('click', function() {
-    const input = document.getElementById('password');
-    input.type = input.type === 'password' ? 'text' : 'password';
-    this.classList.toggle('active');
-});
+<style>
+.step-progress {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+}
 
-document.getElementById('togglePasswordConfirm')?.addEventListener('click', function() {
-    const input = document.getElementById('password_confirm');
-    input.type = input.type === 'password' ? 'text' : 'password';
-    this.classList.toggle('active');
+.step-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.5;
+    transition: opacity 0.3s ease;
+}
+
+.step-indicator.active {
+    opacity: 1;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.step-indicator.active .step-number {
+    background: #4f46e5;
+    color: white;
+}
+
+.step-label {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.step-indicator.active .step-label {
+    color: #4f46e5;
+}
+
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+}
+
+.step-header {
+    margin-bottom: 1.5rem;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.step-subtitle {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.step-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-step-next,
+.btn-step-back {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btn-step-next {
+    background: #4f46e5;
+    color: white;
+}
+
+.btn-step-next:hover {
+    background: #4338ca;
+}
+
+.btn-step-back {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.btn-step-back:hover {
+    background: #e5e7eb;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signupForm');
+    const steps = document.querySelectorAll('.form-step');
+    const indicators = document.querySelectorAll('.step-indicator');
+    const nextButtons = document.querySelectorAll('.btn-step-next');
+    const backButtons = document.querySelectorAll('.btn-step-back');
+    let currentStep = 1;
+
+    function showStep(stepNumber) {
+        steps.forEach(step => {
+            step.classList.remove('active');
+            if (parseInt(step.dataset.step) === stepNumber) {
+                step.classList.add('active');
+            }
+        });
+
+        indicators.forEach(indicator => {
+            indicator.classList.remove('active');
+            if (parseInt(indicator.dataset.step) === stepNumber) {
+                indicator.classList.add('active');
+            }
+        });
+
+        currentStep = stepNumber;
+    }
+
+    function validateCurrentStep() {
+        const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+        const inputs = currentStepEl.querySelectorAll('input[required]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+                input.style.borderColor = '#ef4444';
+            } else {
+                input.style.borderColor = '';
+            }
+        });
+
+        return isValid;
+    }
+
+    nextButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            if (validateCurrentStep()) {
+                const nextStep = parseInt(this.dataset.next);
+                showStep(nextStep);
+            }
+        });
+    });
+
+    backButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const prevStep = parseInt(this.dataset.prev);
+            showStep(prevStep);
+        });
+    });
+
+    document.getElementById('togglePassword')?.addEventListener('click', function() {
+        const input = document.getElementById('password');
+        input.type = input.type === 'password' ? 'text' : 'password';
+        this.classList.toggle('active');
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (!validateCurrentStep()) {
+            e.preventDefault();
+        }
+    });
 });
 </script>
 {% endblock %}
