@@ -1,0 +1,301 @@
+/* ===================================================
+   FORM VALIDATION & INTERACTION STYLES
+   =================================================== */
+
+/* Input Valid State */
+.input-valid {
+    border-color: #22c55e !important;
+    background: rgba(34, 197, 94, 0.05) !important;
+}
+
+.input-valid:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+}
+
+/* Input Error State */
+.input-error {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* Error Message */
+.input-error-msg {
+    display: block;
+    font-size: 0.8rem;
+    color: #fca5a5;
+    margin-top: 0.4rem;
+    font-weight: 500;
+}
+
+/* Message Close Button */
+.message-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+    transition: color 0.3s ease;
+}
+
+.message-close:hover {
+    color: var(--white);
+}
+
+/* Notification Toast */
+.notification {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 300px;
+    max-width: 90%;
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    z-index: 9999;
+    animation: slideInUp 0.4s ease-out;
+}
+
+.notification-info {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.5);
+    color: #93c5fd;
+}
+
+.notification-success {
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.5);
+    color: #86efac;
+}
+
+.notification-error {
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    color: #fca5a5;
+}
+
+.notification-warning {
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    color: #fef08a;
+}
+
+/* Loading State */
+.is-loading {
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+}
+
+.is-loading::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="12" cy="12" r="1"><animate attributeName="r" values="1;8;1" dur="1.5s" repeatCount="indefinite"/><animate attributeName="opacity" values="1;0;1" dur="1.5s" repeatCount="indefinite"/></circle></svg>') center no-repeat;
+    border-radius: inherit;
+}
+
+/* Disabled State */
+:disabled,
+.btn:disabled,
+.btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Focus Visible for Accessibility */
+:focus-visible {
+    outline: 2px solid var(--cyan-glow);
+    outline-offset: 2px;
+}
+
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--cyan-glow);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Mobile Navbar Styles */
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    align-items: flex-end;
+}
+
+.mobile-menu {
+    background: rgba(15, 23, 42, 0.95);
+    width: 100%;
+    min-height: 50vh;
+    max-height: 90vh;
+    border-radius: 20px 20px 0 0;
+    padding: 1.5rem;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+    animation: slideInUp 0.3s ease-out;
+}
+
+.mobile-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    color: var(--white);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.mobile-menu-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mobile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item:active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cyan-glow);
+}
+
+.mobile-menu-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+}
+
+.mobile-menu-text {
+    font-weight: 600;
+}
+
+/* Hover Effects on Cards */
+.game-grid-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(212, 175, 55, 0.2));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 16px;
+    z-index: 1;
+}
+
+.game-grid-card:active {
+    transform: scale(0.98);
+}
+
+/* Active States */
+.nav-item.active,
+.mobile-menu-item.active {
+    color: var(--cyan-glow);
+    border-left: 3px solid var(--cyan-glow);
+}
+
+/* Print Styles */
+@media print {
+    .auth-body,
+    .auth-card,
+    body {
+        background: white;
+        color: black;
+    }
+
+    .btn,
+    button {
+        border: 1px solid #999;
+        background: white;
+        color: black;
+    }
+
+    [class*='icon'],
+    svg {
+        display: none;
+    }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: more) {
+    :root {
+        --gold: #ffb700;
+        --cyan-glow: #00e5ff;
+    }
+
+    .form-input,
+    .btn {
+        border-width: 2px;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Dark Mode (additional) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* Light Mode Override (if user selects) */
+@media (prefers-color-scheme: light) {
+    .auth-body {
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+        color: #0f172a;
+    }
+
+    .auth-card {
+        background: rgba(255, 255, 255, 0.9);
+        color: #0f172a;
+    }
+
+    .form-input {
+        background: rgba(0, 0, 0, 0.05);
+        color: #0f172a;
+        border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .form-input::placeholder {
+        color: rgba(0, 0, 0, 0.4);
+    }
+}

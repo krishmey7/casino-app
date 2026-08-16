@@ -1,0 +1,400 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keno - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 15px;
+        }
+        .info-item {
+            font-size: 1.1em;
+            padding: 10px 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+        }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #00d4ff;
+        }
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .number-btn {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #0f3460, #1a5276);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            padding: 10px;
+        }
+        .number-btn:hover:not(.selected):not(.drawn) {
+            background: linear-gradient(135deg, #1a5276, #2874a6);
+        }
+        .number-btn.selected {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            border-color: #00d4ff;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        .number-btn.drawn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            border-color: #90EE90;
+            color: #000;
+        }
+        .drawn-numbers {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .drawn-title {
+            color: #00d4ff;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .drawn-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .drawn-number {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+        .result-message {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title {
+            color: #00d4ff;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        .picks-info {
+            padding: 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .picks-info strong { color: #00d4ff; }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .numbers-grid { grid-template-columns: repeat(5, 1fr); }
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ui.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 KENO 🎯</h1>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+                <div class="info-item">Numéros sélectionnés: <strong id="pickCount">0</strong>/20</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Grille Keno (Choisissez 1-20 numéros)</div>
+                
+                <div class="numbers-grid" id="numbersGrid"></div>
+
+                <div class="drawn-numbers" id="drawnNumbers" style="display: none;">
+                    <div class="drawn-title">Numéros tirés:</div>
+                    <div class="drawn-list" id="drawnList"></div>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="picks-info">
+                    Sélections: <strong id="picksInfo">0/20</strong>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="100" min="1" max="10000" step="10">
+                </div>
+
+                <button id="playBtn">Jouer</button>
+                <button id="clearBtn">Réinitialiser</button>
+                <div class="error-message" id="errorMessage"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/keno';
+        let currentBalance = 0;
+        let selectedNumbers = [];
+
+        function initializeGrid() {
+            const grid = document.getElementById('numbersGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 80; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'number-btn';
+                btn.textContent = i;
+                btn.addEventListener('click', () => toggleNumber(i, btn));
+                grid.appendChild(btn);
+            }
+        }
+
+        function toggleNumber(num, btn) {
+            const idx = selectedNumbers.indexOf(num);
+            if (idx > -1) {
+                selectedNumbers.splice(idx, 1);
+                btn.classList.remove('selected');
+            } else {
+                if (selectedNumbers.length < 20) {
+                    selectedNumbers.push(num);
+                    selectedNumbers.sort((a, b) => a - b);
+                    btn.classList.add('selected');
+                }
+            }
+            updatePickCount();
+        }
+
+        function updatePickCount() {
+            document.getElementById('pickCount').textContent = selectedNumbers.length;
+            document.getElementById('picksInfo').textContent = selectedNumbers.length + '/20';
+        }
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            const errorMsg = document.getElementById('errorMessage');
+            errorMsg.textContent = '';
+
+            if (selectedNumbers.length === 0) {
+                errorMsg.textContent = 'Sélectionnez au moins 1 numéro';
+                return;
+            }
+
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            if (bet <= 0 || bet > currentBalance) {
+                errorMsg.textContent = 'Mise invalide';
+                return;
+            }
+
+            try {
+                document.getElementById('playBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet, picks: selectedNumbers })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    errorMsg.textContent = data.error || 'Erreur serveur';
+                    document.getElementById('playBtn').disabled = false;
+                    return;
+                }
+
+                displayResults(data);
+                updateBalance();
+
+            } catch (error) {
+                errorMsg.textContent = 'Erreur: ' + error.message;
+                document.getElementById('playBtn').disabled = false;
+            }
+        });
+
+        function displayResults(game) {
+            const drawnSet = new Set(game.drawn_numbers);
+            const buttons = document.querySelectorAll('.number-btn');
+            
+            buttons.forEach((btn, idx) => {
+                const num = idx + 1;
+                if (drawnSet.has(num)) {
+                    btn.classList.add('drawn');
+                }
+            });
+
+            const drawnEl = document.getElementById('drawnNumbers');
+            const drawnList = document.getElementById('drawnList');
+            drawnList.innerHTML = game.drawn_numbers.map(n => 
+                `<div class="drawn-number">${n}</div>`
+            ).join('');
+            drawnEl.style.display = 'block';
+
+            const msg = document.getElementById('resultMessage');
+            if (game.result === 'win') {
+                msg.innerHTML = `🎉 Gagné! <br> Correspondances: ${game.matches} <br> Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else {
+                msg.textContent = `Perdu! Correspondances: ${game.matches} sur ${selectedNumbers.length}`;
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+        }
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            selectedNumbers = [];
+            document.querySelectorAll('.number-btn').forEach(btn => {
+                btn.classList.remove('selected', 'drawn');
+            });
+            document.getElementById('drawnNumbers').style.display = 'none';
+            document.getElementById('resultMessage').style.display = 'none';
+            document.getElementById('errorMessage').textContent = '';
+            document.getElementById('playBtn').disabled = false;
+            updatePickCount();
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        initializeGrid();
+        updateBalance();
+    </script>
+</body>
+</html>

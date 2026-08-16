@@ -1,0 +1,579 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craps - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+        }
+
+        .help-button {
+            background: rgba(0, 212, 255, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .help-button:hover {
+            background: #00d4ff;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #00d4ff;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #0099cc;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            color: #ff6b00;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 8px;
+        }
+
+        .modal-section-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        .header-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .header-balance {
+            text-align: center;
+        }
+
+        .balance-label {
+            color: #aaa;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .balance-amount {
+            color: #00ff00;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            color: #00d4ff;
+        }
+        .dice-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .dice {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            border: 3px solid #0f3460;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: #000;
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .point-display {
+            text-align: center;
+            font-size: 1.3em;
+            color: #00d4ff;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 8px;
+        }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+        }
+        .control-title {
+            color: #00d4ff;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .dice { width: 80px; height: 80px; font-size: 36px; }
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ui.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">🎲 Craps 🎲</div>
+            <div class="header-balance">
+                <div class="balance-label">Solde</div>
+                <div class="balance-amount" id="headerBalance">0.00 CDF</div>
+            </div>
+            <button class="help-button" id="helpButton" title="Aide">?</button>
+        </div>
+
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <div class="modal-title">📋 Comment Jouer au Craps</div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🎮 Objectif du Jeu</div>
+                    <div class="modal-section-content">
+                        Le craps est un jeu de dés où vous pariez sur le résultat du lancer de deux dés. Le but est de prédire si le lanceur va gagner ou perdre selon les règles complexes du jeu.
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🎲 Les Lancers</div>
+                    <div class="modal-section-content">
+                        • <strong>Come Out Roll</strong> : Premier lancer de la manche<br>
+                        • <strong>Point</strong> : Si 4,5,6,8,9,10 sort, devient le point à refaire<br>
+                        • <strong>Seven Out</strong> : Si 7 sort après un point, la manche se termine
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">💰 Types de Paris</div>
+                    <div class="modal-section-content">
+                        <ol class="strategy-list">
+                            <li><strong>Pass Line</strong> : Pari sur le lanceur (avant le come out)</li>
+                            <li><strong>Don't Pass</strong> : Pari contre le lanceur</li>
+                            <li><strong>Come</strong> : Comme Pass Line mais après le point</li>
+                            <li><strong>Don't Come</strong> : Comme Don't Pass mais après le point</li>
+                            <li><strong>Place Bets</strong> : Sur des numéros spécifiques (4,5,6,8,9,10)</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🏆 Résultats et Paiements</div>
+                    <div class="modal-section-content">
+                        • <strong>Come Out 7 ou 11</strong> : Pass Line gagne (1:1)<br>
+                        • <strong>Come Out 2, 3 ou 12</strong> : Pass Line perd (Craps)<br>
+                        • <strong>Point établi puis refait</strong> : Pass Line gagne (1:1)<br>
+                        • <strong>7 avant le point</strong> : Pass Line perd<br>
+                        • <strong>Place Bets</strong> : Paiements variables selon le numéro
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">💡 Règles Importantes</div>
+                    <div class="modal-section-content">
+                        • Le 7 est le numéro le plus probable<br>
+                        • Les craps (2,3,12) sont défavorables au lanceur<br>
+                        • Une fois le point établi, on essaie de le refaire avant le 7<br>
+                        • La maison a toujours un léger avantage
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">⚠️ Conseils Importants</div>
+                    <div class="modal-section-content">
+                        • Jouez de manière responsable<br>
+                        • Définissez un budget<br>
+                        • Les jeux de hasard comportent des risques<br>
+                        • Ne misez que ce que vous pouvez perdre
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Table de Craps</div>
+                
+                <div class="dice-display">
+                    <div id="dice1" class="dice">?</div>
+                    <div id="dice2" class="dice">?</div>
+                </div>
+
+                <div class="point-display" id="pointDisplay" style="display: none;">Point établi: <strong id="pointValue">0</strong></div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="100" min="1" max="10000" step="10">
+                    <div class="error-message" id="betError"></div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betType">Type de pari</label>
+                    <select id="betType">
+                        <option value="pass">Pass (Passer)</option>
+                        <option value="dont_pass">Don't Pass</option>
+                    </select>
+                </div>
+
+                <button id="startBtn">Lancer les dés</button>
+                <button id="rollAgainBtn" disabled>Relancer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/craps';
+        let currentBalance = 0;
+        let currentGame = null;
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('headerBalance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        function validateBet() {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            const error = document.getElementById('betError');
+            error.textContent = '';
+
+            if (isNaN(bet) || bet <= 0) {
+                error.textContent = 'La mise doit être positive';
+                return false;
+            }
+            if (bet > currentBalance) {
+                error.textContent = 'Solde insuffisant';
+                return false;
+            }
+            return true;
+        }
+
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            if (!validateBet()) return;
+
+            const bet = document.getElementById('betAmount').value;
+            const betType = document.getElementById('betType').value;
+
+            try {
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('resultMessage').style.display = 'none';
+                document.getElementById('pointDisplay').style.display = 'none';
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet, bet_type: betType })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    document.getElementById('betError').textContent = data.error || 'Erreur serveur';
+                    document.getElementById('startBtn').disabled = false;
+                    return;
+                }
+
+                currentGame = data;
+                displayResult(data);
+                updateBalance();
+
+                if (data.status === 'point_established') {
+                    document.getElementById('rollAgainBtn').disabled = false;
+                } else {
+                    document.getElementById('startBtn').disabled = false;
+                }
+
+            } catch (error) {
+                document.getElementById('betError').textContent = 'Erreur: ' + error.message;
+                document.getElementById('startBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('rollAgainBtn').addEventListener('click', async () => {
+            try {
+                document.getElementById('rollAgainBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/${currentGame.id}/roll_again/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert('Erreur: ' + (data.error || 'Erreur serveur'));
+                    document.getElementById('rollAgainBtn').disabled = false;
+                    return;
+                }
+
+                currentGame = data;
+                displayResult(data);
+                updateBalance();
+
+                if (data.status === 'finished') {
+                    document.getElementById('rollAgainBtn').disabled = true;
+                    document.getElementById('startBtn').disabled = false;
+                } else {
+                    document.getElementById('rollAgainBtn').disabled = false;
+                }
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('rollAgainBtn').disabled = false;
+            }
+        });
+
+        function displayResult(game) {
+            const dice = game.dice_roll;
+            document.getElementById('dice1').textContent = dice[0];
+            document.getElementById('dice2').textContent = dice[1];
+
+            if (game.point > 0) {
+                document.getElementById('pointDisplay').style.display = 'block';
+                document.getElementById('pointValue').textContent = game.point;
+            }
+
+            if (game.status === 'finished') {
+                const msg = document.getElementById('resultMessage');
+                if (game.result === 'win') {
+                    msg.textContent = `🎉 Gagné! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                    msg.className = 'result-message result-win';
+                } else {
+                    msg.textContent = `Perdu! Total: 0.00 CDF`;
+                    msg.className = 'result-message result-lose';
+                }
+                msg.style.display = 'block';
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Modal Help
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeModal = document.getElementById('closeModal');
+
+        helpButton.addEventListener('click', () => {
+            helpModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
+
+        updateBalance();
+    </script>
+</body>
+</html>

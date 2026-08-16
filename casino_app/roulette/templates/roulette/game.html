@@ -1,0 +1,887 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Roulette - Casino</title>
+    <style>
+        :root {
+            --bg: #0b0f21;
+            --card: rgba(16, 23, 43, 0.95);
+            --text: #f5f7ff;
+            --muted: #a9b0c6;
+            --accent: #ffcf4f;
+            --danger: #ff4b5c;
+            --success: #6be2a4;
+            --border: rgba(255, 255, 255, 0.15);
+            --shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at top, #14224e 0%, #091123 55%, #02050f 100%);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app {
+            width: min(100%, 1200px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            padding: 28px;
+            backdrop-filter: blur(2px);
+        }
+
+        .appelation {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .appelation h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #ffcf4f, #ff9f2f);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.9fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+
+        @media (max-width: 900px) {
+            .layout { 
+                grid-template-columns: 1fr; 
+            }
+        }
+
+        .roulette-panel, .info-panel {
+            background: linear-gradient(145deg, rgba(26, 35, 61, 0.92), rgba(15, 24, 49, 0.85));
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(4px);
+            padding: 20px;
+        }
+
+        .roulette-wrap {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+        }
+
+        .wheel-container {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            overflow: visible;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            transition: transform 4s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+            transform-origin: center center;
+            will-change: transform;
+        }
+
+        .wheel svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+        }
+
+        .wheel-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 18%;
+            height: 18%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, #f5d867, #cc9f2f, #8f5f09);
+            border: 4px solid rgba(255,255,255,.9);
+            box-shadow: 0 0 20px rgba(0,0,0,.5);
+            z-index: 2;
+        }
+
+        .pointer {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 65px solid #ffea61;
+            filter: drop-shadow(0 0 12px rgba(255,255,255,0.9));
+            z-index: 3;
+        }
+
+        .pointer-label {
+            position: absolute;
+            top: -55px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #ffcf4f;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            white-space: nowrap;
+            border: 1px solid #ffcf4f;
+            z-index: 4;
+        }
+
+        .info-panel h3 {
+            margin: 0 0 16px 0;
+            font-size: 1.2rem;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-line {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(125, 137, 168, 0.15);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        .stat-line strong { 
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .field {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field input { 
+            width: 100%; 
+            border: 1px solid rgba(255,255,255,.25); 
+            border-radius: 12px; 
+            background: rgba(0,0,0,.3); 
+            color: #f5f5fb; 
+            padding: 12px 16px;
+            font-size: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            margin-top: 20px;
+            border: none;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #ffb423 0%, #fb9e15 100%);
+            color: #1a1a2e;
+            font-weight: 800;
+            font-size: 1.05rem;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-3px); 
+            filter: brightness(1.1);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message-info { 
+            margin-top: 16px; 
+            border-radius: 12px; 
+            background: rgba(57, 84, 156, 0.3); 
+            padding: 14px; 
+            font-size: 0.9rem;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .history { 
+            margin-top: 8px;
+        }
+
+        .history table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .history th, .history td {
+            border: 1px solid rgba(255,255,255,.12);
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .history th { 
+            background: rgba(13, 24, 45, .8); 
+            color: #ffcf4f;
+        }
+
+        .status-gagné { 
+            color: #6be2a4; 
+            font-weight: 700;
+        }
+
+        .status-perdu { 
+            color: #ff4b5c; 
+            font-weight: 700;
+        }
+
+        .highlight-number {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 0 gold; }
+            50% { transform: scale(1.2); text-shadow: 0 0 15px gold; }
+        }
+
+        .winner-segment {
+            filter: drop-shadow(0 0 15px gold) !important;
+            transition: all 0.3s ease;
+        }
+        
+        .winner-text {
+            font-size: 24px !important;
+            font-weight: 900 !important;
+            fill: #ffcf4f !important;
+            stroke: black !important;
+            stroke-width: 1.5 !important;
+        }
+
+
+
+:root {
+    --bg: #0b0f21;
+    --card: rgba(16, 23, 43, 0.95);
+    --text: #f5f7ff;
+    --muted: #a9b0c6;
+    --accent: #ffcf4f;
+    --danger: #ff4b5c;
+    --success: #6be2a4;
+    --border: rgba(255, 255, 255, 0.15);
+    --shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+* { 
+    box-sizing: border-box; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top, #14224e 0%, #091123 55%, #02050f 100%);
+    color: var(--text);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.app {
+    width: min(100%, 1200px);
+    background: var(--card);
+    border-radius: 28px;
+    box-shadow: var(--shadow);
+    padding: 28px;
+}
+
+/* TITRE */
+.appelation {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.appelation h1 {
+    font-size: 2.2rem;
+}
+
+/* LAYOUT DESKTOP */
+.layout {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 24px;
+}
+
+/* PANELS */
+.roulette-panel, .info-panel {
+    border-radius: 24px;
+    padding: 20px;
+    background: rgba(20,20,40,0.7);
+}
+
+/* ROULETTE */
+.roulette-wrap {
+    position: relative;
+    max-width: 500px;
+    margin: auto;
+    aspect-ratio: 1;
+}
+
+.pointer {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 65px solid #ffea61;
+}
+
+/* INFO */
+.info-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.stat-line {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* INPUT */
+.field input {
+    width: 100%;
+    padding: 12px;
+}
+
+/* BTN */
+.btn {
+    width: 100%;
+    padding: 14px;
+}
+
+/* TABLE */
+.history table {
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+/* ========================= */
+/* 🔥 MEDIA QUERY TABLETTE */
+/* ========================= */
+@media (max-width: 1024px) {
+
+    .layout {
+        grid-template-columns: 1fr;
+    }
+
+    .roulette-wrap {
+        max-width: 350px;
+    }
+
+    .appelation h1 {
+        font-size: 1.8rem;
+    }
+
+    .info-panel {
+        padding: 18px;
+    }
+}
+
+/* ========================= */
+/* 📱 MOBILE */
+/* ========================= */
+@media (max-width: 768px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .app {
+        padding: 16px;
+    }
+
+    .appelation h1 {
+        font-size: 1.5rem;
+    }
+
+    .appelation p {
+        font-size: 0.9rem;
+    }
+
+    .layout {
+        gap: 15px;
+    }
+
+    .roulette-wrap {
+        transform: scale(0.9);
+    }
+
+    .pointer {
+        border-left: 12px solid transparent;
+        border-right: 12px solid transparent;
+        border-top: 40px solid #ffea61;
+    }
+
+    .stat-line {
+        font-size: 0.9rem;
+    }
+
+    .btn {
+        font-size: 1rem;
+        padding: 12px;
+    }
+
+    .history table {
+        font-size: 0.75rem;
+    }
+}
+
+/* ========================= */
+/* 📱 PETITS ÉCRANS */
+/* ========================= */
+@media (max-width: 480px) {
+
+    .appelation h1 {
+        font-size: 1.3rem;
+    }
+
+    .roulette-wrap {
+        transform: scale(0.75);
+    }
+
+    .pointer-label {
+        font-size: 0.7rem;
+    }
+
+    .info-panel h3 {
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .message-info {
+        font-size: 0.8rem;
+    }
+
+    .history table {
+        font-size: 0.7rem;
+    }
+}
+</style>
+
+        
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ui.css' %}">
+</head>
+<body>
+    <main class="app">
+        <section class="appelation">
+            <h1>🎰 Roulette Européenne</h1>
+
+        </section>
+
+        <div class="layout">
+            <section class="roulette-panel">
+                <div class="roulette-wrap">
+                    <div class="pointer-label">▲ RÉSULTAT ICI ▲</div>
+                    <div class="wheel-container">
+                        <div class="wheel" id="wheel">
+                            <svg viewBox="0 0 300 300" id="wheelSvg"></svg>
+                        </div>
+                    </div>
+                    <div class="wheel-center"></div>
+                    <div class="pointer"></div>
+                </div>
+            </section>
+
+            <aside class="info-panel">
+                <button class="btn" id="playButton">🎡 Lancer la roulette</button>  
+
+                <div class="field">
+                    <label>💵 Montant de la mise (CDF)</label>
+                    <input id="mise" type="number" placeholder="100.00" min="1" step="0.01" value="100.00" />
+                </div>
+                <div class="field">
+                    <label>🎲 Votre numéro (0-36)</label>
+                    <input id="numero_pari" type="number" placeholder="0" min="0" max="36" value="0" />
+                </div>
+                
+
+                <div class="message-info" id="messageResult">
+                    ✨ Le résultat apparaît 
+                </div>
+
+
+
+                <h3>🎲 Tableau de contrôle</h3>
+                <div class="info-grid">
+                    <div class="stat-line">
+                        <span>💰 Solde actuel</span>
+                        <span><strong id="soldeDisplay">{{ solde|floatformat:2 }} CDF</strong></span>
+                    </div>
+                    <div class="stat-line">
+                        <span>🎯 Dernier numéro</span>
+                        <span><strong id="lastNumber" style="font-size: 1.5em; background: #ffea6120; padding: 5px 15px; border-radius: 30px;">{{ partie.numero_tire|default:'—' }}</strong></span>
+                    </div>
+                    <div class="stat-line">
+                        <span>📊 Statut</span>
+                        <span><strong id="statusDisplay">{{ partie.statut|default:'—' }}</strong></span>
+                    </div>
+                    <div class="stat-line">
+                        <span>🏆 Gain</span>
+                        <span><strong id="gainDisplay">{{ partie.gain|default:'0.00' }} CDF</strong></span>
+                    </div>
+                </div>
+
+                
+            </aside>
+        </div>
+
+        <section class="history">
+            <h3>📜 Historique (10 dernières parties)</h3>
+            <div style="overflow-x: auto;">
+                 <table>
+                    <thead>
+                         <tr>
+                            <th>Date</th>
+                            <th>Mise</th>
+                            <th>Votre pari</th>
+                            <th>Résultat</th>
+                            <th>Statut</th>
+                            <th>Gain</th>
+                         </tr>
+                    </thead>
+                    <tbody id="historyBody">
+                        {% for p in parties %}
+                         <tr>
+                             <td>{{ p.created_at|date:"d/m/Y H:i" }}</td>
+                             <td>{{ p.mise }} CDF</td>
+                             <td>{{ p.numero_pari }}</td>
+                             <td><strong style="color:#ffea61;font-size:1.2em;background:rgba(0,0,0,0.3);padding:2px 12px;border-radius:25px;">{{ p.numero_tire }}</strong></td>
+                            <td class="status-{{ p.statut }}">{{ p.statut }}</td>
+                             <td>{{ p.gain }} CDF</td>
+                         </tr>
+                        {% empty %}
+                         <tr><td colspan="6">Aucun historique</td></tr>
+                        {% endfor %}
+                    </tbody>
+                 </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const rouletteOrdre = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
+        
+        const getNumberColor = (num) => {
+            if (num === 0) return '#2ecc71';
+            const reds = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+            return reds.includes(num) ? '#e74c3c' : '#2c3e50';
+        };
+
+        let isSpinning = false;
+        let currentRotation = 0;
+        let currentHighlightedIndex = -1;
+        let svgPaths = [];
+        let svgTexts = [];
+
+        function renderWheel() {
+            const svg = document.getElementById('wheelSvg');
+            svg.innerHTML = '';
+            svgPaths = [];
+            svgTexts = [];
+            
+            const segments = rouletteOrdre.length;
+            const anglePerSegment = 360 / segments;
+            
+            rouletteOrdre.forEach((value, idx) => {
+                const start = idx * anglePerSegment;
+                const end = (idx + 1) * anglePerSegment;
+                const startRad = start * Math.PI / 180;
+                const endRad = end * Math.PI / 180;
+                
+                const x1 = 150 + 150 * Math.cos(startRad);
+                const y1 = 150 + 150 * Math.sin(startRad);
+                const x2 = 150 + 150 * Math.cos(endRad);
+                const y2 = 150 + 150 * Math.sin(endRad);
+                
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                path.setAttribute('d', `M 150 150 L ${x1} ${y1} A 150 150 0 0 1 ${x2} ${y2} Z`);
+                path.setAttribute('fill', getNumberColor(value));
+                path.setAttribute('stroke', 'rgba(255,255,255,0.3)');
+                path.setAttribute('stroke-width', '1');
+                svg.appendChild(path);
+                svgPaths.push(path);
+                
+                // Position du texte - toujours à l'endroit
+                const midAngle = start + anglePerSegment / 2;
+                const midRad = midAngle * Math.PI / 180;
+                const tx = 150 + 115 * Math.cos(midRad);
+                const ty = 150 + 115 * Math.sin(midRad);
+                
+                // Créer un groupe pour le texte avec rotation pour qu'il reste droit
+                const textGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                
+                // Calculer l'orientation du texte pour qu'il soit toujours lisible
+                // On veut que le texte soit orienté radialement mais pas à l'envers
+                let textAngle = midAngle;
+                // Si le texte est dans la moitié inférieure, on le retourne pour qu'il soit à l'endroit
+                if (midAngle > 90 && midAngle < 270) {
+                    textAngle = midAngle + 180;
+                }
+                const textRad = textAngle * Math.PI / 180;
+                
+                text.setAttribute('x', tx);
+                text.setAttribute('y', ty);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', 'white');
+                text.setAttribute('font-size', '13');
+                text.setAttribute('font-weight', 'bold');
+                text.setAttribute('transform', `rotate(${textAngle}, ${tx}, ${ty})`);
+                text.textContent = value;
+                
+                textGroup.appendChild(text);
+                svg.appendChild(textGroup);
+                svgTexts.push(text);
+            });
+        }
+
+        function getRotationForNumber(targetNumber) {
+            const index = rouletteOrdre.indexOf(targetNumber);
+            if (index === -1) return 0;
+            
+            const segments = rouletteOrdre.length;
+            const anglePerSegment = 360 / segments;
+            const segmentCenter = (index * anglePerSegment) + (anglePerSegment / 2);
+            let neededRotation = (270 - segmentCenter + 360) % 360;
+            const extraTurns = 10 + Math.floor(Math.random() * 5);
+            return extraTurns * 360 + neededRotation;
+        }
+
+        function highlightSegment(number) {
+            if (currentHighlightedIndex !== -1) {
+                const prevText = svgTexts[currentHighlightedIndex];
+                if (prevText) {
+                    prevText.setAttribute('font-size', '13');
+                    prevText.setAttribute('font-weight', 'bold');
+                    prevText.setAttribute('fill', 'white');
+                    prevText.classList.remove('winner-text');
+                }
+                const prevPath = svgPaths[currentHighlightedIndex];
+                if (prevPath) {
+                    prevPath.setAttribute('stroke', 'rgba(255,255,255,0.3)');
+                    prevPath.setAttribute('stroke-width', '1');
+                    prevPath.classList.remove('winner-segment');
+                }
+            }
+            
+            const index = rouletteOrdre.indexOf(number);
+            if (index === -1) return;
+            
+            currentHighlightedIndex = index;
+            
+            const winnerPath = svgPaths[index];
+            const winnerText = svgTexts[index];
+            
+            if (winnerPath) {
+                winnerPath.setAttribute('stroke', '#ffea61');
+                winnerPath.setAttribute('stroke-width', '5');
+                winnerPath.classList.add('winner-segment');
+            }
+            if (winnerText) {
+                winnerText.setAttribute('font-size', '24');
+                winnerText.setAttribute('font-weight', '900');
+                winnerText.setAttribute('fill', '#ffea61');
+                winnerText.classList.add('winner-text');
+            }
+        }
+
+        function spinToNumber(targetNumber, onComplete) {
+            if (isSpinning) return;
+            isSpinning = true;
+            
+            const wheel = document.getElementById('wheel');
+            const targetRotation = getRotationForNumber(targetNumber);
+            
+            wheel.style.transition = 'none';
+            wheel.style.transform = `rotate(${currentRotation}deg)`;
+            void wheel.offsetHeight;
+            
+            wheel.style.transition = 'transform 4s cubic-bezier(0.2, 0.95, 0.3, 1.05)';
+            wheel.style.transform = `rotate(${targetRotation}deg)`;
+            
+            currentRotation = targetRotation;
+            
+            setTimeout(() => {
+                highlightSegment(targetNumber);
+                isSpinning = false;
+                if (onComplete) onComplete(targetNumber);
+            }, 4100);
+        }
+
+        function updateUI(data) {
+            document.getElementById('soldeDisplay').innerHTML = `${data.solde.toFixed(2)} CDF`;
+            document.getElementById('lastNumber').innerHTML = data.numero_tire;
+            document.getElementById('gainDisplay').innerHTML = `${data.gain.toFixed(2)} CDF`;
+            document.getElementById('statusDisplay').innerHTML = data.statut;
+            document.getElementById('statusDisplay').className = `status-${data.statut}`;
+            
+            const lastNumberSpan = document.getElementById('lastNumber');
+            lastNumberSpan.classList.add('highlight-number');
+            setTimeout(() => lastNumberSpan.classList.remove('highlight-number'), 500);
+            
+            const msgDiv = document.getElementById('messageResult');
+            const mise = parseFloat(document.getElementById('mise').value);
+            
+            if (data.statut === 'gagné') {
+                msgDiv.innerHTML = `🎉 GAGNÉ ! Numéro ${data.numero_tire} ! +${data.gain.toFixed(2)} CDF | Solde: ${data.solde.toFixed(2)} CDF`;
+                msgDiv.style.background = 'rgba(107, 226, 164, 0.3)';
+            } else {
+                msgDiv.innerHTML = `😢 PERDU... Numéro ${data.numero_tire} sorti. Perte: ${mise.toFixed(2)} CDF | Solde: ${data.solde.toFixed(2)} CDF`;
+                msgDiv.style.background = 'rgba(255, 75, 92, 0.25)';
+            }
+            
+            setTimeout(() => msgDiv.style.background = 'rgba(57, 84, 156, 0.3)', 4000);
+        }
+
+        function addToHistory(mise, pari, numeroTire, statut, gain) {
+            const tbody = document.getElementById('historyBody');
+            
+            if (tbody.children.length === 1 && tbody.children[0].innerHTML.includes('Aucun historique')) {
+                tbody.innerHTML = '';
+            }
+            
+            const row = document.createElement('tr');
+            const now = new Date();
+            const dateStr = now.toLocaleString('fr-FR');
+            
+            row.innerHTML = `
+                 <td>${dateStr}</td>
+                 <td>${mise.toFixed(2)} CDF</td>
+                 <td>${pari}</td>
+                 <td><strong style="color:#ffea61;font-size:1.2em;background:rgba(0,0,0,0.3);padding:2px 12px;border-radius:25px;">${numeroTire}</strong></td>
+                <td class="status-${statut}"><strong>${statut.toUpperCase()}</strong></td>
+                 <td>${gain.toFixed(2)} CDF</td>
+            `;
+            
+            while (tbody.children.length >= 10) tbody.removeChild(tbody.lastChild);
+            tbody.insertBefore(row, tbody.firstChild);
+        }
+
+        async function playGame() {
+            if (isSpinning) {
+                document.getElementById('messageResult').innerHTML = '⏳ La roue tourne...';
+                return;
+            }
+            
+            const mise = parseFloat(document.getElementById('mise').value);
+            const pari = parseInt(document.getElementById('numero_pari').value);
+            const playBtn = document.getElementById('playButton');
+            
+            if (isNaN(mise) || mise <= 0) {
+                document.getElementById('messageResult').innerHTML = '❌ Mise invalide';
+                return;
+            }
+            if (isNaN(pari) || pari < 0 || pari > 36) {
+                document.getElementById('messageResult').innerHTML = '❌ Numéro invalide (0-36)';
+                return;
+            }
+            
+            playBtn.disabled = true;
+            playBtn.textContent = '⏳ Rotation...';
+            
+            try {
+                let csrfToken = '';
+                const csrfInput = document.querySelector('[name=csrfmiddlewaretoken]');
+                if (csrfInput) {
+                    csrfToken = csrfInput.value;
+                } else {
+                    const cookies = document.cookie.split(';');
+                    for (let c of cookies) {
+                        const [name, val] = c.trim().split('=');
+                        if (name === 'csrftoken') csrfToken = val;
+                    }
+                }
+                
+                const formData = new FormData();
+                formData.append('mise', mise);
+                formData.append('numero_pari', pari);
+                
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': csrfToken
+                    },
+                    body: formData
+                });
+                
+                if (!response.ok) throw new Error();
+                
+                const data = await response.json();
+                const numeroTire = data.numero_tire;
+                
+                document.getElementById('messageResult').innerHTML = `🎡 La roue tourne...`;
+                
+                spinToNumber(numeroTire, () => {
+                    updateUI({
+                        numero_tire: numeroTire,
+                        statut: data.statut,
+                        gain: data.gain,
+                        solde: data.solde
+                    });
+                    
+                    addToHistory(mise, pari, numeroTire, data.statut, data.gain);
+                    
+                    playBtn.disabled = false;
+                    playBtn.textContent = '🎡 Lancer la roulette';
+                });
+                
+            } catch (error) {
+                document.getElementById('messageResult').innerHTML = '❌ Erreur serveur';
+                playBtn.disabled = false;
+                playBtn.textContent = '🎡 Lancer la roulette';
+            }
+        }
+        
+        renderWheel();
+        document.getElementById('playButton').addEventListener('click', playGame);
+    </script>
+</body>
+</html>

@@ -1,0 +1,142 @@
+<svg viewBox="0 0 560 560" xmlns="http://www.w3.org/2000/svg" class="ludo-board-svg">
+  <defs>
+    <style>
+      .board-bg { fill: #f8f9fa; }
+      .base-cell { fill: #e8e8e8; stroke: #999; stroke-width: 1; }
+      .safe-cell { fill: #fef3c7; }
+      .start-cell { fill: #fbbf24; }
+      .home-stretch-cell { fill: #d1d5db; }
+      .path-label { font-size: 8; fill: #666; text-anchor: middle; dominant-baseline: middle; }
+    </style>
+  </defs>
+
+  <!-- Board background -->
+  <rect class="board-bg" width="560" height="560" rx="8"/>
+
+  <!-- RED BASE AREA (top-left) -->
+  <g id="red-base">
+    <rect x="20" y="20" width="120" height="120" fill="#fee2e2" stroke="#ef4444" stroke-width="3" rx="4"/>
+    <!-- 4 slots in base -->
+    <circle cx="45" cy="45" r="18" class="base-cell" id="red-base-0"/>
+    <circle cx="95" cy="45" r="18" class="base-cell" id="red-base-1"/>
+    <circle cx="45" cy="95" r="18" class="base-cell" id="red-base-2"/>
+    <circle cx="95" cy="95" r="18" class="base-cell" id="red-base-3"/>
+  </g>
+
+  <!-- BLUE BASE AREA (top-right) -->
+  <g id="blue-base">
+    <rect x="420" y="20" width="120" height="120" fill="#dbeafe" stroke="#3b82f6" stroke-width="3" rx="4"/>
+    <!-- 4 slots in base -->
+    <circle cx="445" cy="45" r="18" class="base-cell" id="blue-base-0"/>
+    <circle cx="495" cy="45" r="18" class="base-cell" id="blue-base-1"/>
+    <circle cx="445" cy="95" r="18" class="base-cell" id="blue-base-2"/>
+    <circle cx="495" cy="95" r="18" class="base-cell" id="blue-base-3"/>
+  </g>
+
+  <!-- GREEN BASE AREA (bottom-left) -->
+  <g id="green-base">
+    <rect x="20" y="420" width="120" height="120" fill="#dcfce7" stroke="#22c55e" stroke-width="3" rx="4"/>
+    <!-- 4 slots in base -->
+    <circle cx="45" cy="445" r="18" class="base-cell" id="green-base-0"/>
+    <circle cx="95" cy="445" r="18" class="base-cell" id="green-base-1"/>
+    <circle cx="45" cy="495" r="18" class="base-cell" id="green-base-2"/>
+    <circle cx="95" cy="495" r="18" class="base-cell" id="green-base-3"/>
+  </g>
+
+  <!-- YELLOW BASE AREA (bottom-right) -->
+  <g id="yellow-base">
+    <rect x="420" y="420" width="120" height="120" fill="#fef9c3" stroke="#eab308" stroke-width="3" rx="4"/>
+    <!-- 4 slots in base -->
+    <circle cx="445" cy="445" r="18" class="base-cell" id="yellow-base-0"/>
+    <circle cx="495" cy="445" r="18" class="base-cell" id="yellow-base-1"/>
+    <circle cx="445" cy="495" r="18" class="base-cell" id="yellow-base-2"/>
+    <circle cx="495" cy="495" r="18" class="base-cell" id="yellow-base-3"/>
+  </g>
+
+  <!-- MAIN PATH - Cross shape -->
+  <!-- Red path (left side, going up) -->
+  <g id="red-path">
+    <circle cx="140" cy="280" r="22" class="path-label" id="red-0"/>
+    <circle cx="140" cy="230" r="22" class="path-label" id="red-1"/>
+    <circle cx="140" cy="180" r="22" class="path-label" id="red-2"/>
+    <circle cx="140" cy="130" r="22" class="path-label" id="red-3"/>
+    <!-- Red safe spot -->
+    <circle cx="140" cy="80" r="22" class="safe-cell" id="red-safe"/>
+    <!-- Red start -->
+    <circle cx="140" cy="280" r="22" class="start-cell" id="red-start"/>
+  </g>
+
+  <!-- Blue path (top side, going right) -->
+  <g id="blue-path">
+    <circle cx="280" cy="140" r="22" class="path-label" id="blue-0"/>
+    <circle cx="330" cy="140" r="22" class="path-label" id="blue-1"/>
+    <circle cx="380" cy="140" r="22" class="path-label" id="blue-2"/>
+    <circle cx="430" cy="140" r="22" class="path-label" id="blue-3"/>
+    <!-- Blue safe spot -->
+    <circle cx="480" cy="140" r="22" class="safe-cell" id="blue-safe"/>
+    <!-- Blue start -->
+    <circle cx="280" cy="140" r="22" class="start-cell" id="blue-start"/>
+  </g>
+
+  <!-- Green path (right side, going down) -->
+  <g id="green-path">
+    <circle cx="420" cy="280" r="22" class="path-label" id="green-0"/>
+    <circle cx="420" cy="330" r="22" class="path-label" id="green-1"/>
+    <circle cx="420" cy="380" r="22" class="path-label" id="green-2"/>
+    <circle cx="420" cy="430" r="22" class="path-label" id="green-3"/>
+    <!-- Green safe spot -->
+    <circle cx="420" cy="480" r="22" class="safe-cell" id="green-safe"/>
+    <!-- Green start -->
+    <circle cx="420" cy="280" r="22" class="start-cell" id="green-start"/>
+  </g>
+
+  <!-- Yellow path (bottom side, going left) -->
+  <g id="yellow-path">
+    <circle cx="280" cy="420" r="22" class="path-label" id="yellow-0"/>
+    <circle cx="230" cy="420" r="22" class="path-label" id="yellow-1"/>
+    <circle cx="180" cy="420" r="22" class="path-label" id="yellow-2"/>
+    <circle cx="130" cy="420" r="22" class="path-label" id="yellow-3"/>
+    <!-- Yellow safe spot -->
+    <circle cx="80" cy="420" r="22" class="safe-cell" id="yellow-safe"/>
+    <!-- Yellow start -->
+    <circle cx="280" cy="420" r="22" class="start-cell" id="yellow-start"/>
+  </g>
+
+  <!-- CENTER ZONE -->
+  <g id="center-zone">
+    <circle cx="280" cy="280" r="40" fill="#f3f4f6" stroke="#9ca3af" stroke-width="2"/>
+    <text x="280" y="280" class="path-label" font-size="12">⊙</text>
+  </g>
+
+  <!-- HOME STRETCHES (connecting from each color's path spiral) -->
+  <!-- Red home stretch (vertical up from red path) -->
+  <g id="red-home-stretch">
+    <circle cx="140" cy="40" r="18" class="home-stretch-cell" id="red-home-0"/>
+    <!-- Home circle at the end -->
+    <circle cx="280" cy="20" r="16" fill="#dc2626" id="red-home"/>
+  </g>
+
+  <!-- Blue home stretch (horizontal right from blue path) -->
+  <g id="blue-home-stretch">
+    <circle cx="520" cy="140" r="18" class="home-stretch-cell" id="blue-home-0"/>
+    <!-- Home circle at the end -->
+    <circle cx="540" cy="280" r="16" fill="#2563eb" id="blue-home"/>
+  </g>
+
+  <!-- Green home stretch (vertical down from green path) -->
+  <g id="green-home-stretch">
+    <circle cx="420" cy="520" r="18" class="home-stretch-cell" id="green-home-0"/>
+    <!-- Home circle at the end -->
+    <circle cx="280" cy="540" r="16" fill="#16a34a" id="green-home"/>
+  </g>
+
+  <!-- Yellow home stretch (horizontal left from yellow path) -->
+  <g id="yellow-home-stretch">
+    <circle cx="40" cy="420" r="18" class="home-stretch-cell" id="yellow-home-0"/>
+    <!-- Home circle at the end -->
+    <circle cx="20" cy="280" r="16" fill="#ca8a04" id="yellow-home"/>
+  </g>
+
+  <!-- Decorative border -->
+  <rect x="8" y="8" width="544" height="544" fill="none" stroke="#1f2937" stroke-width="2" rx="12"/>
+</svg>

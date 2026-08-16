@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Exposure Blackjack - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .info-item { padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title { font-size: 1.3em; margin-bottom: 25px; color: #00d4ff; }
+        .hands-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .hand-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .hand-title { color: #00d4ff; font-weight: bold; margin-bottom: 15px; }
+        .cards-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .card {
+            width: 60px;
+            height: 90px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .score-display {
+            font-size: 1.2em;
+            color: #90EE90;
+            font-weight: bold;
+        }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-blackjack {
+            background: rgba(255, 193, 7, 0.3);
+            border: 2px solid #ffc107;
+            color: #ffd700;
+        }
+        .result-push {
+            background: rgba(108, 117, 125, 0.3);
+            border: 2px solid #6c757d;
+            color: #adb5bd;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title { color: #00d4ff; font-size: 1.1em; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .hands-display { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🃏 DOUBLE EXPOSURE BLACKJACK 🃏</h1>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Mains (Dealer Expose)</div>
+                
+                <div class="hands-display">
+                    <div class="hand-section">
+                        <div class="hand-title">Votre Main</div>
+                        <div class="cards-display" id="playerCards">
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                        </div>
+                        <div class="score-display" id="playerScore">-</div>
+                    </div>
+                    
+                    <div class="hand-section">
+                        <div class="hand-title">Main du Dealer (Visible)</div>
+                        <div class="cards-display" id="dealerCards">
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                        </div>
+                        <div class="score-display" id="dealerScore">-</div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="50" min="1" max="10000" step="10">
+                </div>
+
+                <button id="playBtn">Jouer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/double_exposure_blackjack';
+        let currentBalance = 0;
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            
+            if (bet <= 0 || bet > currentBalance) {
+                alert('Mise invalide');
+                return;
+            }
+
+            try {
+                document.getElementById('playBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('playBtn').disabled = false;
+                    return;
+                }
+
+                displayResult(data);
+                updateBalance();
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('playBtn').disabled = false;
+            }
+        });
+
+        function displayResult(game) {
+            const playerDisplay = document.getElementById('playerCards');
+            playerDisplay.innerHTML = game.player_cards.map(card => `<div class="card">${card}</div>`).join('');
+            
+            const dealerDisplay = document.getElementById('dealerCards');
+            dealerDisplay.innerHTML = game.dealer_cards.map(card => `<div class="card">${card}</div>`).join('');
+            
+            document.getElementById('playerScore').textContent = `Score: ${game.player_score}`;
+            document.getElementById('dealerScore').textContent = `Score: ${game.dealer_score}`;
+
+            const msg = document.getElementById('resultMessage');
+            if (game.result === 'blackjack') {
+                msg.textContent = `🎯 BLACKJACK! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-blackjack';
+            } else if (game.result === 'win') {
+                msg.textContent = `🎉 Gagné! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else if (game.result === 'push') {
+                msg.textContent = `🤝 Égalité! Remboursement: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-push';
+            } else {
+                msg.textContent = 'Perdu!';
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+            document.getElementById('playBtn').disabled = false;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateBalance();
+    </script>
+</body>
+</html>

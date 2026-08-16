@@ -1,0 +1,144 @@
+{% extends "core/base_auth.html" %}
+{% load static %}
+
+{% block title %}Connexion - Bet'A Casino{% endblock %}
+
+{% block content %}
+<div class="auth-form-wrapper">
+    <!-- Form Header -->
+    <div class="auth-form-header">
+        <h1 class="auth-form-title">Bienvenue</h1>
+        <p class="auth-form-subtitle">Connectez-vous à votre compte</p>
+    </div>
+
+    <!-- Messages System -->
+    {% if messages %}
+    <div class="auth-messages">
+        {% for message in messages %}
+        <div class="auth-message {% if message.tags %}auth-message-{{ message.tags }}{% endif %}" role="alert">
+            <div class="message-icon">
+                {% if message.tags == 'error' %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                </svg>
+                {% else %}
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                {% endif %}
+            </div>
+            <span class="message-text">{{ message }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Login Form -->
+    <form method="POST" class="auth-form" novalidate>
+        {% csrf_token %}
+
+        <!-- Email/Username Field -->
+        <div class="form-group">
+            <label for="email" class="form-label">
+                <span class="label-text">Email ou Nom d'utilisateur</span>
+                <span class="label-hint">*</span>
+            </label>
+            <div class="form-input-wrapper">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22 6 12 13 2 6"></polyline>
+                </svg>
+                <input 
+                    type="text" 
+                    name="email" 
+                    id="email" 
+                    class="form-input"
+                    placeholder="votreemail@exemple.com"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+        </div>
+
+        <!-- Password Field -->
+        <div class="form-group">
+            <label for="password" class="form-label">
+                <span class="label-text">Mot de passe</span>
+                <span class="label-hint">*</span>
+            </label>
+            <div class="form-input-wrapper">
+                <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <input 
+                    type="password" 
+                    name="password" 
+                    id="password" 
+                    class="form-input"
+                    placeholder="••••••••"
+                    required
+                    autocomplete="current-password"
+                >
+                <button type="button" class="toggle-password" id="togglePassword" title="Afficher/masquer le mot de passe">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Remember & Forgot -->
+        <div class="form-extras">
+            <label class="checkbox-label">
+                <input type="checkbox" name="remember" id="remember" class="checkbox-input">
+                <span class="checkbox-text">Se souvenir de moi</span>
+            </label>
+            <a href="#" class="forgot-link">Mot de passe oublié?</a>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-login-primary">
+            <span class="btn-text">Se connecter</span>
+            <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </button>
+    </form>
+
+    <!-- Divider -->
+    <div class="form-divider">
+        <span class="divider-text">Nouveau sur Bet'A?</span>
+    </div>
+
+    <!-- Sign Up Link -->
+    <a href="{% url 'inscription' %}" class="btn btn-signup-secondary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+        </svg>
+        <span class="btn-text">Créer un compte</span>
+    </a>
+
+    <!-- Footer Text -->
+    <p class="auth-footer-text">
+        En vous connectant, vous acceptez nos 
+        <a href="#" class="footer-link">conditions d'utilisation</a> et notre 
+        <a href="#" class="footer-link">politique de confidentialité</a>
+    </p>
+</div>
+
+<script>
+document.getElementById('togglePassword')?.addEventListener('click', function() {
+    const input = document.getElementById('password');
+    input.type = input.type === 'password' ? 'text' : 'password';
+    this.classList.toggle('active');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Poker - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .info-item { padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title { font-size: 1.3em; margin-bottom: 25px; color: #00d4ff; }
+        .cards-section {
+            margin: 30px 0;
+        }
+        .cards-display {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card-container {
+            position: relative;
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+        .card.held {
+            border-color: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+        }
+        .card-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8em;
+            color: #ccc;
+        }
+        .hold-btn {
+            width: 80px;
+            padding: 8px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .hold-btn:hover {
+            background: linear-gradient(135deg, #20c997, #17a2b8);
+            transform: translateY(-2px);
+        }
+        .hold-btn.held {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+        .game-info {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .hand-rank { color: #90EE90; font-size: 1.2em; font-weight: bold; margin-bottom: 10px; }
+        .payout-info { color: #ffd700; font-size: 1em; }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title { color: #00d4ff; font-size: 1.1em; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .help-button {
+            background: rgba(0, 212, 255, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .help-button:hover {
+            background: #00d4ff;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #00d4ff;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #0099cc;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            color: #ff6b00;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 8px;
+        }
+
+        .modal-section-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        .payout-table {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+        .payout-table h4 { color: #00d4ff; margin-bottom: 10px; }
+        .payout-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .cards-display { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">🃏 VIDEO POKER</div>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+            </div>
+            <button class="help-button" id="helpButton" title="Aide">?</button>
+        </div>
+
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <div class="modal-title">📋 Comment Jouer au Video Poker</div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🎮 Objectif du Jeu</div>
+                    <div class="modal-section-content">
+                        Obtenir la meilleure combinaison de poker possible avec 5 cartes. Plus la combinaison est rare, plus le gain est élevé !
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🃏 Comment Jouer</div>
+                    <div class="modal-section-content">
+                        1. Placez votre mise<br>
+                        2. Recevez 5 cartes<br>
+                        3. Choisissez quelles cartes garder<br>
+                        4. Les cartes non gardées sont remplacées<br>
+                        5. Obtenez la meilleure combinaison possible
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">💰 Combinaisons et Gains</div>
+                    <div class="modal-section-content">
+                        Royal Flush: 250x<br>
+                        Straight Flush: 50x<br>
+                        Four of a Kind: 25x<br>
+                        Full House: 9x<br>
+                        Flush: 6x<br>
+                        Straight: 4x<br>
+                        Three of a Kind: 3x<br>
+                        Two Pair: 2x<br>
+                        Jacks or Better: 1x
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Sélectionnez vos cartes à garder</div>
+                
+                <div class="cards-section">
+                    <div class="cards-display" id="cardsDisplay">
+                        <div class="card-container">
+                            <div class="card" data-index="0">?</div>
+                            <button class="hold-btn" data-index="0">GARDER</button>
+                        </div>
+                        <div class="card-container">
+                            <div class="card" data-index="1">?</div>
+                            <button class="hold-btn" data-index="1">GARDER</button>
+                        </div>
+                        <div class="card-container">
+                            <div class="card" data-index="2">?</div>
+                            <button class="hold-btn" data-index="2">GARDER</button>
+                        </div>
+                        <div class="card-container">
+                            <div class="card" data-index="3">?</div>
+                            <button class="hold-btn" data-index="3">GARDER</button>
+                        </div>
+                        <div class="card-container">
+                            <div class="card" data-index="4">?</div>
+                            <button class="hold-btn" data-index="4">GARDER</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-info" id="gameInfo" style="display: none;">
+                    <div class="hand-rank" id="handRank">-</div>
+                    <div class="payout-info" id="payoutInfo">-</div>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+
+                <div class="payout-table">
+                    <h4>Table des Gains (pour 1 mise)</h4>
+                    <div class="payout-row"><span>Royal Flush</span><span>250x</span></div>
+                    <div class="payout-row"><span>Straight Flush</span><span>50x</span></div>
+                    <div class="payout-row"><span>Carré</span><span>25x</span></div>
+                    <div class="payout-row"><span>Full House</span><span>9x</span></div>
+                    <div class="payout-row"><span>Couleur</span><span>6x</span></div>
+                    <div class="payout-row"><span>Suite</span><span>4x</span></div>
+                    <div class="payout-row"><span>Brelan</span><span>3x</span></div>
+                    <div class="payout-row"><span>Deux Paires</span><span>2x</span></div>
+                    <div class="payout-row"><span>Paire</span><span>1x</span></div>
+                </div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="50" min="1" max="10000" step="10">
+                </div>
+
+                <button id="dealBtn">DISTRIBUER</button>
+                <button id="drawBtn" style="display: none;">TIRER</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/video_poker';
+        let currentBalance = 0;
+        let currentGame = null;
+        let heldCards = [];
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        function toggleHold(index) {
+            const card = document.querySelector(`.card[data-index="${index}"]`);
+            const btn = document.querySelector(`.hold-btn[data-index="${index}"]`);
+            
+            if (heldCards.includes(index)) {
+                heldCards = heldCards.filter(i => i !== index);
+                card.classList.remove('held');
+                btn.classList.remove('held');
+                btn.textContent = 'GARDER';
+            } else {
+                heldCards.push(index);
+                card.classList.add('held');
+                btn.classList.add('held');
+                btn.textContent = 'RELÂCHER';
+            }
+        }
+
+        document.querySelectorAll('.hold-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const index = parseInt(btn.dataset.index);
+                toggleHold(index);
+            });
+        });
+
+        document.getElementById('dealBtn').addEventListener('click', async () => {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            
+            if (bet <= 0 || bet > currentBalance) {
+                alert('Mise invalide');
+                return;
+            }
+
+            try {
+                document.getElementById('dealBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet, hold_indices: [] })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('dealBtn').disabled = false;
+                    return;
+                }
+
+                currentGame = data;
+                displayInitialCards(data.initial_cards);
+                document.getElementById('dealBtn').style.display = 'none';
+                document.getElementById('drawBtn').style.display = 'block';
+                heldCards = [];
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('dealBtn').disabled = false;
+            }
+        });
+
+        document.getElementById('drawBtn').addEventListener('click', async () => {
+            try {
+                document.getElementById('drawBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ 
+                        bet_amount: currentGame.bet_amount, 
+                        hold_indices: heldCards 
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('drawBtn').disabled = false;
+                    return;
+                }
+
+                displayFinalResult(data);
+                updateBalance();
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('drawBtn').disabled = false;
+            }
+        });
+
+        function displayInitialCards(cards) {
+            const cardElements = document.querySelectorAll('.card');
+            cardElements.forEach((card, index) => {
+                card.textContent = cards[index];
+                card.classList.remove('held');
+            });
+            
+            document.querySelectorAll('.hold-btn').forEach(btn => {
+                btn.classList.remove('held');
+                btn.textContent = 'GARDER';
+            });
+        }
+
+        function displayFinalResult(game) {
+            const cardElements = document.querySelectorAll('.card');
+            game.final_cards.forEach((card, index) => {
+                cardElements[index].textContent = card;
+            });
+
+            document.getElementById('handRank').textContent = `Main: ${game.hand_rank.replace('_', ' ').toUpperCase()}`;
+            document.getElementById('payoutInfo').textContent = `Multiplicateur: ${game.payout_multiplier}x`;
+            document.getElementById('gameInfo').style.display = 'block';
+
+            const msg = document.getElementById('resultMessage');
+            if (game.result === 'win') {
+                msg.textContent = `🎉 Gagné! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else {
+                msg.textContent = 'Perdu!';
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+
+            document.getElementById('dealBtn').style.display = 'block';
+            document.getElementById('drawBtn').style.display = 'none';
+            document.getElementById('dealBtn').disabled = false;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateBalance();
+
+        // Modal help functionality
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeModal = document.getElementById('closeModal');
+
+        helpButton.addEventListener('click', () => {
+            helpModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

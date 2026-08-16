@@ -1,0 +1,1397 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FACE OU PILE — Casino Royale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0d1329 0%, #09101e 100%);
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 0.75rem;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(10, 14, 30, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #ffd966;
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .balance-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #fff7d2;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 221, 119, 0.12);
+            border-radius: 999px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+        }
+
+        /* Player Cards */
+        .player-card {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: rgba(20, 22, 40, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            min-height: 3.5rem;
+        }
+
+        .player-card.active {
+            border-color: rgba(6, 182, 212, 0.5);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        .player-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #66fcf1, #45a29e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #0a0c1a;
+            font-size: 1rem;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .player-status {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+        }
+
+        /* Arena */
+        .arena {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            min-height: 0;
+        }
+
+        /* 3D Coin */
+        .coin-container {
+            width: 8rem;
+            height: 8rem;
+            perspective: 1000px;
+        }
+
+        .coin {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+
+        .coin.flipping-face {
+            animation: coinFlipFace 3s ease-out forwards;
+        }
+
+        .coin.flipping-pile {
+            animation: coinFlipPile 3s ease-out forwards;
+        }
+
+        @keyframes coinFlipFace {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1800deg); }
+        }
+
+        @keyframes coinFlipPile {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1980deg); }
+        }
+
+        .coin-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.5rem;
+            border: 4px solid #ffd966;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3), inset 0 0 20px rgba(255, 215, 0, 0.1);
+        }
+
+        .coin-front {
+            background: linear-gradient(135deg, #d4af37, #ffdd77, #d4af37);
+            color: #1E1A2F;
+        }
+
+        .coin-back {
+            background: linear-gradient(135deg, #b8860b, #daa520, #b8860b);
+            color: #1E1A2F;
+            transform: rotateY(180deg);
+        }
+
+        .coin-result-face {
+            transform: rotateY(0deg);
+        }
+
+        .coin-result-pile {
+            transform: rotateY(180deg);
+        }
+
+        /* Pot Display */
+        .pot-display {
+            background: rgba(255, 215, 0, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 0.5rem 1.5rem;
+            border-radius: 999px;
+            color: #ffd966;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .pot-display.hidden {
+            display: none;
+        }
+
+        /* Status Text */
+        .status-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0 1rem;
+        }
+
+        /* Scoreboard BO3 */
+        .scoreboard {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 0.75rem 1rem;
+            background: rgba(18, 20, 31, 0.8);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .scoreboard.hidden {
+            display: none;
+        }
+
+        .score-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .score-dots {
+            display: flex;
+            gap: 0.35rem;
+        }
+
+        .score-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .score-dot.filled {
+            background: linear-gradient(145deg, #ffd966, #ffaa00);
+            border-color: #ffd966;
+        }
+
+        .score-dot.empty {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .round-info {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #ffd966;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 999px;
+        }
+
+        /* Round 3 Toss Animation */
+        .toss-animation {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 150;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .toss-animation.show {
+            display: flex;
+        }
+
+        .toss-text {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffd966;
+            text-align: center;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        .toss-result {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.5s ease;
+        }
+
+        .toss-result.show {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.05); }
+        }
+
+        /* Round Winner Toast */
+        .round-winner-toast {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: linear-gradient(135deg, #ffd966 0%, #ff9500 100%);
+            color: #000;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 800;
+            font-size: 1.25rem;
+            text-align: center;
+            z-index: 140;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .round-winner-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Action Dock */
+        .action-dock {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(10, 14, 30, 0.9);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 1rem;
+        }
+
+        .choice-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: linear-gradient(145deg, rgba(22, 27, 51, 0.9), rgba(16, 19, 36, 0.9));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1rem;
+            color: #f6f1df;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choice-btn:active {
+            transform: scale(0.95);
+        }
+
+        .choice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .choice-btn i {
+            font-size: 1.75rem;
+            color: #ffd966;
+        }
+
+        /* Menu Overlay */
+        .menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 14, 30, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 2rem;
+            z-index: 100;
+        }
+
+        .menu-overlay.hidden {
+            display: none;
+        }
+
+        .menu-title {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+        }
+
+        .menu-input {
+            width: 100%;
+            max-width: 280px;
+            padding: 1rem 1.5rem;
+            background: rgba(14, 15, 28, 0.9);
+            border: 2px solid #ffd966;
+            border-radius: 999px;
+            color: #ffecb3;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .menu-btn {
+            width: 100%;
+            max-width: 280px;
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 999px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .menu-btn-primary {
+            background: linear-gradient(105deg, #d4af37, #ffdd77);
+            color: #1E1A2F;
+        }
+
+        .menu-btn-secondary {
+            background: rgba(30, 30, 55, 0.95);
+            color: #ffeaaf;
+            border: 2px solid #ffd966;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Game List */
+        .game-list {
+            width: 100%;
+            max-width: 320px;
+            max-height: 40vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .game-item {
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            color: #f1eed9;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .game-item:active {
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        /* Result Modal */
+        .result-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 1rem;
+        }
+
+        .result-modal.show {
+            display: flex;
+        }
+
+        .result-card {
+            background: rgba(18, 20, 31, 0.96);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        .result-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffd966;
+            margin-bottom: 1rem;
+        }
+
+        .result-body {
+            color: #f7f3ea;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .result-close {
+            margin-top: 1.5rem;
+            padding: 0.75rem 2rem;
+            background: linear-gradient(105deg, #d4af37, #ffdd77);
+            border: none;
+            border-radius: 999px;
+            color: #1E1A2F;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .result-rematch {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(105deg, #06b6d4, #0891b2);
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .result-rematch:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .result-rematch:active {
+            transform: scale(0.95);
+        }
+
+        /* Rematch Request Overlay */
+        .rematch-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            padding: 1rem;
+        }
+
+        .rematch-overlay.show {
+            display: flex;
+        }
+
+        .rematch-card {
+            background: rgba(18, 20, 31, 0.96);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            text-align: center;
+            max-width: 320px;
+            width: 100%;
+        }
+
+        .rematch-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #ffd966;
+            margin-bottom: 1rem;
+        }
+
+        .rematch-message {
+            color: #f7f3ea;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .rematch-buttons {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+        }
+
+        .rematch-accept {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(105deg, #22c55e, #16a34a);
+            border: none;
+            border-radius: 999px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .rematch-decline {
+            padding: 0.75rem 1.5rem;
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
+            border-radius: 999px;
+            color: #ef4444;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+            <div class="balance-display">
+                <i class="fas fa-wallet"></i>
+                <span id="balance">{{ balance }}</span> FC
+            </div>
+        </div>
+
+        <!-- Opponent Card -->
+        <div class="player-card" id="opponentCard">
+            <div class="player-avatar"><i class="fas fa-user"></i></div>
+            <div class="player-info">
+                <div class="player-name" id="opponentName">En attente...</div>
+                <div class="player-status" id="opponentStatus">Recherche adversaire</div>
+            </div>
+        </div>
+
+        <!-- Arena Center -->
+        <div class="arena-center">
+            <div class="pot-display hidden" id="potDisplay">
+                <div class="pot-label">POT</div>
+                <div class="pot-amount" id="potAmount">0.00 FC</div>
+            </div>
+
+            <!-- Scoreboard BO3 -->
+            <div class="scoreboard hidden" id="scoreboard">
+                <div class="score-item">
+                    <div class="score-label" id="scoreLabel1">J1</div>
+                    <div class="score-dots" id="scoreDots1">
+                        <span class="score-dot empty"></span>
+                        <span class="score-dot empty"></span>
+                    </div>
+                </div>
+                <div class="round-info" id="roundInfo">Manche 1/3</div>
+                <div class="score-item">
+                    <div class="score-dots" id="scoreDots2">
+                        <span class="score-dot empty"></span>
+                        <span class="score-dot empty"></span>
+                    </div>
+                    <div class="score-label" id="scoreLabel2">J2</div>
+                </div>
+            </div>
+
+            <div class="coin-container">
+                <div class="coin" id="coin">
+                    <div class="coin-face coin-front">
+                        <div class="coin-inner">
+                            <div class="coin-text">FACE</div>
+                        </div>
+                    </div>
+                    <div class="coin-face coin-back">
+                        <div class="coin-inner">
+                            <div class="coin-text">PILE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-text" id="statusText">Créez une partie pour commencer</div>
+        </div>
+
+        <!-- Player Card -->
+        <div class="player-card active" id="playerCard">
+            <div class="player-avatar"><i class="fas fa-user"></i></div>
+            <div class="player-info">
+                <div class="player-name">Vous</div>
+                <div class="player-status" id="playerStatus">Prêt</div>
+            </div>
+        </div>
+
+        <!-- Action Dock -->
+        <div class="action-dock hidden" id="actionDock">
+            <button class="choice-btn" id="faceBtn" data-choice="face" disabled>
+                <i class="fas fa-coin"></i>
+                <span>FACE</span>
+            </button>
+            <button class="choice-btn" id="pileBtn" data-choice="pile" disabled>
+                <i class="fas fa-coin"></i>
+                <span>PILE</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu Overlay -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="menu-title"><i class="fas fa-coins"></i> FACE OU PILE BO3</div>
+        <input type="number" class="menu-input" id="betInput" placeholder="MISE (FC)" min="0.5" step="0.5" value="10">
+        <button class="menu-btn menu-btn-primary" id="createGameBtn">CRÉER LA PARTIE</button>
+        <button class="menu-btn menu-btn-secondary" id="listGamesBtn">PARTIES EN ATTENTE</button>
+        <div class="game-list hidden" id="gameList"></div>
+        <button class="menu-btn menu-btn-secondary hidden" id="hideListBtn">RETOUR</button>
+    </div>
+
+    <!-- Result Modal -->
+    <div class="result-modal" id="resultModal">
+        <div class="result-card">
+            <div class="result-title" id="resultTitle">Résultat</div>
+            <div class="result-body" id="resultBody"></div>
+            <div class="result-buttons">
+                <button class="result-close" id="resultClose">Quitter</button>
+                <button class="result-rematch" id="resultRematch">🔄 Revanche</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Round 3 Toss Animation -->
+    <div class="toss-animation" id="tossAnimation">
+        <div class="toss-text" id="tossText">Tirage au sort pour la manche décisive...</div>
+        <div class="toss-result" id="tossResult"></div>
+    </div>
+
+    <!-- Round Winner Toast -->
+    <div class="round-winner-toast" id="roundWinnerToast"></div>
+
+    <!-- Rematch Request Overlay -->
+    <div class="rematch-overlay" id="rematchOverlay">
+        <div class="rematch-card">
+            <div class="rematch-title" id="rematchTitle">Demande de Revanche</div>
+            <div class="rematch-message" id="rematchMessage"></div>
+            <div class="rematch-buttons" id="rematchButtons">
+                <button class="rematch-accept" id="rematchAccept">Accepter</button>
+                <button class="rematch-decline" id="rematchDecline">Refuser</button>
+            </div>
+        </div>
+    </div>
+
+    {% csrf_token %}
+    <script>
+        let currentGameId = null;
+        let pollingInterval = null;
+        let currentUsername = null;
+        let isFlipping = false;
+        let resultModalShown = false;
+        let selectedChoice = null;
+        let websocket = null;
+        let pendingGameFinishedData = null;
+
+        function getCSRFToken() {
+            const tokenElem = document.querySelector('[name=csrfmiddlewaretoken]');
+            return tokenElem ? tokenElem.value : '';
+        }
+
+        async function apiRequest(url, method='GET', data=null) {
+            const headers = { 'X-CSRFToken': getCSRFToken(), 'Content-Type': 'application/json' };
+            const options = { method, headers, credentials: 'same-origin' };
+            if (data) options.body = JSON.stringify(data);
+            const response = await fetch(url, options);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || errorData.detail || `HTTP ${response.status}`);
+            }
+            return await response.json();
+        }
+
+        const balanceSpan = document.getElementById('balance');
+        const statusText = document.getElementById('statusText');
+        const opponentName = document.getElementById('opponentName');
+        const opponentStatus = document.getElementById('opponentStatus');
+        const playerStatus = document.getElementById('playerStatus');
+        const potDisplay = document.getElementById('potDisplay');
+        const potAmount = document.getElementById('potAmount');
+        const coin = document.getElementById('coin');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const gameList = document.getElementById('gameList');
+        const resultModal = document.getElementById('resultModal');
+        const resultTitle = document.getElementById('resultTitle');
+        const resultBody = document.getElementById('resultBody');
+        const resultClose = document.getElementById('resultClose');
+        const resultRematch = document.getElementById('resultRematch');
+        const scoreboard = document.getElementById('scoreboard');
+        const roundInfo = document.getElementById('roundInfo');
+        const scoreDots1 = document.getElementById('scoreDots1');
+        const scoreDots2 = document.getElementById('scoreDots2');
+        const scoreLabel1 = document.getElementById('scoreLabel1');
+        const scoreLabel2 = document.getElementById('scoreLabel2');
+        const actionDock = document.getElementById('actionDock');
+        const faceBtn = document.getElementById('faceBtn');
+        const pileBtn = document.getElementById('pileBtn');
+        const tossAnimation = document.getElementById('tossAnimation');
+        const tossText = document.getElementById('tossText');
+        const tossResult = document.getElementById('tossResult');
+        const roundWinnerToast = document.getElementById('roundWinnerToast');
+        const rematchOverlay = document.getElementById('rematchOverlay');
+        const rematchTitle = document.getElementById('rematchTitle');
+        const rematchMessage = document.getElementById('rematchMessage');
+        const rematchButtons = document.getElementById('rematchButtons');
+        const rematchAccept = document.getElementById('rematchAccept');
+        const rematchDecline = document.getElementById('rematchDecline');
+        let previousRound = 1;
+
+        function setStatus(msg) {
+            statusText.innerText = msg;
+        }
+
+        async function refreshBalance() {
+            try {
+                const data = await apiRequest('/api/wallet/balance/');
+                balanceSpan.innerText = data.balance;
+            } catch (e) { console.warn('Erreur balance:', e); }
+        }
+
+        function fetchCurrentUser() {
+            currentUsername = '{{ user.username|default:"joueur" }}';
+        }
+
+        function showMenu() {
+            menuOverlay.classList.remove('hidden');
+        }
+
+        function hideMenu() {
+            menuOverlay.classList.add('hidden');
+        }
+
+        function enterGameMode() {
+            hideMenu();
+            potDisplay.classList.remove('hidden');
+            scoreboard.classList.remove('hidden');
+            actionDock.classList.remove('hidden');
+            connectWebSocket();
+        }
+
+        function exitGameMode() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            disconnectWebSocket();
+            currentGameId = null;
+            selectedChoice = null;
+            showMenu();
+            potDisplay.classList.add('hidden');
+            scoreboard.classList.add('hidden');
+            actionDock.classList.add('hidden');
+            setStatus('Créez une partie pour commencer');
+            opponentName.innerText = 'En attente...';
+            opponentStatus.innerText = 'Recherche adversaire';
+            playerStatus.innerText = 'Prêt';
+            coin.classList.remove('flipping');
+            coin.style.transform = 'rotateY(0deg)';
+            isFlipping = false;
+            resultModalShown = false;
+            refreshBalance();
+        }
+
+        function connectWebSocket() {
+            if (!currentGameId || websocket) return;
+            
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/face_ou_pile/${currentGameId}/`;
+            
+            websocket = new WebSocket(wsUrl);
+            
+            websocket.onopen = () => {
+                console.log('WebSocket connecté');
+            };
+            
+            websocket.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+            
+            websocket.onclose = () => {
+                console.log('WebSocket déconnecté');
+                websocket = null;
+            };
+            
+            websocket.onerror = (error) => {
+                console.error('Erreur WebSocket:', error);
+            };
+        }
+
+        function disconnectWebSocket() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+        }
+
+        function handleWebSocketMessage(data) {
+            switch (data.type) {
+                case 'game_flip_start':
+                    handleCoinFlipAnimation(data);
+                    break;
+                case 'game_update':
+                    if (data.game_state) {
+                        updateGamePanel(data.game_state);
+                    }
+                    break;
+                case 'game_finished':
+                    // Stocker les données pour affichage après l'animation
+                    pendingGameFinishedData = data;
+                    break;
+                case 'rematch_requested':
+                    handleRematchRequested(data);
+                    break;
+                case 'rematch_accepted':
+                    handleRematchAccepted(data);
+                    break;
+                case 'rematch_declined':
+                    handleRematchDeclined(data);
+                    break;
+            }
+        }
+
+        async function handleCoinFlipAnimation(data) {
+            if (isFlipping) return;
+            isFlipping = true;
+
+            const coin = document.getElementById('coin');
+            const isPile = data.result && data.result.toLowerCase() === 'pile';
+            const animationClass = isPile ? 'flipping-pile' : 'flipping-face';
+
+            // 1. Démarrage rotation
+            coin.classList.remove('flipping-face', 'flipping-pile');
+            void coin.offsetWidth; // Force reflow
+            coin.classList.add(animationClass);
+
+            // Attendre la fin de la rotation (3s)
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // 2. Mettre la bonne face en CSS et MISE À JOUR DU SCORE ICI
+            coin.classList.remove(animationClass);
+            coin.style.transform = isPile ? 'rotateY(180deg)' : 'rotateY(0deg)';
+            
+            // Le score s'actualise au moment exact où la pièce se pose !
+            updateScoreboard(data.player1_score, data.player2_score);
+
+            // Pause visuelle
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            // 3. Message vainqueur de manche
+            if (data.round_winner) {
+                const winnerText = data.round_winner === currentUsername ? 'Vous' : data.round_winner;
+                roundWinnerToast.innerText = `Manche ${data.round} remportée par ${winnerText} !`;
+                roundWinnerToast.classList.add('show');
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                roundWinnerToast.classList.remove('show');
+            }
+
+            // 4. Modal fin si partie finie
+            if (data.is_game_over) {
+                showFinalWinnerModal(data);
+            }
+
+            isFlipping = false;
+        }
+
+        function showFinalWinnerModal(data) {
+            if (resultModalShown) return;
+            resultModalShown = true;
+            
+            const winnerIsYou = data.winner === currentUsername;
+            const totalPot = parseFloat(data.bet_amount) * 2;
+            
+            resultTitle.innerText = winnerIsYou ? 'Victoire BO3 !' : 'Défaite BO3';
+            resultBody.innerHTML = winnerIsYou ? 
+                `Félicitations ! Vous avez gagné le BO3 (${data.player1_score}-${data.player2_score}). Vous remportez 95% du pot (${(totalPot * 0.95).toFixed(2)} FC).` :
+                `${data.winner} a gagné le BO3 (${data.player1_score}-${data.player2_score}).`;
+            
+            // Réinitialiser le bouton de revanche pour permettre les revanches illimitées
+            resultRematch.disabled = false;
+            resultRematch.innerText = '🔄 Revanche';
+            
+            resultModal.classList.add('show');
+        }
+
+        function handleGameFinished(data) {
+            // Cette fonction n'est plus appelée directement par handleWebSocketMessage
+            // Elle est conservée pour compatibilité mais showFinalWinnerModal est utilisée
+            showFinalWinnerModal(data);
+        }
+
+        function handleRematchRequested(data) {
+            // Un joueur demande une revanche
+            if (data.requester === currentUsername) {
+                // C'est nous qui avons demandé, mettre le bouton en attente
+                resultRematch.disabled = true;
+                resultRematch.innerText = 'En attente...';
+            } else {
+                // C'est l'autre joueur qui demande, afficher l'overlay
+                rematchTitle.innerText = 'Demande de Revanche';
+                rematchMessage.innerText = `${data.requester} souhaite une revanche. Acceptez-vous ?`;
+                rematchButtons.style.display = 'flex';
+                rematchOverlay.classList.add('show');
+            }
+        }
+
+        function handleRematchAccepted(data) {
+            // La revanche a été acceptée
+            rematchOverlay.classList.remove('show');
+            resultModal.classList.remove('show');
+            
+            // Mettre à jour immédiatement l'identifiant de partie
+            currentGameId = data.new_game_id;
+            
+            // Déconnecter le WebSocket actuel
+            disconnectWebSocket();
+            
+            // Réinitialiser complètement l'état du jeu
+            isFlipping = false;
+            resultModalShown = false;
+            pendingGameFinishedData = null;
+            previousRound = 1;
+            
+            // Réinitialiser le bouton de revanche
+            resultRematch.disabled = false;
+            resultRematch.innerText = '🔄 Revanche';
+            
+            // Réinitialiser l'affichage de la pièce
+            coin.classList.remove('flipping-face', 'flipping-pile');
+            coin.style.transform = 'rotateY(0deg)';
+            
+            // Réinitialiser le tableau des scores (0-0)
+            updateScoreboard({
+                player1: document.getElementById('scoreLabel1').innerText,
+                player2: document.getElementById('scoreLabel2').innerText,
+                player1_score: 0,
+                player2_score: 0,
+                current_round: 1,
+            });
+            
+            // Reconnecter au nouveau salon WebSocket
+            connectWebSocket();
+            
+            // Rafraîchir l'état du jeu
+            fetchGame();
+        }
+
+        function handleRematchDeclined(data) {
+            // La revanche a été refusée
+            if (data.decliner === currentUsername) {
+                // Nous avons refusé, fermer l'overlay
+                rematchOverlay.classList.remove('show');
+            } else {
+                // L'autre a refusé, notifier et réactiver le bouton
+                resultRematch.disabled = false;
+                resultRematch.innerText = '🔄 Revanche';
+                setStatus(`${data.decliner} a refusé la revanche`);
+            }
+        }
+
+        function sendWebSocketMessage(action) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify({ action }));
+            }
+        }
+
+        function updateScoreboard(gameOrScore1, score2) {
+            // Support两种调用方式: updateScoreboard(game) 或 updateScoreboard(score1, score2)
+            let player1_score, player2_score, player1_name, player2_name, current_round;
+            
+            if (typeof gameOrScore1 === 'object') {
+                // 调用方式: updateScoreboard(game)
+                player1_score = gameOrScore1.player1_score;
+                player2_score = gameOrScore1.player2_score;
+                player1_name = gameOrScore1.player1;
+                player2_name = gameOrScore1.player2;
+                current_round = gameOrScore1.current_round;
+            } else {
+                // 调用方式: updateScoreboard(score1, score2)
+                player1_score = gameOrScore1;
+                player2_score = score2;
+                // 保持现有的玩家名称
+                player1_name = scoreLabel1.innerText;
+                player2_name = scoreLabel2.innerText;
+                current_round = 1; // 默认值
+            }
+            
+            // Update labels with player names (仅当传入完整对象时更新)
+            if (typeof gameOrScore1 === 'object') {
+                scoreLabel1.innerText = player1_name ? player1_name.substring(0, 2).toUpperCase() : 'J1';
+                scoreLabel2.innerText = player2_name ? player2_name.substring(0, 2).toUpperCase() : 'J2';
+            }
+            
+            // Update score dots
+            const dots1 = scoreDots1.querySelectorAll('.score-dot');
+            const dots2 = scoreDots2.querySelectorAll('.score-dot');
+            
+            for (let i = 0; i < 2; i++) {
+                dots1[i].className = 'score-dot ' + (i < player1_score ? 'filled' : 'empty');
+                dots2[i].className = 'score-dot ' + (i < player2_score ? 'filled' : 'empty');
+            }
+            
+            // Update round info (仅当传入完整对象时更新)
+            if (typeof gameOrScore1 === 'object') {
+                if (current_round === 3) {
+                    roundInfo.innerText = 'Manche Décisive 3/3';
+                } else {
+                    roundInfo.innerText = `Manche ${current_round}/3`;
+                }
+            }
+        }
+
+        async function fetchGame() {
+            if (!currentGameId) return;
+            try {
+                const game = await apiRequest(`/api/face_ou_pile/games/${currentGameId}/`);
+                updateGamePanel(game);
+            } catch (e) {
+                console.error('Erreur fetchGame:', e);
+                if (e.message.includes('404')) exitGameMode();
+            }
+        }
+
+        function updateGamePanel(game) {
+            if (!game) return;
+            
+            const isPlayer1 = currentUsername === game.player1;
+            const isPlayer2 = currentUsername === game.player2;
+
+            // Update scoreboard
+            updateScoreboard(game);
+
+            // Check if we just entered round 3 (score 1-1)
+            if (game.current_round === 3 && previousRound === 2 && game.status === 'playing') {
+                showRound3Toss(game);
+            }
+            previousRound = game.current_round;
+
+            // Update opponent info
+            if (game.player2) {
+                opponentName.innerText = isPlayer2 ? 'Vous' : game.player2;
+                opponentStatus.innerText = 'En ligne';
+                document.getElementById('opponentCard').classList.add('active');
+            } else {
+                opponentName.innerText = 'En attente...';
+                opponentStatus.innerText = 'Recherche adversaire';
+                document.getElementById('opponentCard').classList.remove('active');
+            }
+
+            // Update pot
+            const betAmount = Number(game.bet_amount) || 0;
+            const potTotal = game.player2 ? (betAmount * 2) : betAmount;
+            potAmount.innerText = potTotal.toFixed(2);
+
+            if (game.status === 'waiting') {
+                setStatus('En attente d\'un adversaire...');
+                playerStatus.innerText = isPlayer1 ? 'Créateur' : 'Spectateur';
+                faceBtn.disabled = true;
+                pileBtn.disabled = true;
+            } else if (game.status === 'playing') {
+                if (!isPlayer1 && !isPlayer2) {
+                    setStatus('Vous n\'êtes pas joueur dans cette partie');
+                    playerStatus.innerText = 'Spectateur';
+                    faceBtn.disabled = true;
+                    pileBtn.disabled = true;
+                    return;
+                }
+                
+                // Determine whose turn it is
+                const isPlayer1Turn = game.round_chooser === 'player1';
+                const isMyTurn = (isPlayer1 && isPlayer1Turn) || (isPlayer2 && !isPlayer1Turn);
+                
+                // Ne réactiver les boutons que si l'animation n'est pas en cours
+                if (isMyTurn && !isFlipping) {
+                    setStatus(`Manche ${game.current_round}/3 : À vous de choisir !`);
+                    playerStatus.innerText = 'Votre tour';
+                    faceBtn.disabled = false;
+                    pileBtn.disabled = false;
+                } else if (!isMyTurn) {
+                    const chooserName = isPlayer1Turn ? game.player1 : game.player2;
+                    setStatus(`Manche ${game.current_round}/3 : ${chooserName} choisit...`);
+                    playerStatus.innerText = 'Attente';
+                    faceBtn.disabled = true;
+                    pileBtn.disabled = true;
+                }
+            } else if (game.status === 'finished') {
+                playerStatus.innerText = 'Partie terminée';
+                faceBtn.disabled = true;
+                pileBtn.disabled = true;
+                
+                if (!resultModalShown && !isFlipping) {
+                    handleGameResult(game);
+                }
+            }
+        }
+
+        async function showRound3Toss(roundChooser) {
+            const chooserName = roundChooser === 'player1' ? document.getElementById('scoreLabel1').innerText : document.getElementById('scoreLabel2').innerText;
+            
+            tossAnimation.classList.add('show');
+            tossText.innerText = 'Tirage au sort pour la manche décisive...';
+            tossResult.classList.remove('show');
+            await new Promise(r => setTimeout(r, 1500));
+
+            tossText.innerText = 'C\'est à ' + chooserName + ' de choisir !';
+            tossResult.innerText = chooserName + ' a remporté le tirage et va choisir !';
+            tossResult.classList.add('show');
+            
+            // Bloquer l'écran pendant 3 secondes minimum avec le message explicite
+            await new Promise(r => setTimeout(r, 3000));
+            
+            tossAnimation.classList.remove('show');
+        }
+
+        async function handleGameResult(game) {
+            isFlipping = true;
+            resultModalShown = true;
+            
+            const result = game.coin_result;
+            
+            // Start coin flip animation
+            coin.classList.add('flipping');
+            setStatus('La pièce tourne...');
+            
+            // Wait for animation to complete (2 seconds)
+            setTimeout(() => {
+                coin.classList.remove('flipping');
+                
+                // Set final position based on result
+                if (result === 'face') {
+                    coin.style.transform = 'rotateY(0deg)';
+                } else if (result === 'pile') {
+                    coin.style.transform = 'rotateY(180deg)';
+                }
+                
+                setStatus('Résultat : ' + (result ? result.toUpperCase() : 'INCONNU'));
+                
+                // Show result modal after 0.5s delay
+                setTimeout(() => {
+                    showResultModal(game, result);
+                    isFlipping = false;
+                }, 500);
+            }, 2000);
+        }
+
+        function showResultModal(game, result) {
+            const bet = parseFloat(game.bet_amount) || 0;
+            const totalPot = bet * 2;
+            let title = 'Résultat';
+            let body = '';
+            
+            const winnerIsYou = game.winner === currentUsername;
+            title = winnerIsYou ? 'Victoire BO3 !' : 'Défaite BO3';
+            body = winnerIsYou ? 
+                `Félicitations ! Vous avez gagné le BO3 (${game.player1_score}-${game.player2_score}). Vous remportez 95% du pot (${(totalPot * 0.95).toFixed(2)} FC).` :
+                `${game.winner} a gagné le BO3 (${game.player1_score}-${game.player2_score}).`;
+            
+            resultTitle.innerText = title;
+            resultBody.innerHTML = body;
+            resultModal.classList.add('show');
+        }
+
+        function closeResultModal() {
+            resultModal.classList.remove('show');
+            exitGameMode();
+        }
+
+        async function createGame() {
+            const bet = parseFloat(document.getElementById('betInput').value);
+            if (!bet || bet <= 0) {
+                setStatus('Entrez une mise valide (minimum 0.5FC)');
+                return;
+            }
+            try {
+                const game = await apiRequest('/api/face_ou_pile/games/create_game/', 'POST', { 
+                    bet_amount: bet
+                });
+                currentGameId = game.id;
+                enterGameMode();
+                setStatus('Partie créée. En attente d\'un adversaire...');
+                playerStatus.innerText = 'Créateur';
+                fetchGame();
+                pollingInterval = setInterval(fetchGame, 2000);
+            } catch (e) {
+                setStatus(e.message);
+            }
+        }
+
+        async function listGames() {
+            try {
+                const games = await apiRequest('/api/face_ou_pile/games/');
+                const waiting = games.filter(g => g.status === 'waiting');
+                
+                if (!waiting.length) {
+                    gameList.innerHTML = '<div style="text-align:center; padding:1rem; color:rgba(255,255,255,0.6);">Aucune partie en attente</div>';
+                } else {
+                    gameList.innerHTML = waiting.map(game => 
+                        `<div class="game-item" data-gameid="${game.id}">
+                            Partie #${game.id} • Mise ${game.bet_amount}FC • ${game.player1}
+                        </div>`
+                    ).join('');
+                    gameList.querySelectorAll('[data-gameid]').forEach(el => {
+                        el.addEventListener('click', () => joinGame(el.dataset.gameid));
+                    });
+                }
+                
+                gameList.classList.remove('hidden');
+                document.getElementById('hideListBtn').classList.remove('hidden');
+                document.getElementById('createGameBtn').style.display = 'none';
+                document.getElementById('listGamesBtn').style.display = 'none';
+            } catch (e) {
+                setStatus('Impossible de charger les parties');
+            }
+        }
+
+        function hideGameList() {
+            gameList.classList.add('hidden');
+            document.getElementById('hideListBtn').classList.add('hidden');
+            document.getElementById('createGameBtn').style.display = 'block';
+            document.getElementById('listGamesBtn').style.display = 'block';
+        }
+
+        async function joinGame(gameId) {
+            try {
+                const game = await apiRequest(`/api/face_ou_pile/games/${gameId}/join_game/`, 'POST');
+                currentGameId = game.id;
+                enterGameMode();
+                setStatus('Partie rejointe. Prêt pour le BO3 !');
+                playerStatus.innerText = 'Joueur 2';
+                
+                fetchGame();
+                pollingInterval = setInterval(fetchGame, 2000);
+            } catch (e) {
+                setStatus(e.message);
+            }
+        }
+
+        async function sendChoice(choice) {
+            if (!currentGameId || isFlipping) return;
+            try {
+                faceBtn.disabled = true;
+                pileBtn.disabled = true;
+                setStatus('Envoi du choix...');
+                const game = await apiRequest(`/api/face_ou_pile/games/${currentGameId}/make_choice/`, 'POST', { choice });
+                updateGamePanel(game);
+                // L'animation sera déclenchée par le message WebSocket
+            } catch (e) {
+                console.error('Erreur sendChoice:', e);
+                setStatus(e.message || 'Erreur lors de l\'envoi du choix');
+                faceBtn.disabled = false;
+                pileBtn.disabled = false;
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('backBtn').addEventListener('click', exitGameMode);
+        document.getElementById('createGameBtn').addEventListener('click', createGame);
+        document.getElementById('listGamesBtn').addEventListener('click', listGames);
+        document.getElementById('hideListBtn').addEventListener('click', hideGameList);
+        faceBtn.addEventListener('click', () => sendChoice('face'));
+        pileBtn.addEventListener('click', () => sendChoice('pile'));
+        document.getElementById('resultClose').addEventListener('click', closeResultModal);
+        
+        // Utiliser onclick pour éviter l'accumulation de listeners
+        resultRematch.onclick = function() {
+            sendWebSocketMessage('request_rematch');
+        };
+        
+        rematchAccept.onclick = function() {
+            sendWebSocketMessage('accept_rematch');
+        };
+        
+        rematchDecline.onclick = function() {
+            sendWebSocketMessage('decline_rematch');
+        };
+
+        async function init() {
+            fetchCurrentUser();
+            await refreshBalance();
+            showMenu();
+            
+            const inviteId = new URLSearchParams(window.location.search).get('invite');
+            if (inviteId) joinGame(inviteId);
+        }
+        init();
+    </script>
+</body>
+</html>

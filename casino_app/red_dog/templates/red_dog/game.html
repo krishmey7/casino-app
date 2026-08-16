@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Dog - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .info-item { padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title { font-size: 1.3em; margin-bottom: 25px; color: #00d4ff; }
+        .cards-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .card {
+            width: 80px;
+            height: 120px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .spread-display {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.3em;
+        }
+        .spread-display strong { color: #00d4ff; }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title { color: #00d4ff; font-size: 1.1em; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .help-button {
+            background: rgba(0, 212, 255, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .help-button:hover {
+            background: #00d4ff;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #00d4ff;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #0099cc;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            color: #ff6b00;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 8px;
+        }
+
+        .modal-section-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">🐕 RED DOG</div>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+            </div>
+            <button class="help-button" id="helpButton" title="Aide">?</button>
+        </div>
+
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <div class="modal-title">📋 Comment Jouer au Red Dog</div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🎮 Objectif du Jeu</div>
+                    <div class="modal-section-content">
+                        Parier sur l'écart entre deux cartes. Si une troisième carte tombe dans l'écart, vous gagnez !
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🃏 Comment Jouer</div>
+                    <div class="modal-section-content">
+                        1. Deux cartes sont distribuées<br>
+                        2. Si elles sont consécutives, c'est un "push" (égalité)<br>
+                        3. Si elles sont identiques, double mise gagnée<br>
+                        4. Sinon, un écart se forme<br>
+                        5. Une troisième carte est tirée<br>
+                        6. Si elle tombe dans l'écart, vous gagnez selon les cotes
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">💰 Cotes de Gain</div>
+                    <div class="modal-section-content">
+                        Écart de 1 : 5x la mise<br>
+                        Écart de 2 : 4x la mise<br>
+                        Écart de 3 : 3x la mise<br>
+                        Écart de 4-7 : 2x la mise<br>
+                        Cartes identiques : 11x la mise
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Cartes</div>
+                
+                <div class="cards-display" id="cardsDisplay">
+                    <div class="card">?</div>
+                    <div class="card">?</div>
+                    <div class="card">?</div>
+                </div>
+
+                <div class="spread-display" id="spreadDisplay" style="display: none;">
+                    Écart: <strong id="spreadValue">0</strong>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="100" min="1" max="10000" step="10">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betType">Type de pari</label>
+                    <select id="betType">
+                        <option value="spread">Écart</option>
+                        <option value="high">Plus haute</option>
+                        <option value="low">Plus basse</option>
+                    </select>
+                </div>
+
+                <button id="playBtn">Jouer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/red_dog';
+        let currentBalance = 0;
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            const betType = document.getElementById('betType').value;
+            
+            if (bet <= 0 || bet > currentBalance) {
+                alert('Mise invalide');
+                return;
+            }
+
+            try {
+                document.getElementById('playBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet, bet_type: betType })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('playBtn').disabled = false;
+                    return;
+                }
+
+                displayResult(data);
+                updateBalance();
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('playBtn').disabled = false;
+            }
+        });
+
+        function displayResult(game) {
+            const display = document.getElementById('cardsDisplay');
+            display.innerHTML = game.cards.map(card => `<div class="card">${card}</div>`).join('');
+            
+            document.getElementById('spreadValue').textContent = game.spread;
+            document.getElementById('spreadDisplay').style.display = 'block';
+
+            const msg = document.getElementById('resultMessage');
+            if (game.result === 'win') {
+                msg.textContent = `🎉 Gagné! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else {
+                msg.textContent = 'Perdu!';
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+            document.getElementById('playBtn').disabled = false;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateBalance();
+
+        // Modal help functionality
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeModal = document.getElementById('closeModal');
+
+        helpButton.addEventListener('click', () => {
+            helpModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

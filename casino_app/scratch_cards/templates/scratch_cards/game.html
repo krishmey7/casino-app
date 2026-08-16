@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scratch Cards - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .info-item { padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title { font-size: 1.3em; margin-bottom: 25px; color: #00d4ff; }
+        .scratch-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            border: 3px solid #b8860b;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-title {
+            text-align: center;
+            color: #000;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .scratch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .scratch-cell {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+            border: 2px solid #daa520;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+        .scratch-cell:hover {
+            transform: scale(1.05);
+        }
+        .scratch-cell.scratched {
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            color: #000;
+            cursor: default;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .scratch-cell.scratched::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(0,0,0,0.1) 5px,
+                rgba(0,0,0,0.1) 10px
+            );
+        }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .prize-display {
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 15px 0;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title { color: #00d4ff; font-size: 1.1em; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .card-types {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .card-types h4 { color: #00d4ff; margin-bottom: 10px; }
+        .card-type-info { font-size: 0.8em; margin-bottom: 8px; }
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .scratch-card { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎫 SCRATCH CARDS 🎫</h1>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Grattez votre carte</div>
+                
+                <div class="scratch-card" id="scratchCard">
+                    <div class="card-title" id="cardTitle">CARTE CLASSIC</div>
+                    
+                    <div class="scratch-grid" id="scratchGrid">
+                        <div class="scratch-cell" data-index="0">?</div>
+                        <div class="scratch-cell" data-index="1">?</div>
+                        <div class="scratch-cell" data-index="2">?</div>
+                        <div class="scratch-cell" data-index="3">?</div>
+                        <div class="scratch-cell" data-index="4">?</div>
+                        <div class="scratch-cell" data-index="5">?</div>
+                        <div class="scratch-cell" data-index="6">?</div>
+                        <div class="scratch-cell" data-index="7">?</div>
+                        <div class="scratch-cell" data-index="8">?</div>
+                    </div>
+                    
+                    <div class="prize-display" id="prizeDisplay" style="display: none;"></div>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="betAmount">Montant à miser</label>
+                    <input type="number" id="betAmount" value="50" min="1" max="10000" step="10">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="cardType">Type de carte</label>
+                    <select id="cardType">
+                        <option value="classic">Classic</option>
+                        <option value="deluxe">Deluxe</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+
+                <button id="buyBtn">ACHETER CARTE</button>
+
+                <div class="card-types">
+                    <h4>Types de Cartes</h4>
+                    <div class="card-type-info"><strong>Classic:</strong> Prix de base, gains jusqu'à 50x</div>
+                    <div class="card-type-info"><strong>Deluxe:</strong> Prix moyen, gains jusqu'à 500x</div>
+                    <div class="card-type-info"><strong>Premium:</strong> Prix élevé, gains jusqu'à 2500x</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/scratch_cards';
+        let currentBalance = 0;
+        let currentGame = null;
+        let scratchedCells = 0;
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('betAmount').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        document.getElementById('cardType').addEventListener('change', function() {
+            const cardTitle = document.getElementById('cardTitle');
+            const type = this.value;
+            if (type === 'classic') {
+                cardTitle.textContent = 'CARTE CLASSIC';
+            } else if (type === 'deluxe') {
+                cardTitle.textContent = 'CARTE DELUXE';
+            } else {
+                cardTitle.textContent = 'CARTE PREMIUM';
+            }
+        });
+
+        document.getElementById('buyBtn').addEventListener('click', async () => {
+            const bet = parseFloat(document.getElementById('betAmount').value);
+            const cardType = document.getElementById('cardType').value;
+            
+            if (bet <= 0 || bet > currentBalance) {
+                alert('Mise invalide');
+                return;
+            }
+
+            try {
+                document.getElementById('buyBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ bet_amount: bet, card_type: cardType })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('buyBtn').disabled = false;
+                    return;
+                }
+
+                currentGame = data;
+                setupScratchCard(data);
+                updateBalance();
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('buyBtn').disabled = false;
+            }
+        });
+
+        function setupScratchCard(game) {
+            scratchedCells = 0;
+            const cells = document.querySelectorAll('.scratch-cell');
+            cells.forEach((cell, index) => {
+                cell.textContent = '?';
+                cell.classList.remove('scratched');
+                cell.style.cursor = 'pointer';
+                
+                cell.addEventListener('click', () => scratchCell(cell, index, game.symbols[index]));
+            });
+
+            document.getElementById('prizeDisplay').style.display = 'none';
+            document.getElementById('resultMessage').style.display = 'none';
+        }
+
+        function scratchCell(cell, index, symbol) {
+            if (cell.classList.contains('scratched')) return;
+            
+            cell.textContent = symbol;
+            cell.classList.add('scratched');
+            cell.style.cursor = 'default';
+            scratchedCells++;
+
+            // Vérifier si toutes les cellules sont grattées
+            if (scratchedCells === 9) {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            const prize = parseFloat(currentGame.prize);
+            const winnings = parseFloat(currentGame.winnings);
+            
+            document.getElementById('prizeDisplay').textContent = `Prix: ${prize.toFixed(2)} CDF`;
+            document.getElementById('prizeDisplay').style.display = 'block';
+
+            const msg = document.getElementById('resultMessage');
+            if (currentGame.result === 'win') {
+                msg.textContent = `🎉 Gagné! Gain total: ${winnings.toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else {
+                msg.textContent = 'Perdu!';
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+            
+            document.getElementById('buyBtn').disabled = false;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateBalance();
+    </script>
+</body>
+</html>

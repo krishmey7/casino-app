@@ -1,0 +1,239 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 col-md-12">
+            <h2 class="mb-3">Parties de Dames en attente</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Créer une nouvelle partie</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'checkers:create_game' %}">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label for="stake" class="form-label">Mise (crédits)</label>
+                                    <input type="number" class="form-control" id="stake" name="stake" 
+                                           min="10" step="10" value="50" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Votre solde</label>
+                                    <div class="form-control-plaintext">
+                                        <strong>{{ user_wallet.balance }} crédits</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 w-md-auto">
+                            <i class="fas fa-plus"></i> Créer la partie
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Parties disponibles</h5>
+                </div>
+                <div class="card-body">
+                    {% if waiting_games %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Créateur</th>
+                                        <th>Mise</th>
+                                        <th class="d-none d-md-table-cell">Créée le</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in waiting_games %}
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user"></i> {{ game.player1.username }}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">{{ game.stake }} crédits</span>
+                                            </td>
+                                            <td class="d-none d-md-table-cell">{{ game.created_at|date:"H:i" }}</td>
+                                            <td>
+                                                {% if game.player1 == request.user %}
+                                                    <form method="post" action="{% url 'checkers:cancel_game' game.id %}" 
+                                                          class="d-inline" onsubmit="return confirm('Annuler cette partie?')">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-times"></i> Annuler
+                                                        </button>
+                                                    </form>
+                                                {% else %}
+                                                    {% if user_wallet.balance >= game.stake %}
+                                                        <form method="post" action="{% url 'checkers:join_game' game.id %}" class="d-inline">
+                                                            {% csrf_token %}
+                                                            <button type="submit" class="btn btn-sm btn-success">
+                                                                <i class="fas fa-play"></i> Rejoindre
+                                                            </button>
+                                                        </form>
+                                                    {% else %}
+                                                        <button class="btn btn-sm btn-secondary" disabled>
+                                                            <i class="fas fa-coins"></i> Solde insuffisant
+                                                        </button>
+                                                    {% endif %}
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chess fa-3x mb-3"></i>
+                            <p>Aucune partie en attente pour le moment.</p>
+                            <p>Soyez le premier à créer une partie!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Parties en cours -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Vos parties en cours</h5>
+                </div>
+                <div class="card-body">
+                    {% if active_games %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Adversaire</th>
+                                        <th>Mise</th>
+                                        <th class="d-none d-md-table-cell">Démarrée</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for game in active_games %}
+                                        <tr>
+                                            <td>
+                                                <i class="fas fa-user"></i> 
+                                                {% if game.player1 == request.user %}
+                                                    {{ game.player2.username }}
+                                                {% else %}
+                                                    {{ game.player1.username }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-warning">{{ game.stake }} crédits</span>
+                                            </td>
+                                            <td class="d-none d-md-table-cell">{{ game.updated_at|date:"H:i" }}</td>
+                                            <td>
+                                                <a href="{% url 'checkers:game' game.id %}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-play"></i> Retourner dans la partie
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-chess-board fa-3x mb-3"></i>
+                            <p>Aucune partie en cours.</p>
+                            <p>Rejoignez ou créez une partie pour commencer!</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 col-md-12 mt-4 mt-lg-0">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Comment jouer?</h5>
+                </div>
+                <div class="card-body">
+                    <ol class="small">
+                        <li>Créez une partie avec une mise de votre choix</li>
+                        <li>Vos fonds sont bloqués automatiquement</li>
+                        <li>Attendez qu'un autre joueur rejoigne</li>
+                        <li>La partie commence automatiquement</li>
+                        <li>Le gagnant remporte la totalité des mises</li>
+                    </ol>
+                    
+                    <hr>
+                    
+                    <h6>Votre solde actuel</h6>
+                    <div class="alert alert-info">
+                        <i class="fas fa-wallet"></i> 
+                        <strong>{{ user_wallet.balance }} crédits</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .card-header h5 {
+        font-size: 1.1rem;
+    }
+    
+    .table td, .table th {
+        padding: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+    
+    .badge {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+    
+    .form-control {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+}
+</style>
+{% endblock %}

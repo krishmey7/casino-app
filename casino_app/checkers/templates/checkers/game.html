@@ -1,0 +1,3076 @@
+{% extends "core/base.html" %}
+{% load checkers_tags %}
+
+{% block extra_css %}
+<style>
+/* Masquer la navigation mobile et le header dans le jeu de dames */
+@media (max-width: 768px) {
+    .bottom-nav {
+        display: none !important;
+    }
+    
+    .main-header {
+        display: none !important;
+    }
+    
+    .main-content {
+        padding-bottom: 1rem !important;
+        padding-top: 1rem !important;
+    }
+    
+    .main-layout {
+        min-height: 100vh !important;
+    }
+}
+/* Compact Mobile-First Checkers Board Design */
+.game-container {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    max-width: 100vw;
+    margin: 0;
+}
+
+#checkers-board {
+    border: 8px solid #4a2c17 !important;
+    border-radius: 8px;
+    margin: 0 auto !important;
+    border-collapse: separate !important;
+    border-spacing: 2px !important;
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -2px 4px rgba(139, 69, 19, 0.2);
+    overflow: hidden;
+    width: 100%;
+    max-width: min(98vw, 98vh);
+    table-layout: fixed;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #3e2415;
+}
+
+#checkers-board td {
+    width: calc(min(95vw, 95vh) / 10) !important;
+    height: calc(min(95vw, 95vh) / 10) !important;
+    display: table-cell !important;
+    transition: all 0.2s ease;
+    position: relative;
+    border-radius: 2px;
+}
+
+#checkers-board td[data-row] {
+    border-radius: 4px;
+}
+
+/* Realistic Wood Checkerboard Pattern */
+/* Light wood squares - maple/birch */
+#checkers-board td {
+    background: 
+        linear-gradient(135deg, #f4e4d4 0%, #e8d4c4 25%, #dcc4b4 50%, #e0d0c0 75%, #e8d8c8 100%) !important;
+    box-shadow: 
+        inset 0 1px 2px rgba(139, 69, 19, 0.1),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.2),
+        0 1px 1px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+#checkers-board td::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 69, 19, 0.03) 2px, rgba(139, 69, 19, 0.03) 4px);
+    pointer-events: none;
+}
+
+/* Dark wood squares - walnut/mahogany */
+#checkers-board tr:nth-child(1) td:nth-child(2n),
+#checkers-board tr:nth-child(2) td:nth-child(2n+1),
+#checkers-board tr:nth-child(3) td:nth-child(2n),
+#checkers-board tr:nth-child(4) td:nth-child(2n+1),
+#checkers-board tr:nth-child(5) td:nth-child(2n),
+#checkers-board tr:nth-child(6) td:nth-child(2n+1),
+#checkers-board tr:nth-child(7) td:nth-child(2n),
+#checkers-board tr:nth-child(8) td:nth-child(2n+1),
+#checkers-board tr:nth-child(9) td:nth-child(2n),
+#checkers-board tr:nth-child(10) td:nth-child(2n+1) {
+    background: 
+        linear-gradient(135deg, #6b4423 0%, #5a3a1f 25%, #4a3018 50%, #543820 75%, #5e4025 100%) !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.4),
+        inset 0 -1px 2px rgba(139, 69, 19, 0.3),
+        0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+#checkers-board tr:nth-child(1) td:nth-child(2n)::before,
+#checkers-board tr:nth-child(2) td:nth-child(2n+1)::before,
+#checkers-board tr:nth-child(3) td:nth-child(2n)::before,
+#checkers-board tr:nth-child(4) td:nth-child(2n+1)::before,
+#checkers-board tr:nth-child(5) td:nth-child(2n)::before,
+#checkers-board tr:nth-child(6) td:nth-child(2n+1)::before,
+#checkers-board tr:nth-child(7) td:nth-child(2n)::before,
+#checkers-board tr:nth-child(8) td:nth-child(2n+1)::before,
+#checkers-board tr:nth-child(9) td:nth-child(2n)::before,
+#checkers-board tr:nth-child(10) td:nth-child(2n+1)::before {
+    background: 
+        repeating-linear-gradient(45deg, transparent, transparent 3px, rgba(0, 0, 0, 0.1) 3px, rgba(0, 0, 0, 0.1) 6px),
+        repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(139, 69, 19, 0.05) 3px, rgba(139, 69, 19, 0.05) 6px);
+}
+
+/* Hover effect on dark squares */
+#checkers-board tr:nth-child(1) td:nth-child(2n):hover,
+#checkers-board tr:nth-child(2) td:nth-child(2n+1):hover,
+#checkers-board tr:nth-child(3) td:nth-child(2n):hover,
+#checkers-board tr:nth-child(4) td:nth-child(2n+1):hover,
+#checkers-board tr:nth-child(5) td:nth-child(2n):hover,
+#checkers-board tr:nth-child(6) td:nth-child(2n+1):hover,
+#checkers-board tr:nth-child(7) td:nth-child(2n):hover,
+#checkers-board tr:nth-child(8) td:nth-child(2n+1):hover,
+#checkers-board tr:nth-child(9) td:nth-child(2n):hover,
+#checkers-board tr:nth-child(10) td:nth-child(2n+1):hover {
+    background: 
+        linear-gradient(135deg, #7a5433 0%, #694a2f 25%, #594028 50%, #634830 75%, #6d5035 100%) !important;
+}
+
+/* Valid move highlight */
+#checkers-board td.valid-move {
+    background: linear-gradient(145deg, #90EE90 0%, #32CD32 100%) !important;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(50, 205, 50, 0.7); }
+    50% { transform: scale(1.05); box-shadow: 0 0 15px 5px rgba(50, 205, 50, 0.5); }
+}
+
+/* Piece styling - Mobile First */
+[data-piece] {
+    width: calc(min(95vw, 95vh) / 10 * 0.8) !important;
+    height: calc(min(95vw, 95vh) / 10 * 0.8) !important;
+    border-radius: 50% !important;
+    margin: calc(min(95vw, 95vh) / 10 * 0.1) auto !important;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: calc(min(95vw, 95vh) / 10 * 0.4) !important;
+    border: none !important;
+}
+
+/* Black pieces - realistic dark marble/stone */
+[data-piece="b"], [data-piece="B"] {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(0, 0, 0, 0.3) 0%, transparent 50%),
+        linear-gradient(145deg, #5a5a5a 0%, #3a3a3a 50%, #2a2a2a 100%) !important;
+    box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 3px 6px rgba(255, 255, 255, 0.1),
+        inset 0 -3px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* White pieces - realistic ivory/pearl */
+[data-piece="w"], [data-piece="W"] {
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(200, 200, 200, 0.3) 0%, transparent 50%),
+        linear-gradient(145deg, #ffffff 0%, #f5f5f5 50%, #e8e8e8 100%) !important;
+    box-shadow: 
+        0 6px 12px rgba(0, 0, 0, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.15),
+        inset 0 3px 6px rgba(255, 255, 255, 0.9),
+        inset 0 -3px 6px rgba(180, 180, 180, 0.2);
+}
+
+/* King pieces - crown icon with glow */
+[data-piece="B"]::after, [data-piece="W"]::after {
+    content: '♔';
+    color: #FFD700;
+    text-shadow: 
+        0 0 10px rgba(255, 215, 0, 0.8),
+        0 0 20px rgba(255, 215, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+    font-size: 24px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+/* Selected piece */
+[data-piece].selected {
+    transform: scale(1.15) translateY(-5px);
+    box-shadow: 
+        0 8px 16px rgba(0, 0, 0, 0.5),
+        0 0 20px rgba(255, 215, 0, 0.6);
+    animation: selected-glow 1s infinite alternate;
+}
+
+@keyframes selected-glow {
+    from { box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.6); }
+    to { box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.9); }
+}
+
+/* Hover effect on pieces */
+[data-piece]:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Hover effect on squares */
+#checkers-board td:hover {
+    filter: brightness(1.1);
+}
+
+/* Card styling */
+.card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+}
+
+.card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 15px 15px 0 0;
+    color: white;
+    padding: 20px;
+}
+
+.card-header h4, .card-header h5 {
+    margin: 0;
+    font-weight: 600;
+}
+
+/* Badge styling */
+.badge {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Button styling */
+.btn {
+    border-radius: 25px;
+    padding: 10px 25px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Debug section styling */
+.bg-light {
+    background: rgba(248, 249, 250, 0.9) !important;
+    border-radius: 10px;
+}
+
+/* Turn indicator animation */
+.badge.bg-success {
+    animation: turn-pulse 2s infinite;
+}
+
+@keyframes turn-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+    50% { box-shadow: 0 0 15px 5px rgba(40, 167, 69, 0.4); }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .game-container {
+        padding: 20px;
+    }
+    
+    #checkers-board td {
+        width: 45px !important;
+        height: 45px !important;
+    }
+    
+    [data-piece] {
+        width: 34px !important;
+        height: 34px !important;
+        margin: 5px auto !important;
+        font-size: 16px;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 992px) {
+    .game-container {
+        padding: 15px;
+        border-radius: 15px;
+    }
+    
+    #checkers-board {
+        border: 4px solid #2c1810 !important;
+        border-spacing: 1px !important;
+    }
+    
+    #checkers-board td {
+        width: 38px !important;
+        height: 38px !important;
+    }
+    
+    [data-piece] {
+        width: 28px !important;
+        height: 28px !important;
+        margin: 5px auto !important;
+        font-size: 14px;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: 18px;
+    }
+    
+    .card-header {
+        padding: 15px;
+    }
+    
+    .card-header h4 {
+        font-size: 18px;
+    }
+    
+    .badge {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .btn {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Full screen mobile layout */
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 5px;
+        max-width: 100vw;
+        width: 100vw;
+        margin: 0;
+    }
+    
+    .game-container {
+        padding: 5px;
+        border-radius: 5px;
+        width: 100%;
+        max-width: 100vw;
+    }
+    
+    /* Compact header */
+    .card-header {
+        padding: 5px 8px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        min-height: auto;
+        gap: 5px;
+    }
+    
+    .card-header h4 {
+        font-size: 14px;
+        margin: 0;
+        flex: 1;
+    }
+    
+    .card-header > div {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .badge {
+        padding: 2px 4px;
+        font-size: 9px;
+        border-radius: 8px;
+        white-space: nowrap;
+    }
+    
+    /* Maximize board space */
+    .card-body {
+        padding: 5px;
+    }
+    
+    .row.mb-3 {
+        margin-bottom: 3px;
+    }
+    
+    .row.mb-3 .col-md-6 {
+        padding: 2px;
+        margin-bottom: 2px;
+    }
+    
+    .row.mb-3 strong {
+        font-size: 10px;
+    }
+    
+    /* Board sizing - calculate based on viewport */
+    #checkers-board {
+        border: 2px solid #2c1810 !important;
+        border-spacing: 0 !important;
+        width: 100%;
+        max-width: min(95vw, 95vh);
+        margin: 0 auto;
+        table-layout: fixed;
+    }
+    
+    #checkers-board td {
+        width: calc(min(95vw, 95vh) / 10) !important;
+        height: calc(min(95vw, 95vh) / 10) !important;
+        border-radius: 1px;
+        padding: 0;
+    }
+    
+    [data-piece] {
+        width: calc(min(95vw, 95vh) / 10 * 0.75) !important;
+        height: calc(min(95vw, 95vh) / 10 * 0.75) !important;
+        margin: calc(min(95vw, 95vh) / 10 * 0.125) auto !important;
+        font-size: calc(min(95vw, 95vh) / 10 * 0.375) !important;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: calc(min(95vw, 95vh) / 10 * 0.44) !important;
+    }
+    
+    .btn {
+        padding: 4px 8px;
+        font-size: 10px;
+        border-radius: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Even more compact mobile layout */
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 2px;
+        max-width: 100vw;
+        width: 100vw;
+        margin: 0;
+    }
+    
+    .game-container {
+        padding: 2px;
+        border-radius: 3px;
+        width: 100%;
+        max-width: 100vw;
+    }
+    
+    /* Ultra-compact header */
+    .card-header {
+        padding: 3px 5px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        min-height: auto;
+        gap: 3px;
+    }
+    
+    .card-header h4 {
+        font-size: 12px;
+        margin: 0;
+        flex: 1;
+    }
+    
+    .card-header > div {
+        display: flex;
+        gap: 2px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .badge {
+        padding: 1px 3px;
+        font-size: 8px;
+        border-radius: 6px;
+        white-space: nowrap;
+    }
+    
+    /* Maximize board space even more */
+    .card-body {
+        padding: 3px;
+    }
+    
+    .row.mb-3 {
+        margin-bottom: 2px;
+    }
+    
+    .row.mb-3 .col-md-6 {
+        padding: 1px;
+        margin-bottom: 1px;
+    }
+    
+    .row.mb-3 strong {
+        font-size: 9px;
+    }
+    
+    /* Board sizing - even larger viewport usage */
+    #checkers-board {
+        border: 1px solid #2c1810 !important;
+        border-spacing: 0 !important;
+        width: 100%;
+        max-width: min(98vw, 98vh);
+        margin: 0 auto;
+        table-layout: fixed;
+    }
+    
+    #checkers-board td {
+        width: calc(min(98vw, 98vh) / 10) !important;
+        height: calc(min(98vw, 98vh) / 10) !important;
+        border-radius: 1px;
+        padding: 0;
+    }
+    
+    [data-piece] {
+        width: calc(min(98vw, 98vh) / 10 * 0.8) !important;
+        height: calc(min(98vw, 98vh) / 10 * 0.8) !important;
+        margin: calc(min(98vw, 98vh) / 10 * 0.1) auto !important;
+        font-size: calc(min(98vw, 98vh) / 10 * 0.4) !important;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: calc(min(98vw, 98vh) / 10 * 0.45) !important;
+    }
+    
+    .btn {
+        padding: 3px 6px;
+        font-size: 9px;
+        border-radius: 12px;
+    }
+    
+    .col-md-8, .col-md-4 {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Maximum compact mobile layout */
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+    }
+    
+    .container {
+        padding: 1px;
+        max-width: 100vw;
+        width: 100vw;
+        margin: 0;
+    }
+    
+    .game-container {
+        padding: 1px;
+        border-radius: 2px;
+        width: 100%;
+        max-width: 100vw;
+    }
+    
+    /* Extreme-compact header */
+    .card-header {
+        padding: 2px 3px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        min-height: auto;
+        gap: 2px;
+    }
+    
+    .card-header h4 {
+        font-size: 10px;
+        margin: 0;
+        flex: 1;
+    }
+    
+    .card-header > div {
+        display: flex;
+        gap: 1px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+    
+    .badge {
+        padding: 1px 2px;
+        font-size: 7px;
+        border-radius: 4px;
+        white-space: nowrap;
+    }
+    
+    /* Absolute maximum board space */
+    .card-body {
+        padding: 2px;
+    }
+    
+    .row.mb-3 {
+        margin-bottom: 1px;
+    }
+    
+    .row.mb-3 .col-md-6 {
+        padding: 1px;
+        margin-bottom: 1px;
+    }
+    
+    .row.mb-3 strong {
+        font-size: 8px;
+    }
+    
+    /* Board sizing - maximum viewport usage */
+    #checkers-board {
+        border: 1px solid #2c1810 !important;
+        border-spacing: 0 !important;
+        width: 100%;
+        max-width: min(99vw, 99vh);
+        margin: 0 auto;
+        table-layout: fixed;
+    }
+    
+    #checkers-board td {
+        width: calc(min(99vw, 99vh) / 10) !important;
+        height: calc(min(99vw, 99vh) / 10) !important;
+        border-radius: 1px;
+        padding: 0;
+    }
+    
+    [data-piece] {
+        width: calc(min(99vw, 99vh) / 10 * 0.85) !important;
+        height: calc(min(99vw, 99vh) / 10 * 0.85) !important;
+        margin: calc(min(99vw, 99vh) / 10 * 0.075) auto !important;
+        font-size: calc(min(99vw, 99vh) / 10 * 0.42) !important;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: calc(min(99vw, 99vh) / 10 * 0.48) !important;
+    }
+    
+    .btn {
+        padding: 2px 4px;
+        font-size: 8px;
+        border-radius: 10px;
+    }
+    
+    .btn-text {
+        font-size: 8px;
+    }
+    
+    .btn i {
+        font-size: 7px;
+    }
+}
+
+/* Landscape mode for mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-container {
+        padding: 5px;
+    }
+    
+    #checkers-board td {
+        width: 30px !important;
+        height: 30px !important;
+    }
+    
+    [data-piece] {
+        width: 22px !important;
+        height: 22px !important;
+        margin: 4px auto !important;
+        font-size: 11px;
+    }
+    
+    .card-header {
+        padding: 8px;
+    }
+    
+    .card-body {
+        padding: 10px;
+    }
+}
+
+/* Mobile-specific button optimizations */
+@media (max-width: 768px) {
+    .btn-text {
+        display: inline;
+    }
+    
+    .d-grid.gap-2 .btn {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn-text {
+        display: inline;
+    }
+    
+    .d-grid.gap-2 .btn {
+        min-height: 40px;
+        font-size: 11px;
+        gap: 6px;
+    }
+    
+    .d-grid.gap-2 .btn i {
+        font-size: 10px;
+    }
+}
+
+/* Touch-friendly interactions */
+@media (hover: none) and (pointer: coarse) {
+    [data-piece]:hover {
+        transform: none;
+    }
+    
+    #checkers-board td:hover {
+        filter: none;
+    }
+    
+    [data-piece]:active {
+        transform: scale(0.95);
+    }
+    
+    #checkers-board td:active {
+        filter: brightness(0.9);
+    }
+}
+
+/* Compact layout for very small screens */
+@media (max-width: 360px) {
+    .container {
+        padding: 2px;
+    }
+    
+    .game-container {
+        padding: 2px;
+        border-radius: 5px;
+    }
+    
+    #checkers-board {
+        border: 1px solid #2c1810 !important;
+        margin: 2px auto !important;
+    }
+    
+    #checkers-board td {
+        width: 22px !important;
+        height: 22px !important;
+    }
+    
+    [data-piece] {
+        width: 14px !important;
+        height: 14px !important;
+        margin: 4px auto !important;
+        font-size: 8px;
+    }
+    
+    [data-piece="B"]::after, [data-piece="W"]::after {
+        font-size: 8px;
+    }
+    
+    .card-header {
+        padding: 3px;
+    }
+    
+    .card-header h4 {
+        font-size: 11px;
+    }
+    
+    .badge {
+        padding: 1px 3px;
+        font-size: 8px;
+        border-radius: 8px;
+    }
+    
+    .btn {
+        padding: 3px 6px;
+        font-size: 9px;
+        min-height: 32px;
+    }
+    
+    .btn-text {
+        font-size: 9px;
+    }
+    
+    .btn i {
+        font-size: 8px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="checkers-game">
+    <!-- Header simplifié -->
+    <header class="game-header">
+        <div class="game-info">
+            <h1 class="game-title">♟️ Dames</h1>
+            <div class="game-meta">
+                <span class="stake">{{ game.stake }} crédits</span>
+                <span class="turn-indicator {% if is_player_turn %}active{% endif %}">
+                    {% if is_player_turn %}Votre tour{% else %}Adversaire{% endif %}
+                </span>
+            </div>
+        </div>
+        <div class="players">
+            <div class="player {% if is_player1 %}current{% endif %}">
+                <span class="player-name">{{ game.player1.username }}</span>
+                {% if is_player1 %}<span class="you-tag">Vous</span>{% endif %}
+            </div>
+            <div class="vs">VS</div>
+            <div class="player {% if not is_player1 %}current{% endif %}">
+                <span class="player-name">{{ game.player2.username }}</span>
+                {% if not is_player1 %}<span class="you-tag">Vous</span>{% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Plateau de jeu -->
+    <main class="game-main">
+        <div class="board-wrapper">
+            <table id="checkers-board">
+                {% if is_player1 %}
+                    {% for row in '0123456789' %}
+                <tr>
+                    {% for col in '0123456789' %}
+                        {% with position=row|str_concat:col %}
+                        {% with row_num=forloop.parentloop.counter0 %}
+                        {% with col_num=forloop.counter0 %}
+                        {% with is_black_square=row_num|add:col_num|divisibleby:2 %}
+                        <td data-row="{{ row_num }}" data-col="{{ col_num }}" data-position="{{ position }}"
+                            {% if is_black_square %}
+                                class="light-square"
+                            {% else %}
+                                class="dark-square"
+                            {% endif %}>
+                            {% if not is_black_square %}
+                                {% with piece=game.board_state|get_item:position %}
+                                    {% if piece %}
+                                        <div data-piece="{{ piece }}" data-position="{{ position }}"></div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% else %}
+                    {% for row in '9876543210' %}
+                <tr>
+                    {% for col in '9876543210' %}
+                        {% with position=row|str_concat:col %}
+                        {% with row_num=forloop.parentloop.counter0|reverse_index:9 %}
+                        {% with col_num=forloop.counter0|reverse_index:9 %}
+                        {% with is_black_square=row_num|add:col_num|divisibleby:2 %}
+                        <td data-row="{{ row_num }}" data-col="{{ col_num }}" data-position="{{ position }}"
+                            {% if is_black_square %}
+                                class="light-square"
+                            {% else %}
+                                class="dark-square"
+                            {% endif %}>
+                            {% if not is_black_square %}
+                                {% with piece=game.board_state|get_item:position %}
+                                    {% if piece %}
+                                        <div data-piece="{{ piece }}" data-position="{{ position }}"></div>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </td>
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+                {% endif %}
+            </table>
+        </div>
+        
+        <!-- Actions compactes sous le tableau -->
+        <div class="game-actions">
+            <button onclick="refreshGameState()" class="action-btn refresh">
+                <span>↻</span>
+            </button>
+            <button onclick="forfeitGame()" class="action-btn forfeit">
+                <span>🏳</span>
+            </button>
+            <a href="{% url 'checkers:lobby' %}" class="action-btn back">
+                <span>←</span>
+            </a>
+        </div>
+    </main>
+</div>
+
+<style>
+/* Nouveau design moderne et épuré */
+.checkers-game {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: white;
+}
+
+/* Header compact */
+.game-header {
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.game-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0;
+    color: #d4af37;
+}
+
+.game-meta {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.stake {
+    background: rgba(212, 175, 55, 0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.turn-indicator {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.turn-indicator.active {
+    background: #4CAF50;
+    color: white;
+}
+
+.players {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.875rem;
+}
+
+.player {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.player.current {
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid #d4af37;
+}
+
+.player-name {
+    font-weight: 600;
+}
+
+.you-tag {
+    background: #d4af37;
+    color: #0f172a;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.vs {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 700;
+}
+
+/* Plateau de jeu - compact */
+.game-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+.board-wrapper {
+    width: 100%;
+    max-width: min(75vw, 65vh);
+    margin: 0 auto;
+    flex-shrink: 0;
+}
+
+#checkers-board {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+    border: 3px solid #2c1810;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 1px;
+}
+
+#checkers-board td {
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Override inline styles - force two-color pattern */
+#checkers-board td[style*="background: #DEB887"],
+#checkers-board td[style*="background: #deb887"] {
+    background: #f5deb3 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#checkers-board td[style*="background: #8B4513"],
+#checkers-board td[style*="background: #8b4513"] {
+    background: #8B4513 !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+#checkers-board td[style*="background: #8B4513"]:hover,
+#checkers-board td[style*="background: #8b4513"]:hover {
+    background: #A0522D !important;
+}
+
+
+/* Actions - compactes sous le tableau */
+.game-actions {
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.action-btn {
+    width: 35px;
+    height: 35px;
+    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.action-btn.forfeit:hover {
+    background: rgba(239, 68, 68, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-header {
+        padding: 0.5rem;
+    }
+    
+    .game-title {
+        font-size: 1.1rem;
+    }
+    
+    .game-meta {
+        gap: 0.5rem;
+    }
+    
+    .players {
+        gap: 0.5rem;
+        font-size: 0.75rem;
+    }
+    
+    .player {
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .game-actions {
+        padding: 0.5rem;
+        gap: 0.75rem;
+    }
+    
+    .action-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+}
+
+/* iPhone SE 375x667 optimization */
+@media (max-width: 375px) and (max-height: 667px) {
+    .game-header {
+        padding: 0.4rem;
+    }
+    
+    .game-title {
+        font-size: 1rem;
+    }
+    
+    .game-meta {
+        gap: 0.25rem;
+    }
+    
+    .turn-indicator {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.5rem;
+    }
+    
+    .players {
+        gap: 0.25rem;
+        font-size: 0.7rem;
+    }
+    
+    .player {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .you-tag {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.4rem;
+    }
+    
+    .game-main {
+        padding: 0.25rem;
+    }
+    
+    .board-wrapper {
+        max-width: min(70vw, 55vh);
+    }
+    
+    .game-actions {
+        padding: 0.4rem;
+        gap: 0.5rem;
+        margin-top: 0.15rem;
+    }
+    
+    .action-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+}
+
+.checkers-piece.white {
+    background: radial-gradient(circle at 35% 35%, #ffffff, #d0d0d0) !important;
+    border-color: #333 !important;
+    visibility: visible !important;
+}
+
+.checkers-piece.king::before {
+    content: '♛';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 28px;
+    color: gold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.checkers-piece:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.checkers-piece.dragging {
+    opacity: 0.7;
+    cursor: grabbing;
+    transform: scale(1.15);
+}
+
+.checkers-square.selected {
+    background: #FFD700 !important;
+    box-shadow: inset 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.checkers-square.valid-move {
+    background: #90EE90 !important;
+    box-shadow: inset 0 0 15px rgba(144, 238, 144, 0.6);
+}
+
+.checkers-square.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(0, 128, 0, 0.5);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.checkers-square.valid-capture {
+    background: #FF6347 !important;
+    box-shadow: inset 0 0 15px rgba(255, 99, 71, 0.6);
+}
+
+.checkers-square.valid-capture::after {
+    content: '⚔';
+    position: absolute;
+    font-size: 24px;
+    color: white;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.1);
+    }
+}
+
+.move-animation {
+    animation: movePiece 0.3s ease-in-out;
+}
+
+@keyframes movePiece {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.capture-animation {
+    animation: capturePiece 0.4s ease-out;
+}
+
+@keyframes capturePiece {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.5;
+    }
+    100% {
+        transform: scale(0);
+        opacity: 0;
+    }
+}
+
+.game-info {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.turn-indicator {
+    font-size: 1.2em;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 25px;
+    display: inline-block;
+    margin: 10px 0;
+}
+
+.turn-indicator.my-turn {
+    background: #4CAF50;
+    animation: glow 2s ease-in-out infinite;
+}
+
+.turn-indicator.opponent-turn {
+    background: #ff9800;
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+    }
+}
+
+.player-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.player-info.active {
+    border: 2px solid #4CAF50;
+}
+
+.player-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.pieces-count {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Mobile responsive styles */
+@media (max-width: 768px) {
+    .checkers-board {
+        grid-template-columns: repeat(8, 40px);
+        grid-template-rows: repeat(8, 40px);
+        border-width: 3px;
+    }
+    
+    .checkers-square {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .checkers-piece {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .checkers-piece.king::before {
+        font-size: 16px;
+    }
+    
+    .game-info {
+        padding: 12px;
+    }
+    
+    .turn-indicator {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+        padding: 8px 16px;
+    }
+    
+    .player-info {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .player-avatar {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .container {
+        padding: 0.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .checkers-board {
+        grid-template-columns: repeat(8, 38px);
+        grid-template-rows: repeat(8, 38px);
+        border-width: 2px;
+    }
+    
+    .checkers-square {
+        width: 38px;
+        height: 38px;
+    }
+    
+    .checkers-piece {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .checkers-piece.king::before {
+        font-size: 16px;
+    }
+    
+    .game-info {
+        padding: 12px;
+    }
+    
+    .turn-indicator {
+        font-size: 0.9rem;
+        padding: 6px 12px;
+    }
+    
+    .player-info {
+        padding: 8px;
+        gap: 8px;
+    }
+    
+    .player-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .pieces-count {
+        font-size: 1.2em;
+    }
+}
+</style>
+
+<script>
+console.log('=== SCRIPT STARTED ===');
+
+const gameId = '{{ game.id|escapejs }}';
+const isPlayer1 = {{ is_player1|yesno:"true,false" }};
+const playerColor = isPlayer1 ? 'b' : 'w';
+const opponentColor = isPlayer1 ? 'w' : 'b';
+
+// Variables globales de sélection
+let selectedPiece = null;
+let selectedPosition = null;
+let validMoves = [];
+
+// WebSocket connection
+let ws = null;
+let wsConnected = false;
+
+console.log('Game ID:', gameId);
+console.log('Player color:', playerColor);
+
+///////////////////////////////////////////////////////////////
+// 🔧 NOUVEAU : construire un "board logique" depuis le DOM
+// 👉 Permet de simuler les captures sans dépendre de l'affichage
+///////////////////////////////////////////////////////////////
+function getBoardStateFromDOM() {
+    const board = {};
+
+    document.querySelectorAll('[data-piece]').forEach(el => {
+        const pos = el.dataset.position;
+        const piece = el.dataset.piece;
+        board[pos] = piece;
+    });
+
+    return board;
+}
+
+///////////////////////////////////////////////////////////////
+// 🔧 Calculer le maximum de captures pour tous les pions du joueur
+///////////////////////////////////////////////////////////////
+function getMaxCapturesForPlayer(board, playerColor) {
+    let maxCaptures = 0;
+
+    for (const [pos, piece] of Object.entries(board)) {
+        if (piece && piece.toLowerCase() === playerColor) {
+            const captures = calculateMaxCaptures(board, pos, piece, playerColor);
+            if (captures > maxCaptures) {
+                maxCaptures = captures;
+            }
+        }
+    }
+
+    return maxCaptures;
+}
+
+///////////////////////////////////////////////////////////////
+// 🔧 Calculer le nombre maximum de captures depuis une position
+///////////////////////////////////////////////////////////////
+function calculateMaxCaptures(board, position, piece, playerColor, visited = null) {
+    if (visited === null) {
+        visited = new Set();
+    }
+
+    if (visited.has(position)) {
+        return 0;
+    }
+
+    visited.add(position);
+    const row = parseInt(position[0]);
+    const col = parseInt(position[1]);
+    const isKing = piece === 'B' || piece === 'W';
+
+    let maxCaptures = 0;
+
+    if (isKing) {
+        // Dame volante: peut capturer à distance sur les diagonales
+        const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+
+        for (const [dr, dc] of directions) {
+            // Chercher des pièces adverses sur cette diagonale
+            let foundEnemy = null;
+            let enemyPos = null;
+
+            for (let i = 1; i < 10; i++) {
+                const checkRow = row + i * dr;
+                const checkCol = col + i * dc;
+
+                if (!isValidPosition(checkRow, checkCol)) break;
+
+                const checkPos = `${checkRow}${checkCol}`;
+                const checkPiece = board[checkPos];
+
+                if (checkPiece) {
+                    if (checkPiece.toLowerCase() !== playerColor) {
+                        // Pièce adverse trouvée
+                        foundEnemy = checkPiece;
+                        enemyPos = checkPos;
+                        break;
+                    } else {
+                        // Pièce alliée, chemin bloqué
+                        break;
+                    }
+                }
+            }
+
+            if (foundEnemy) {
+                // Chercher les positions d'atterrissage après la pièce adverse
+                for (let i = 1; i < 10; i++) {
+                    const landRow = parseInt(enemyPos[0]) + i * dr;
+                    const landCol = parseInt(enemyPos[1]) + i * dc;
+
+                    if (!isValidPosition(landRow, landCol)) break;
+
+                    const landPos = `${landRow}${landCol}`;
+
+                    // Vérifier que la position d'atterrissage est vide
+                    if (board[landPos]) break;
+
+                    // Simuler la capture
+                    const newBoard = { ...board };
+                    delete newBoard[enemyPos];
+                    newBoard[landPos] = piece;
+                    delete newBoard[position];
+
+                    // Calculer les captures supplémentaires depuis la nouvelle position
+                    const additionalCaptures = calculateMaxCaptures(newBoard, landPos, piece, playerColor, new Set(visited));
+                    const totalCaptures = 1 + additionalCaptures;
+
+                    if (totalCaptures > maxCaptures) {
+                        maxCaptures = totalCaptures;
+                    }
+                }
+            }
+        }
+    } else {
+        // Pion: capture à 2 cases seulement
+        const directions = [[-2, -2], [-2, 2], [2, -2], [2, 2]];
+
+        for (const [dr, dc] of directions) {
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const midRow = row + dr / 2;
+            const midCol = col + dc / 2;
+
+            // Vérifier que la destination est dans le plateau
+            if (!isValidPosition(newRow, newCol)) continue;
+
+            const newPos = `${newRow}${newCol}`;
+            const midPos = `${midRow}${midCol}`;
+
+            // Vérifier que la destination est vide
+            if (board[newPos]) continue;
+
+            // Vérifier qu'il y a un pion adverse au milieu
+            const midPiece = board[midPos];
+            if (midPiece && midPiece.toLowerCase() !== playerColor) {
+                // Simuler la capture
+                const newBoard = { ...board };
+                delete newBoard[midPos];
+
+                // Vérifier si le pion est promu après ce mouvement
+                let newPiece = piece;
+                let isPromoted = false;
+                if (piece === 'w' && newRow === 9) {
+                    newPiece = 'W';
+                    isPromoted = true;
+                } else if (piece === 'b' && newRow === 0) {
+                    newPiece = 'B';
+                    isPromoted = true;
+                }
+
+                newBoard[newPos] = newPiece;
+                delete newBoard[position];
+
+                // Si le pion est promu, la capture s'arrête (règle internationale)
+                if (isPromoted) {
+                    const totalCaptures = 1;
+                    if (totalCaptures > maxCaptures) {
+                        maxCaptures = totalCaptures;
+                    }
+                } else {
+                    // Calculer les captures supplémentaires depuis la nouvelle position
+                    const additionalCaptures = calculateMaxCaptures(newBoard, newPos, newPiece, playerColor, new Set(visited));
+                    const totalCaptures = 1 + additionalCaptures;
+
+                    if (totalCaptures > maxCaptures) {
+                        maxCaptures = totalCaptures;
+                    }
+                }
+            }
+        }
+    }
+
+    return maxCaptures;
+}
+
+///////////////////////////////////////////////////////////////
+// Initialisation des interactions
+///////////////////////////////////////////////////////////////
+function initializeBoardInteraction() {
+    const board = document.getElementById('checkers-board');
+    if (!board) {
+        console.error('Board element not found');
+        return;
+    }
+
+    board.addEventListener('click', handleCellClick);
+    console.log('Board interaction initialized');
+
+    // Initialiser la connexion WebSocket
+    connectWebSocket();
+}
+
+///////////////////////////////////////////////////////////////
+// Connexion WebSocket
+///////////////////////////////////////////////////////////////
+function connectWebSocket() {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const wsUrl = `${protocol}//${host}/ws/checkers/${gameId}/`;
+
+    console.log('Connecting to WebSocket:', wsUrl);
+
+    ws = new WebSocket(wsUrl);
+
+    ws.onopen = function() {
+        console.log('WebSocket connected');
+        wsConnected = true;
+    };
+
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('WebSocket message received:', data);
+
+        if (data.type === 'game_update') {
+            handleGameUpdate(data.game_state);
+            // Si on reçoit une mise à jour, c'est que l'autre joueur est reconnecté
+            if (disconnectInterval || disconnectTimer) {
+                console.log('Game update received, cancelling disconnect counter');
+                cancelDisconnectCounter();
+            }
+        } else if (data.type === 'error') {
+            handleWebSocketError(data.message);
+        } else if (data.type === 'player_disconnected') {
+            handlePlayerDisconnected(data.player);
+        } else if (data.type === 'player_reconnected') {
+            console.log('Player reconnected message received');
+            cancelDisconnectCounter();
+        } else if (data.type === 'player_joined') {
+            showPlayerJoinedNotification(data.opponent_name);
+        } else if (data.type === 'game_finished') {
+            // Marquer que le WebSocket a géré l'abandon
+            forfeitWebSocketHandled = true;
+            handleGameFinished(data);
+        }
+    };
+
+    ws.onclose = function() {
+        console.log('WebSocket disconnected');
+        wsConnected = false;
+        // Tentative de reconnexion après 5 secondes
+        setTimeout(connectWebSocket, 5000);
+    };
+
+    ws.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
+}
+
+///////////////////////////////////////////////////////////////
+// Gestion des mises à jour de jeu via WebSocket
+///////////////////////////////////////////////////////////////
+function handleGameUpdate(gameState) {
+    console.log('Game state updated:', gameState);
+
+    // Si la partie est terminée, rediriger vers le lobby
+    if (gameState.status === 'finished') {
+        const winner = gameState.winner;
+        alert(`Partie terminée! ${winner} a gagné!`);
+        window.location.href = '/checkers/lobby/';
+        return;
+    }
+
+    // Mettre à jour le plateau sans rechargement
+    updateBoardWithoutReload(gameState.board_state);
+
+    // Mettre à jour l'indicateur de tour
+    updateTurnIndicator(gameState.current_turn);
+}
+
+///////////////////////////////////////////////////////////////
+// Mettre à jour le plateau sans rechargement
+///////////////////////////////////////////////////////////////
+function updateBoardWithoutReload(boardState) {
+    // Supprimer toutes les pièces existantes
+    document.querySelectorAll('[data-piece]').forEach(el => {
+        el.remove();
+    });
+
+    // Ajouter les nouvelles pièces selon le board_state
+    for (const [position, piece] of Object.entries(boardState)) {
+        if (piece) {
+            const cell = document.querySelector(`td[data-position="${position}"]`);
+            if (cell) {
+                const pieceDiv = document.createElement('div');
+                pieceDiv.setAttribute('data-piece', piece);
+                pieceDiv.setAttribute('data-position', position);
+                cell.appendChild(pieceDiv);
+            }
+        }
+    }
+
+    // Réinitialiser la sélection
+    clearSelection();
+}
+
+///////////////////////////////////////////////////////////////
+// Mettre à jour l'indicateur de tour
+///////////////////////////////////////////////////////////////
+function updateTurnIndicator(currentTurn) {
+    const isMyTurn = (isPlayer1 && currentTurn === 1) || (!isPlayer1 && currentTurn === 2);
+
+    // Mettre à jour le turn-indicator dans le header
+    const turnIndicator = document.querySelector('.turn-indicator');
+    if (turnIndicator) {
+        if (isMyTurn) {
+            turnIndicator.classList.add('active');
+            turnIndicator.textContent = 'Votre tour';
+        } else {
+            turnIndicator.classList.remove('active');
+            turnIndicator.textContent = 'Adversaire';
+        }
+    }
+
+    // Mettre à jour les badges de l'ancien design (s'ils existent)
+    const turnBadge = document.querySelector('.badge.bg-success, .badge.bg-warning');
+    if (turnBadge) {
+        if (isMyTurn) {
+            turnBadge.className = 'badge bg-success';
+            turnBadge.textContent = 'Votre tour';
+        } else {
+            turnBadge.className = 'badge bg-warning';
+            turnBadge.textContent = 'Tour de l\'adversaire';
+        }
+    }
+
+    // Mettre à jour les joueurs actifs
+    const players = document.querySelectorAll('.player');
+    players.forEach(player => {
+        player.classList.remove('current');
+    });
+    
+    if (isMyTurn) {
+        // Ajouter la classe current au joueur actuel
+        if (isPlayer1) {
+            document.querySelector('.player:first-child')?.classList.add('current');
+        } else {
+            document.querySelector('.player:last-child')?.classList.add('current');
+        }
+    } else {
+        // Ajouter la classe current à l'adversaire
+        if (isPlayer1) {
+            document.querySelector('.player:last-child')?.classList.add('current');
+        } else {
+            document.querySelector('.player:first-child')?.classList.add('current');
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////
+// Gestion des erreurs WebSocket
+///////////////////////////////////////////////////////////////
+function handleWebSocketError(message) {
+    console.error('WebSocket error:', message);
+    alert(message);
+}
+
+///////////////////////////////////////////////////////////////
+// Gestion de la déconnexion d'un joueur - Compteur 5 minutes
+///////////////////////////////////////////////////////////////
+let disconnectTimer = null;
+let disconnectInterval = null;
+
+function handlePlayerDisconnected(player) {
+    console.log('Player disconnected:', player);
+    
+    // Afficher le compteur de 5 minutes
+    showDisconnectCounter(player);
+}
+
+function showDisconnectCounter(disconnectedPlayer) {
+    // Créer et afficher le modal du compteur
+    const modal = document.createElement('div');
+    modal.id = 'disconnect-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+        ">
+            <h3 style="color: #f59e0b; margin-bottom: 1rem; font-size: 1.5rem;">
+                ⏱️ Adversaire déconnecté
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                ${disconnectedPlayer} s'est déconnecté.<br>
+                Victoire automatique dans <span id="disconnect-timer" style="color: #10b981; font-weight: bold; font-size: 1.2rem;">5:00</span>
+            </p>
+            <div style="
+                width: 100%;
+                height: 8px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 1rem;
+            ">
+                <div id="disconnect-progress" style="
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(90deg, #10b981, #059669);
+                    transition: width 1s linear;
+                "></div>
+            </div>
+            <p style="font-size: 0.875rem; opacity: 0.7;">
+                Si l'adversaire se reconnecte, le compteur s'arrêtera
+            </p>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Démarrer le compteur de 5 minutes (300 secondes)
+    let timeLeft = 300;
+    
+    disconnectInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        const timerElement = document.getElementById('disconnect-timer');
+        const progressElement = document.getElementById('disconnect-progress');
+        
+        if (timerElement) {
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        if (progressElement) {
+            progressElement.style.width = `${(timeLeft / 300) * 100}%`;
+        }
+        
+        // Changer de couleur quand il reste moins de 30 secondes
+        if (timeLeft <= 30 && timerElement) {
+            timerElement.style.color = '#ef4444';
+            progressElement.style.background = 'linear-gradient(90deg, #ef4444, #dc2626)';
+        }
+        
+        if (timeLeft <= 0) {
+            clearInterval(disconnectInterval);
+            handleDisconnectVictory();
+        }
+    }, 1000);
+    
+    // Timer pour la victoire automatique
+    disconnectTimer = setTimeout(() => {
+        handleDisconnectVictory();
+    }, 300000); // 5 minutes en millisecondes
+}
+
+function handleDisconnectVictory() {
+    // Nettoyer les timers
+    if (disconnectInterval) clearInterval(disconnectInterval);
+    if (disconnectTimer) clearTimeout(disconnectTimer);
+    
+    // Supprimer le modal
+    const modal = document.getElementById('disconnect-modal');
+    if (modal) modal.remove();
+    
+    // Afficher la victoire
+    showVictoryMessage('Victoire par abandon !', 'L\'adversaire s\'est déconnecté pendant plus de 5 minutes.');
+    
+    // Notifier le serveur de la victoire
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'disconnect_victory',
+            game_id: gameId
+        }));
+    }
+}
+
+function cancelDisconnectCounter() {
+    console.log('Cancelling disconnect counter...');
+    
+    // Nettoyer les timers
+    if (disconnectInterval) {
+        clearInterval(disconnectInterval);
+        disconnectInterval = null;
+        console.log('disconnectInterval cleared');
+    }
+    if (disconnectTimer) {
+        clearTimeout(disconnectTimer);
+        disconnectTimer = null;
+        console.log('disconnectTimer cleared');
+    }
+    
+    // Supprimer le modal
+    const modal = document.getElementById('disconnect-modal');
+    if (modal) {
+        modal.remove();
+        console.log('disconnect modal removed');
+    }
+    
+    // Afficher un message de reconnexion
+    showReconnectMessage();
+}
+
+function showReconnectMessage() {
+    const message = document.createElement('div');
+    message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        font-weight: 600;
+        animation: slideIn 0.3s ease-out;
+    `;
+    message.textContent = '✅ Adversaire reconnecté !';
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.remove();
+    }, 3000);
+}
+
+///////////////////////////////////////////////////////////////
+// Fonctions utilitaires
+///////////////////////////////////////////////////////////////
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+///////////////////////////////////////////////////////////////
+// Affichage des messages d'erreur
+///////////////////////////////////////////////////////////////
+function showErrorModal(message) {
+    console.log('Showing error modal:', message);
+    
+    // Créer la modal d'erreur
+    const modal = document.createElement('div');
+    modal.className = 'error-modal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+            animation: slideUp 0.3s ease-out;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">
+                Erreur
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                ${message}
+            </p>
+            <button onclick="closeErrorModal()" style="
+                background: white;
+                color: #c82333;
+                border: none;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                OK
+            </button>
+        </div>
+    `;
+    
+    // Ajouter les animations CSS si nécessaire
+    if (!document.querySelector('#error-animations')) {
+        const style = document.createElement('style');
+        style.id = 'error-animations';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(modal);
+}
+
+function closeErrorModal() {
+    const modal = document.querySelector('.error-modal');
+    if (modal) {
+        modal.remove();
+        console.log('Error modal closed');
+    }
+}
+
+///////////////////////////////////////////////////////////////
+// Notification quand un joueur rejoint une partie créée
+///////////////////////////////////////////////////////////////
+function showPlayerJoinedNotification(opponentName) {
+    const notification = document.createElement('div');
+    notification.id = 'player-joined-notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    notification.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎮</div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">
+                Un joueur a rejoint votre partie !
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                ${opponentName} est prêt à jouer contre vous
+            </p>
+            <button onclick="goToGame()" style="
+                background: white;
+                color: #059669;
+                border: none;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                🚀 Aller dans la partie
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+}
+
+function goToGame() {
+    // Supprimer la notification
+    const notification = document.getElementById('player-joined-notification');
+    if (notification) notification.remove();
+    
+    // Recharger la page pour afficher le jeu
+    window.location.reload();
+}
+
+function showVictoryMessage(title, message) {
+    const victoryModal = document.createElement('div');
+    victoryModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    `;
+    
+    victoryModal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🏆</div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.8rem;">
+                ${title}
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                ${message}
+            </p>
+            <button onclick="window.location.href='/checkers/lobby/'" style="
+                background: white;
+                color: #d97706;
+                border: none;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                🏠 Retour au lobby
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(victoryModal);
+}
+
+///////////////////////////////////////////////////////////////
+// Gestion de la fin de partie via WebSocket
+///////////////////////////////////////////////////////////////
+function handleGameFinished(data) {
+    console.log('Game finished:', data);
+
+    // Déterminer si l'utilisateur est le gagnant
+    const isWinner = data.winner === '{{ user.username }}';
+    
+    // Afficher le résultat avec une modal JavaScript
+    showGameResultModal({
+        winner: data.winner,
+        loser: data.loser,
+        stake: data.stake,
+        is_winner: isWinner,
+        reason: data.reason || 'La partie est terminée'
+    });
+}
+
+///////////////////////////////////////////////////////////////
+// Gestion des clics utilisateur
+///////////////////////////////////////////////////////////////
+function handleCellClick(event) {
+    const cell = event.target.closest('td');
+    if (!cell) return;
+
+    const position = cell.dataset.position;
+    const piece = cell.querySelector('[data-piece]');
+
+    // Si une pièce est déjà sélectionnée
+    if (selectedPiece) {
+
+        // Si on clique sur un coup valide → on joue
+        if (validMoves.includes(position)) {
+            executeMove(selectedPosition, position);
+            clearSelection();
+            return;
+        }
+
+        // Si on clique sur une autre pièce → on change sélection
+        if (piece && piece.dataset.piece.toLowerCase() === playerColor) {
+            selectPiece(cell, position, piece.dataset.piece);
+            return;
+        }
+
+        // Sinon → reset
+        clearSelection();
+        return;
+    }
+
+    // Si aucune pièce sélectionnée → tentative de sélection
+    if (piece && piece.dataset.piece.toLowerCase() === playerColor) {
+        selectPiece(cell, position, piece.dataset.piece);
+    }
+}
+
+///////////////////////////////////////////////////////////////
+// Sélection d'une pièce
+///////////////////////////////////////////////////////////////
+function selectPiece(cell, position, piece) {
+    clearSelection();
+
+    selectedPiece = cell;
+    selectedPosition = position;
+
+    // Highlight visuel
+    const pieceElement = cell.querySelector('[data-piece]');
+    if (pieceElement) {
+        pieceElement.classList.add('selected');
+    }
+
+    // Calcul des coups possibles
+    validMoves = calculateValidMoves(position, piece, playerColor);
+
+    // Highlight des cases
+    validMoves.forEach(movePos => {
+        const moveCell = document.querySelector(`td[data-position="${movePos}"]`);
+        if (moveCell) {
+            moveCell.classList.add('valid-move');
+        }
+    });
+}
+
+///////////////////////////////////////////////////////////////
+// Reset sélection
+///////////////////////////////////////////////////////////////
+function clearSelection() {
+    if (selectedPiece) {
+        const pieceElement = selectedPiece.querySelector('[data-piece]');
+        if (pieceElement) {
+            pieceElement.classList.remove('selected');
+        }
+    }
+
+    validMoves.forEach(movePos => {
+        const moveCell = document.querySelector(`td[data-position="${movePos}"]`);
+        if (moveCell) {
+            moveCell.classList.remove('valid-move');
+        }
+    });
+
+    selectedPiece = null;
+    selectedPosition = null;
+    validMoves = [];
+}
+
+///////////////////////////////////////////////////////////////
+// 🔥 CALCUL DES COUPS (inclut les prises multiples)
+///////////////////////////////////////////////////////////////
+function calculateValidMoves(position, piece, playerColor) {
+
+    console.log('DEBUG calculateValidMoves: position=', position, 'piece=', piece, 'playerColor=', playerColor);
+
+    const row = parseInt(position[0]);
+    const col = parseInt(position[1]);
+    const moves = [];
+    const isKing = piece === 'B' || piece === 'W';
+
+    console.log('DEBUG calculateValidMoves: isKing=', isKing);
+
+    const direction = piece === 'w' || piece === 'W' ? 1 : -1;
+
+    ///////////////////////////////////////////////////////////
+    // 🟢 COUPS SIMPLES
+    ///////////////////////////////////////////////////////////
+    if (isKing) {
+        console.log('DEBUG calculateValidMoves: Calculating king moves');
+        // Dame volante: peut se déplacer sur plusieurs cases diagonales
+        const kingDirections = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+        
+        kingDirections.forEach(([dr, dc]) => {
+            for (let i = 1; i < 10; i++) {
+                const newRow = row + i * dr;
+                const newCol = col + i * dc;
+                const newPos = `${newRow}${newCol}`;
+
+                if (!isValidPosition(newRow, newCol)) break;
+
+                const targetCell = document.querySelector(`td[data-position="${newPos}"]`);
+                if (!targetCell) break;
+
+                if (targetCell.querySelector('[data-piece]')) break; // Chemin bloqué
+
+                moves.push(newPos);
+                console.log('DEBUG calculateValidMoves: Added king move', newPos);
+            }
+        });
+    } else {
+        console.log('DEBUG calculateValidMoves: Calculating pawn moves');
+        // Pion: mouvement simple sur 1 case
+        const diagonals = [
+            [direction, -1],
+            [direction, 1]
+        ];
+
+        diagonals.forEach(([dr, dc]) => {
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const newPos = `${newRow}${newCol}`;
+
+            if (isValidPosition(newRow, newCol)) {
+                const targetCell = document.querySelector(`td[data-position="${newPos}"]`);
+                if (targetCell && !targetCell.querySelector('[data-piece]')) {
+                    moves.push(newPos);
+                    console.log('DEBUG calculateValidMoves: Added pawn move', newPos);
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////
+    // 🔥 CAPTURES (logique principale corrigée)
+    ///////////////////////////////////////////////////////////
+
+    const board = getBoardStateFromDOM(); // état réel du plateau
+    const allCapturePaths = [];
+
+    if (isKing) {
+        // Dame volante: peut capturer à distance sur les diagonales
+        const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+
+        directions.forEach(([dr, dc]) => {
+            // Chercher des pièces adverses sur cette diagonale
+            let foundEnemy = null;
+            let enemyPos = null;
+
+            for (let i = 1; i < 10; i++) {
+                const checkRow = row + i * dr;
+                const checkCol = col + i * dc;
+
+                if (!isValidPosition(checkRow, checkCol)) break;
+
+                const checkPos = `${checkRow}${checkCol}`;
+                const checkPiece = board[checkPos];
+
+                if (checkPiece) {
+                    if (checkPiece.toLowerCase() !== playerColor) {
+                        // Pièce adverse trouvée
+                        foundEnemy = checkPiece;
+                        enemyPos = checkPos;
+                        break;
+                    } else {
+                        // Pièce alliée, chemin bloqué
+                        break;
+                    }
+                }
+            }
+
+            if (foundEnemy) {
+                // Chercher les positions d'atterrissage après la pièce adverse
+                for (let i = 1; i < 10; i++) {
+                    const landRow = parseInt(enemyPos[0]) + i * dr;
+                    const landCol = parseInt(enemyPos[1]) + i * dc;
+
+                    if (!isValidPosition(landRow, landCol)) break;
+
+                    const landPos = `${landRow}${landCol}`;
+
+                    // Vérifier que la position d'atterrissage est vide
+                    if (board[landPos]) break;
+
+                    // Simulation du board
+                    const newBoard = { ...board };
+                    delete newBoard[enemyPos];
+                    delete newBoard[position];
+                    newBoard[landPos] = piece;
+
+                    // Recherche récursive des captures suivantes
+                    const subPaths = calculateMultiCapturePaths(
+                        newBoard,
+                        landPos,
+                        piece,
+                        playerColor
+                    );
+
+                    if (subPaths.length > 0) {
+                        subPaths.forEach(path => {
+                            allCapturePaths.push([position, enemyPos, landPos, ...path]);
+                        });
+                    } else {
+                        allCapturePaths.push([position, enemyPos, landPos]);
+                    }
+                }
+            }
+        });
+    } else {
+        // Pion: capture à 2 cases seulement
+        const captureDiagonals = [
+            [-2, -2], [-2, 2],
+            [2, -2], [2, 2]
+        ];
+
+        captureDiagonals.forEach(([dr, dc]) => {
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const midRow = row + dr / 2;
+            const midCol = col + dc / 2;
+
+            const newPos = `${newRow}${newCol}`;
+            const midPos = `${midRow}${midCol}`;
+
+            if (!isValidPosition(newRow, newCol)) return;
+
+            const midPiece = board[midPos];
+
+            // Si capture valide
+            if (
+                midPiece &&
+                midPiece.toLowerCase() !== playerColor &&
+                !board[newPos]
+            ) {
+                ///////////////////////////////////////////////////
+                // 🔥 SIMULATION DU BOARD
+                ///////////////////////////////////////////////////
+                const newBoard = { ...board };
+                delete newBoard[midPos];      // on enlève la pièce capturée
+                delete newBoard[position];    // on enlève la pièce actuelle
+                newBoard[newPos] = piece;     // on place la pièce
+
+                // Recherche récursive des captures suivantes
+                const subPaths = calculateMultiCapturePaths(
+                    newBoard,
+                    newPos,
+                    piece,
+                    playerColor
+                );
+
+                if (subPaths.length > 0) {
+                    subPaths.forEach(path => {
+                        allCapturePaths.push([position, midPos, newPos, ...path]);
+                    });
+                } else {
+                    allCapturePaths.push([position, midPos, newPos]);
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////
+    // 🧠 FILTRAGE : garder uniquement les meilleures prises (MAXIMUM GLOBAL)
+    ///////////////////////////////////////////////////////////
+    if (allCapturePaths.length > 0) {
+        // Calculer le maximum de captures pour TOUS les pions du joueur
+        const maxCapturesGlobal = getMaxCapturesForPlayer(board, playerColor);
+        console.log('DEBUG calculateValidMoves: maxCapturesGlobal=', maxCapturesGlobal);
+
+        allCapturePaths.forEach(path => {
+            const captures = (path.length - 1) / 2;
+            if (captures === maxCapturesGlobal) {
+                moves.push(path[path.length - 1]);
+            }
+        });
+    }
+
+    return moves;
+}
+
+///////////////////////////////////////////////////////////////
+// 🔥 RECURSION : calcul des prises multiples (corrigé)
+///////////////////////////////////////////////////////////////
+function calculateMultiCapturePaths(board, position, piece, playerColor, captured = new Set()) {
+
+    const row = parseInt(position[0]);
+    const col = parseInt(position[1]);
+    const isKing = piece === 'B' || piece === 'W';
+    const paths = [];
+
+    if (isKing) {
+        // Dame volante: peut capturer à distance sur les diagonales
+        const directions = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
+
+        directions.forEach(([dr, dc]) => {
+            // Chercher des pièces adverses sur cette diagonale
+            let foundEnemy = null;
+            let enemyPos = null;
+
+            for (let i = 1; i < 10; i++) {
+                const checkRow = row + i * dr;
+                const checkCol = col + i * dc;
+
+                if (!isValidPosition(checkRow, checkCol)) break;
+
+                const checkPos = `${checkRow}${checkCol}`;
+                const checkPiece = board[checkPos];
+
+                if (checkPiece) {
+                    if (checkPiece.toLowerCase() !== playerColor) {
+                        // Pièce adverse trouvée
+                        foundEnemy = checkPiece;
+                        enemyPos = checkPos;
+                        break;
+                    } else {
+                        // Pièce alliée, chemin bloqué
+                        break;
+                    }
+                }
+            }
+
+            if (foundEnemy && !captured.has(enemyPos)) {
+                // Chercher les positions d'atterrissage après la pièce adverse
+                for (let i = 1; i < 10; i++) {
+                    const landRow = parseInt(enemyPos[0]) + i * dr;
+                    const landCol = parseInt(enemyPos[1]) + i * dc;
+
+                    if (!isValidPosition(landRow, landCol)) break;
+
+                    const landPos = `${landRow}${landCol}`;
+
+                    // Vérifier que la position d'atterrissage est vide
+                    if (board[landPos]) break;
+
+                    // Simulation du board
+                    const newBoard = { ...board };
+                    delete newBoard[enemyPos];
+                    delete newBoard[position];
+                    newBoard[landPos] = piece;
+
+                    // Mémorisation des pièces déjà capturées
+                    const newCaptured = new Set(captured);
+                    newCaptured.add(enemyPos);
+
+                    // Récursion
+                    const subPaths = calculateMultiCapturePaths(
+                        newBoard,
+                        landPos,
+                        piece,
+                        playerColor,
+                        newCaptured
+                    );
+
+                    if (subPaths.length > 0) {
+                        subPaths.forEach(sub => {
+                            paths.push([enemyPos, landPos, ...sub]);
+                        });
+                    } else {
+                        paths.push([enemyPos, landPos]);
+                    }
+                }
+            }
+        });
+    } else {
+        // Pion: capture à 2 cases seulement
+        const captureDiagonals = [
+            [-2, -2], [-2, 2],
+            [2, -2], [2, 2]
+        ];
+
+        captureDiagonals.forEach(([dr, dc]) => {
+
+            const newRow = row + dr;
+            const newCol = col + dc;
+            const midRow = row + dr / 2;
+            const midCol = col + dc / 2;
+
+            const newPos = `${newRow}${newCol}`;
+            const midPos = `${midRow}${midCol}`;
+
+            if (!isValidPosition(newRow, newCol)) return;
+
+            const midPiece = board[midPos];
+
+            // Vérifie capture valide + empêche double capture
+            if (
+                midPiece &&
+                midPiece.toLowerCase() !== playerColor &&
+                !captured.has(midPos) &&
+                !board[newPos]
+            ) {
+
+                ///////////////////////////////////////////////////
+                // 🔥 SIMULATION DU BOARD À CHAQUE SAUT
+                ///////////////////////////////////////////////////
+                const newBoard = { ...board };
+                delete newBoard[midPos];
+                delete newBoard[position];
+
+                // Vérifier si le pion est promu après ce mouvement
+                let newPiece = piece;
+                let isPromoted = false;
+                if (piece === 'w' && newRow === 9) {
+                    newPiece = 'W';
+                    isPromoted = true;
+                } else if (piece === 'b' && newRow === 0) {
+                    newPiece = 'B';
+                    isPromoted = true;
+                }
+
+                newBoard[newPos] = newPiece;
+
+                // Mémorisation des pièces déjà capturées
+                const newCaptured = new Set(captured);
+                newCaptured.add(midPos);
+
+                // Si le pion est promu, la capture s'arrête (règle internationale)
+                if (isPromoted) {
+                    paths.push([midPos, newPos]);
+                } else {
+                    // Récursion
+                    const subPaths = calculateMultiCapturePaths(
+                        newBoard,
+                        newPos,
+                        newPiece,
+                        playerColor,
+                        newCaptured
+                    );
+
+                    if (subPaths.length > 0) {
+                        subPaths.forEach(sub => {
+                            paths.push([midPos, newPos, ...sub]);
+                        });
+                    } else {
+                        paths.push([midPos, newPos]);
+                    }
+                }
+            }
+        });
+    }
+
+    return paths;
+}
+
+///////////////////////////////////////////////////////////////
+function isValidPosition(row, col) {
+    return row >= 0 && row < 10 && col >= 0 && col < 10;
+}
+
+///////////////////////////////////////////////////////////////
+// Envoi du mouvement via WebSocket
+///////////////////////////////////////////////////////////////
+function executeMove(fromPos, toPos) {
+    console.log('Executing move via WebSocket:', fromPos, '->', toPos);
+
+    if (!wsConnected) {
+        alert('WebSocket non connecté. Réessayez dans quelques secondes.');
+        return;
+    }
+
+    // Parser les positions
+    const fromRow = parseInt(fromPos[0]);
+    const fromCol = parseInt(fromPos[1]);
+    const toRow = parseInt(toPos[0]);
+    const toCol = parseInt(toPos[1]);
+
+    // Envoyer le mouvement via WebSocket
+    ws.send(JSON.stringify({
+        action: 'move',
+        from_row: fromRow,
+        from_col: fromCol,
+        to_row: toRow,
+        to_col: toCol
+    }));
+}
+
+///////////////////////////////////////////////////////////////
+// Token CSRF
+///////////////////////////////////////////////////////////////
+function getCsrfToken() {
+    const csrfCookie = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+    return csrfCookie ? csrfCookie.split('=')[1] : '';
+}
+
+///////////////////////////////////////////////////////////////
+// Abandonner la partie
+///////////////////////////////////////////////////////////////
+async function forfeitGame() {
+    showForfeitConfirmation();
+}
+
+function showForfeitConfirmation() {
+    // Créer la modal de confirmation
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+            animation: slideUp 0.3s ease-out;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🏳</div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">
+                Abandonner la partie ?
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                Êtes-vous sûr de vouloir abandonner ?<br>
+                Votre adversaire remportera la victoire.
+            </p>
+            <div style="display: flex; gap: 1rem; justify-content: center;">
+                <button onclick="confirmForfeit()" style="
+                    background: white;
+                    color: #dc2626;
+                    border: none;
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'" 
+                   onmouseout="this.style.transform='translateY(0)'">
+                    Oui, abandonner
+                </button>
+                <button onclick="cancelForfeit()" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    border: 1px solid rgba(255, 255, 255, 0.3);
+                    padding: 0.75rem 1.5rem;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'" 
+                   onmouseout="this.style.transform='translateY(0)'">
+                    Annuler
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Ajouter les animations CSS si nécessaire
+    if (!document.querySelector('#forfeit-animations')) {
+        const style = document.createElement('style');
+        style.id = 'forfeit-animations';
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            @keyframes slideUp {
+                from { transform: translateY(20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(modal);
+}
+
+function confirmForfeit() {
+    // Supprimer la modal
+    const modal = document.querySelector('div[style*="position: fixed"]');
+    if (modal) modal.remove();
+    
+    // Exécuter l'abandon
+    executeForfeit();
+}
+
+function cancelForfeit() {
+    // Supprimer la modal
+    const modal = document.querySelector('div[style*="position: fixed"]');
+    if (modal) modal.remove();
+}
+
+let forfeitWebSocketHandled = false;
+
+async function executeForfeit() {
+    console.log('Executing forfeit for game:', gameId);
+    forfeitWebSocketHandled = false;
+    
+    try {
+        // Envoyer l'abandon via WebSocket pour une notification temps réel
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            console.log('Sending forfeit via WebSocket');
+            ws.send(JSON.stringify({
+                action: 'forfeit'
+            }));
+            
+            // Attendre un peu pour la réponse WebSocket
+            setTimeout(() => {
+                // Si pas de réponse WebSocket, fallback vers HTTP
+                if (!forfeitWebSocketHandled) {
+                    console.log('WebSocket fallback to HTTP');
+                    executeForfeitHTTP();
+                }
+            }, 1000);
+        } else {
+            // Fallback direct vers HTTP
+            console.log('WebSocket not available, using HTTP');
+            executeForfeitHTTP();
+        }
+    } catch (error) {
+        console.error('Error forfeiting game:', error);
+        if (!forfeitWebSocketHandled) {
+            showErrorModal(`Erreur lors de l'abandon: ${error.message}`);
+        }
+    }
+}
+
+async function executeForfeitHTTP() {
+    try {
+        const response = await fetch(`/checkers/forfeit/${gameId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        });
+
+        console.log('Forfeit response status:', response.status);
+        console.log('Forfeit response ok:', response.ok);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Forfeit successful:', data);
+            showGameResultModal(data);
+        } else {
+            const errorText = await response.text();
+            console.error('Forfeit failed:', response.statusText);
+            console.error('Error response body:', errorText);
+            if (!forfeitWebSocketHandled) {
+                showErrorModal(`Erreur lors de l'abandon: ${response.statusText}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error forfeiting game:', error);
+        if (!forfeitWebSocketHandled) {
+            showErrorModal(`Erreur lors de l'abandon: ${error.message}`);
+        }
+    }
+}
+
+///////////////////////////////////////////////////////////////
+// Initialisation
+///////////////////////////////////////////////////////////////
+document.addEventListener('DOMContentLoaded', function() {
+    initializeBoardInteraction();
+    startInactivityTimer();
+});
+
+///////////////////////////////////////////////////////////////
+// Timer d'inactivité
+///////////////////////////////////////////////////////////////
+let inactivityTimeout = 5 * 60 * 1000; // 5 minutes en millisecondes
+let inactivityTimer = null;
+let lastActivityTime = Date.now();
+
+function startInactivityTimer() {
+    resetInactivityTimer();
+
+    // Mettre à jour le timestamp d'activité lors des interactions
+    document.addEventListener('click', resetInactivityTimer);
+    document.addEventListener('keydown', resetInactivityTimer);
+}
+
+function resetInactivityTimer() {
+    lastActivityTime = Date.now();
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(checkInactivity, inactivityTimeout);
+}
+
+function checkInactivity() {
+    const inactiveTime = Date.now() - lastActivityTime;
+    if (inactiveTime >= inactivityTimeout) {
+        console.log('Player inactive for too long');
+    }
+}
+
+///////////////////////////////////////////////////////////////
+// Modal de résultat de partie
+///////////////////////////////////////////////////////////////
+function showGameResultModal(data) {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        max-width: 400px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    `;
+
+    const isWinner = data.is_winner;
+    const title = isWinner ? '🎉 Victoire !' : '😢 Défaite';
+    const titleColor = isWinner ? '#28a745' : '#dc3545';
+
+    modalContent.innerHTML = `
+        <h2 style="color: ${titleColor}; margin-bottom: 20px;">${title}</h2>
+        <p style="font-size: 18px; margin-bottom: 10px;">
+            ${isWinner ? 'Vous avez gagné !' : 'Vous avez perdu.'}
+        </p>
+        <p style="margin-bottom: 10px;">
+            <strong>Adversaire:</strong> ${isWinner ? data.loser : data.winner}
+        </p>
+        <p style="margin-bottom: 10px;">
+            <strong>Mise:</strong> ${data.stake} €
+        </p>
+        <p style="margin-bottom: 20px;">
+            <strong>Votre solde:</strong> ${isWinner ? data.winner_balance : data.loser_balance} €
+        </p>
+        <button id="closeModalBtn" style="
+            background: ${titleColor};
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        ">OK</button>
+    `;
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+        modal.remove();
+        window.location.href = '/checkers/lobby/';
+    });
+}
+</script>
+{% endblock %}

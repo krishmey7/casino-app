@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pierre-Papier-Ciseaux - Jeu de Casino</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .balance {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            font-size: 1.1em;
+        }
+        .game-list {
+            margin: 20px 0;
+        }
+        .game-item {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+        .game-item:hover {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        {% csrf_token %}
+        <h1>🃏 Pierre-Papier-Ciseaux 🃏</h1>
+        <div class="balance">💰 Solde: <span id="balance">{{ balance }}</span> FC</div>
+        <div class="status" id="status">Bienvenue ! Choisissez une action pour commencer.</div>
+
+        <div id="menu">
+            <button id="create-game">🎮 Créer une partie</button>
+            <input type="number" id="bet-amount" placeholder="Montant de la mise" min="0.01" step="0.01">
+            <br><br>
+            <button id="list-games">📋 Voir les parties en attente</button>
+        </div>
+
+        <div id="game-list" class="game-list" style="display: none;"></div>
+
+        <div id="game-area" style="display: none;">
+            <div id="game-info"></div>
+            <div class="choices" id="choices" style="display: none;">
+                <div class="choice-btn" id="rock">
+                    <img src="https://cdn-icons-png.flaticon.com/512/201/201612.png" alt="Pierre">
+                    Pierre
+                </div>
+                <div class="choice-btn" id="paper">
+                    <img src="https://cdn-icons-png.flaticon.com/512/201/201614.png" alt="Papier">
+                    Papier
+                </div>
+                <div class="choice-btn" id="scissors">
+                    <img src="https://cdn-icons-png.flaticon.com/512/201/201613.png" alt="Ciseaux">
+                    Ciseaux
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentGameId = null;
+        let pollInterval = null;
+
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+        }
+
+        const headers = {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json'
+        };
+
+        document.getElementById('create-game').addEventListener('click', async () => {
+            const bet = document.getElementById('bet-amount').value;
+            if (!bet) return alert('Entrez un montant de mise.');
+            try {
+                const response = await fetch('/api/rock_paper_scissors/games/create_game/', {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ bet_amount: bet })
+                });
+                const data = await response.json();
+                if (response.ok) {
+                    currentGameId = data.id;
+                    document.getElementById('menu').style.display = 'none';
+                    document.getElementById('game-area').style.display = 'block';
+                    document.getElementById('status').textContent = 'Partie créée (ID: ' + currentGameId + '). En attente d\'un adversaire...';
+                    startPolling();
+                } else {
+                    alert(data.error);
+                }
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        });
+
+        document.getElementById('list-games').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/api/rock_paper_scissors/games/');
+                const games = await response.json();
+                const waitingGames = games.filter(g => g.status === 'waiting');
+                const listDiv = document.getElementById('game-list');
+                listDiv.innerHTML = '<h3>Parties en attente:</h3>';
+                if (waitingGames.length === 0) {
+                    listDiv.innerHTML += '<p>Aucune partie en attente.</p>';
+                } else {
+                    waitingGames.forEach(game => {
+                        const item = document.createElement('div');
+                        item.className = 'game-item';
+                        item.textContent = `Partie ${game.id} - Mise: ${game.bet_amount}FC - Créée par ${game.player1}`;
+                        item.addEventListener('click', () => joinGame(game.id));
+                        listDiv.appendChild(item);
+                    });
+                }
+                listDiv.style.display = 'block';
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+            }
+        });
+
+        async function joinGame(gameId) {
+            const response = await fetch(`/api/rock_paper_scissors/games/${gameId}/join_game/`, {
+                method: 'POST',
+                headers
+            });
+            const data = await response.json();
+            if (response.ok) {
+                currentGameId = gameId;
+                document.getElementById('menu').style.display = 'none';
+                document.getElementById('game-list').style.display = 'none';
+                document.getElementById('game-area').style.display = 'block';
+                document.getElementById('status').textContent = 'Partie rejointe. En attente du choix...';
+                startPolling();
+            } else {
+                alert(data.error);
+            }
+        }
+
+        function startPolling() {
+            if (pollInterval) clearInterval(pollInterval);
+            pollInterval = setInterval(async () => {
+                if (!currentGameId) return;
+                try {
+                    const response = await fetch(`/api/rock_paper_scissors/games/${currentGameId}/`);
+                    const game = await response.json();
+                    updateGameUI(game);
+                } catch (error) {
+                    console.error('Erreur de polling:', error);
+                }
+            }, 2000);
+        }
+
+        function updateGameUI(game) {
+            document.getElementById('game-info').textContent = `Joueur 1: ${game.player1}, Joueur 2: ${game.player2 || 'En attente'}, Statut: ${game.status}`;
+            if (game.status === 'playing') {
+                document.getElementById('status').textContent = 'Partie en cours. Faites votre choix !';
+                document.getElementById('choices').style.display = 'flex';
+                // Disable buttons if already chose
+                const user = /* get current user somehow */ '{{ user.username }}';
+                if ((user === game.player1 && game.player1_choice) || (user === game.player2 && game.player2_choice)) {
+                    document.getElementById('choices').style.display = 'none';
+                    document.getElementById('status').textContent = 'Choix enregistré. En attente de l\'adversaire...';
+                }
+            } else if (game.status === 'finished') {
+                document.getElementById('status').textContent = `Partie terminée. ${game.winner ? 'Gagnant: ' + game.winner : 'Égalité'}`;
+                document.getElementById('choices').style.display = 'none';
+                updateBalance();
+                clearInterval(pollInterval);
+            }
+        }
+
+        ['rock', 'paper', 'scissors'].forEach(choice => {
+            document.getElementById(choice).addEventListener('click', async () => {
+                if (!currentGameId) return;
+                try {
+                    const response = await fetch(`/api/rock_paper_scissors/games/${currentGameId}/make_choice/`, {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({ choice })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        document.getElementById('status').textContent = 'Choix enregistré. En attente de l\'adversaire...';
+                        document.getElementById('choices').style.display = 'none';
+                    } else {
+                        alert(data.error);
+                    }
+                } catch (error) {
+                    alert('Erreur: ' + error.message);
+                }
+            });
+        });
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                document.getElementById('balance').textContent = data.balance;
+            } catch (error) {
+                console.error('Erreur balance:', error);
+            }
+        }
+
+        // Initial balance update
+        updateBalance();
+    </script>
+</body>
+</html>

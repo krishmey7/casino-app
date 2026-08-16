@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="color-scheme" content="dark">
+    <title>{% block title %}Bet'A - Connexion{% endblock %}</title>
+    
+    <!-- CSS Root Variables -->
+    <style>
+        :root {
+            --dark-blue: #0f172a;
+            --darker-blue: #020617;
+            --blue-night: #1e293b;
+            --blue-accent: #334155;
+            --blue-glow: #3b82f6;
+            --gold: #d4af37;
+            --gold-light: #f4d03f;
+            --gold-glow: #ffd700;
+            --white: #ffffff;
+            --text-light: #e8e8e8;
+            --cyan-accent: #06b6d4;
+            --cyan-glow: #22d3ee;
+        }
+    </style>
+
+    <!-- Auth Styles -->
+    <link rel="stylesheet" href="{% static 'css/auth-modern.css' %}">
+    {% block extra_css %}{% endblock %}
+    
+    <!-- Modern JS -->
+    <script src="{% static 'js/main-modern.js' %}" defer></script>
+</head>
+<body class="auth-body">
+    <div class="auth-container">
+        <a href="{% url 'accueil' %}" class="auth-logo" title="Retour à l'accueil">Bet'A</a>
+        <main class="auth-card" role="main">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
+</html>

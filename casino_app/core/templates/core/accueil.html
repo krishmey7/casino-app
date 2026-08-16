@@ -1,0 +1,319 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-0">
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-background">
+        <div class="floating-coins"></div>
+    </div>
+    <div class="hero-content container">
+        <h1 class="hero-title">
+            Découvrez le Casino <span class="highlight-gold">#1</span> en Afrique
+        </h1>
+        <p class="hero-subtitle">
+            Rejoignez les gagnants! Obtenez votre bonus 100% maintenant!
+        </p>
+        <a href="{% url 'wallet' %}" class="btn btn-offer">
+            <svg class="offer-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span>Profiter de l'Offre</span>
+        </a>
+        <p class="hero-proof">Approuvé par des milliers de joueurs</p>
+        <div class="hero-characters">
+            <div class="character" style="--gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%)"></div>
+            <div class="character" style="--gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"></div>
+            <div class="character" style="--gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"></div>
+            <div class="character" style="--gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)"></div>
+            <div class="character" style="--gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%)"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Games Section -->
+<section class="games-section">
+    <div class="container">
+        <div class="games-header">
+            <h2 class="games-title">Nos Jeux</h2>
+            <div class="games-nav-arrows">
+                <button class="arrow-btn prev-arrow" id="prevGames">‹</button>
+                <button class="arrow-btn next-arrow" id="nextGames">›</button>
+            </div>
+        </div>
+        <div class="games-container">
+            <div class="games-scroll" id="gamesScroll">
+                {% for game in games %}
+                <a href="{{ game.url }}" class="game-card-link">
+                    <div class="game-card">
+                        <div class="game-image">
+                            <div class="game-icon">
+                                {{ game.icon }}
+                            </div>
+                        </div>
+                        <div class="game-info">
+                            <h3 class="game-name">{{ game.name }}</h3>
+                            <p class="game-description">{{ game.description }}</p>
+                            <div class="game-players">
+                                <span class="player-dot"></span>
+                                <span class="player-count">{{ game.players }} joueurs</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gamesScroll = document.getElementById('gamesScroll');
+    const prevBtn = document.getElementById('prevGames');
+    const nextBtn = document.getElementById('nextGames');
+    
+    console.log('Elements found:', {
+        gamesScroll: !!gamesScroll,
+        prevBtn: !!prevBtn,
+        nextBtn: !!nextBtn
+    });
+    
+    if (gamesScroll && prevBtn && nextBtn) {
+        const scrollAmount = 160; // Largeur d'une carte + gap
+        
+        prevBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Prev button clicked');
+            gamesScroll.scrollBy({
+                left: -scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+        
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Next button clicked');
+            gamesScroll.scrollBy({
+                left: scrollAmount,
+                behavior: 'smooth'
+            });
+        });
+        
+        // Gérer l'état des boutons selon la position de défilement
+        function updateArrowButtons() {
+            const maxScroll = gamesScroll.scrollWidth - gamesScroll.clientWidth;
+            console.log('Scroll position:', gamesScroll.scrollLeft, 'Max scroll:', maxScroll);
+            
+            if (gamesScroll.scrollLeft <= 0) {
+                prevBtn.style.opacity = '0.5';
+                prevBtn.style.cursor = 'not-allowed';
+            } else {
+                prevBtn.style.opacity = '1';
+                prevBtn.style.cursor = 'pointer';
+            }
+            
+            if (gamesScroll.scrollLeft >= maxScroll - 1) {
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.cursor = 'not-allowed';
+            } else {
+                nextBtn.style.opacity = '1';
+                nextBtn.style.cursor = 'pointer';
+            }
+        }
+        
+        // Mettre à jour au défilement
+        gamesScroll.addEventListener('scroll', updateArrowButtons);
+        
+        // État initial après un petit délai pour s'assurer que tout est chargé
+        setTimeout(updateArrowButtons, 100);
+        
+        // Forcer le recalcul après le chargement des images
+        window.addEventListener('load', updateArrowButtons);
+    }
+});
+</script>
+
+<!-- Info Blocks Section -->
+<section class="info-blocks-section">
+    <div class="container">
+        <div class="info-blocks-container">
+            <div class="info-block">
+                <div class="info-icon info-icon-shield">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3 class="info-title">Sécurité Garantie</h3>
+                    <p class="info-text">Transactions sécurisées</p>
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-icon info-icon-check">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3 class="info-title">Licence Officielle</h3>
+                    <p class="info-text">Opérateur agréé</p>
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-icon info-icon-clock">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3 class="info-title">Paiement immédiat</h3>
+                    <p class="info-text">via Orange Money, Vodacom, Airtel et Africell</p>
+                </div>
+            </div>
+            <div class="info-block">
+                <div class="info-icon info-icon-users">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="info-content">
+                    <h3 class="info-title">+10,000 Joueurs</h3>
+                    <p class="info-text">Une communauté active</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <a href="{% url 'wallet' %}" class="btn btn-cta">
+            <span class="cta-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </span>
+            <span>J'en profite</span>
+        </a>
+    </div>
+</section>
+
+<!-- Risk-Free Guarantee Section -->
+<section class="risk-free-section">
+    <div class="container">
+        <div class="risk-free-banner">
+            <div class="risk-free-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+            </div>
+            <div class="risk-free-content">
+                <h3 class="risk-free-title">Garantie Sans Risque</h3>
+                <p class="risk-free-text">Récupère ton argent n'importe quand!</p>
+            </div>
+            <a href="#" class="btn btn-risk-free">
+                <span class="risk-free-btn-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                    </svg>
+                </span>
+                J'en profite
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Recent Wins Section -->
+<section class="recent-wins-section">
+    <div class="container">
+        <div class="recent-wins-header">
+            <div class="recent-wins-title-container">
+                <div class="recent-wins-trophy-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
+                        <path d="M4 22h16"/>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>
+                    </svg>
+                </div>
+                <h3 class="recent-wins-title">Gains Récents</h3>
+            </div>
+            <div class="recent-wins-live">
+                <span class="recent-wins-live-dot"></span>
+                <span class="recent-wins-live-text">En Direct</span>
+            </div>
+        </div>
+        <div class="recent-wins-grid">
+            <div class="recent-wins-column">
+                {% for win in recent_wins_left %}
+                <div class="recent-win-item">
+                    <div class="recent-win-player">{{ win.player }}</div>
+                    <div class="recent-win-amount">
+                        <span class="recent-win-value">{{ win.amount }}</span>
+                        <span class="recent-win-currency">{{ win.currency }}</span>
+                    </div>
+                    <div class="recent-win-time">{{ win.time }}</div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="recent-wins-column">
+                {% for win in recent_wins_right %}
+                <div class="recent-win-item">
+                    <div class="recent-win-player">{{ win.player }}</div>
+                    <div class="recent-win-amount">
+                        <span class="recent-win-value">{{ win.amount }}</span>
+                        <span class="recent-win-currency">{{ win.currency }}</span>
+                    </div>
+                    <div class="recent-win-time">{{ win.time }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="container">
+        <div class="testimonials-header">
+            <div class="testimonials-icon">
+                <svg viewBox="0 0 24 24">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+            </div>
+            <h2 class="testimonials-title">Ils nous font confiance</h2>
+        </div>
+        <div class="testimonials-rating">
+            <div class="rating-value">{{ rating }}</div>
+            <div class="rating-separator">/</div>
+            <div class="rating-max">5</div>
+        </div>
+        <p class="testimonials-count">Basé sur {{ review_count }} avis</p>
+        <div class="testimonials-grid">
+            {% for testimonial in testimonials %}
+            <div class="testimonial-card">
+                <div class="testimonial-stars">
+                    {% for i in "12345"|make_list %}
+                    <svg viewBox="0 0 24 24" class="star-icon">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                    {% endfor %}
+                </div>
+                <p class="testimonial-text">"{{ testimonial.text }}"</p>
+                <p class="testimonial-author">- {{ testimonial.author }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+</div>
+{% endblock %}

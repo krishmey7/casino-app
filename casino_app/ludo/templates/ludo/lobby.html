@@ -1,0 +1,329 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}LUDO - Lobby{% endblock %}
+
+{% block extra_css %}
+<style>
+    .lobby-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 32px;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    }
+
+    .lobby-hero h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .wallet-card {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .wallet-card .balance {
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .create-game-card {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border: none;
+        margin-bottom: 32px;
+    }
+
+    .create-game-card h5 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 12px 16px;
+        border: 2px solid #e4e8eb;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 24px;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s;
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-create:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(102, 126, 234, 0.4);
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 32px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+    }
+
+    .game-card {
+        background: white;
+        border-radius: 20px;
+        padding: 24px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid #f0f0f0;
+        transition: all 0.3s;
+        height: 100%;
+    }
+
+    .game-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .game-card h5 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 16px;
+    }
+
+    .game-card .game-info {
+        margin-bottom: 20px;
+    }
+
+    .game-card .game-info strong {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .btn-join {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 6px 16px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-join:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-play {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-play:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    .empty-state {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .badge-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .badge-info {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .lobby-hero {
+            padding: 24px;
+        }
+
+        .lobby-hero h1 {
+            font-size: 2rem;
+        }
+
+        .wallet-card .balance {
+            font-size: 1.8rem;
+        }
+
+        .create-game-card {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="lobby-hero">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1>🎲 LUDO</h1>
+                <p class="mb-0 opacity-90">Jouez et gagnez avec vos amis</p>
+            </div>
+            <div class="col-md-4">
+                <div class="wallet-card">
+                    <div class="text-white-50 small mb-1">Solde actuel</div>
+                    <div class="balance">{{ user_wallet.balance }} €</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire de création de partie -->
+    <div class="create-game-card">
+        <h5>🎮 Créer une nouvelle partie</h5>
+        <form method="post" action="{% url 'ludo:create_game' %}">
+            {% csrf_token %}
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label for="stake" class="form-label fw-semibold">Mise (€)</label>
+                    <input type="number" class="form-control" id="stake" name="stake" 
+                           min="1" step="1" value="10" required placeholder="10">
+                </div>
+                <div class="col-md-4">
+                    <label for="min_players" class="form-label fw-semibold">Joueurs minimum</label>
+                    <select class="form-select" id="min_players" name="min_players" required>
+                        <option value="2" selected>2 joueurs</option>
+                        <option value="3">3 joueurs</option>
+                        <option value="4">4 joueurs</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">&nbsp;</label>
+                    <button type="submit" class="btn btn-create w-100">
+                        <i class="fas fa-plus me-2"></i> Créer
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Parties en attente -->
+    <h3 class="section-title">⏳ Parties en attente</h3>
+    {% if waiting_games %}
+        <div class="row g-4 mb-5">
+            {% for game in waiting_games %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="game-card">
+                        <h5>Partie #{{ game.id|slice:":8" }}</h5>
+                        <div class="game-info">
+                            <div><strong>Mise:</strong> {{ game.stake }} €</div>
+                            <div><strong>Joueurs:</strong> {{ game.get_player_count }}/4</div>
+                        </div>
+                        <form method="post" action="{% url 'ludo:join_game' game.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-join w-100">
+                                <i class="fas fa-sign-in-alt me-2"></i> Rejoindre
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state mb-5">
+            <i class="fas fa-inbox"></i>
+            <p class="mb-0">Aucune partie en attente pour le moment.</p>
+        </div>
+    {% endif %}
+
+    <!-- Parties actives -->
+    <h3 class="section-title">🎮 Vos parties actives</h3>
+    {% if active_games %}
+        <div class="row g-4">
+            {% for game in active_games %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="game-card">
+                        <h5>Partie #{{ game.id|slice:":8" }}</h5>
+                        <div class="game-info">
+                            <div><strong>Mise:</strong> {{ game.stake }} €</div>
+                            <div><strong>Status:</strong> 
+                                {% if game.status == 'active' %}
+                                    <span class="badge badge-custom badge-success">En cours</span>
+                                {% else %}
+                                    <span class="badge badge-custom badge-warning">{{ game.get_status_display }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a href="{% url 'ludo:game' game.id %}" class="btn btn-play w-100">
+                            <i class="fas fa-play me-2"></i> Jouer
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-gamepad"></i>
+            <p class="mb-0">Vous n'avez aucune partie active.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

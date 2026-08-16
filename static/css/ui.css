@@ -1,0 +1,311 @@
+/* ============================================================
+   UI OVERRIDES (Mobile-first, compact, modern) — Bet'A theme
+   Loaded after legacy inline styles in `core/base.html`.
+   Goal: improve density/spacing without breaking functionality.
+   ============================================================ */
+
+:root {
+  --ui-radius: 14px;
+  --ui-radius-sm: 10px;
+  --ui-pad: 14px;
+  --ui-pad-sm: 10px;
+  --ui-gap: 10px;
+  --ui-gap-sm: 8px;
+
+  --ui-bg: rgba(15, 23, 42, 0.62);
+  --ui-bg-strong: rgba(15, 23, 42, 0.84);
+  --ui-border: rgba(59, 130, 246, 0.18);
+  --ui-border-strong: rgba(212, 175, 55, 0.20);
+  --ui-text-dim: rgba(232, 232, 232, 0.86);
+}
+
+/* Global typography tuning (mobile-first) */
+html { -webkit-text-size-adjust: 100%; }
+body {
+  font-size: 15px;
+  letter-spacing: 0.1px;
+}
+
+/* Safer tap targets on mobile */
+button, .btn, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+/* Containers: reduce wasted space on mobile */
+.container,
+.container-fluid {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+/* Header: compact + better wrapping */
+.main-header {
+  padding: 10px 12px !important;
+}
+.header-container {
+  gap: 10px;
+}
+.header-actions {
+  gap: 8px !important;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+.user-greeting {
+  display: none; /* mobile-first; still visible on desktop below */
+}
+.balance-badge {
+  padding: 6px 10px !important;
+  font-size: 12px;
+  min-width: unset !important;
+}
+
+/* Bottom nav: safe-area + compact labels + consistent height */
+.bottom-nav {
+  /* floating dock */
+  left: 10px !important;
+  right: 10px !important;
+  bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+  width: auto !important;
+  max-width: 520px;
+  margin: 0 auto;
+
+  border-radius: 18px !important;
+  border: 1px solid rgba(59, 130, 246, 0.25) !important;
+  background: rgba(2, 6, 23, 0.72) !important;
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+
+  padding: 8px 10px !important;
+  min-height: 60px !important;
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+}
+.bottom-nav-item {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 8px !important;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+}
+.bottom-nav-text {
+  font-size: 11px !important;
+  line-height: 1;
+  opacity: 0.82;
+  letter-spacing: 0.2px;
+}
+
+.bottom-nav-icon {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+.bottom-nav-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.bottom-nav-item:hover {
+  color: var(--white);
+  background: rgba(59, 130, 246, 0.10);
+  border-color: rgba(59, 130, 246, 0.18);
+}
+
+.bottom-nav-item.active {
+  color: var(--gold) !important;
+  background: linear-gradient(90deg, rgba(212,175,55,0.16), rgba(59,130,246,0.10));
+  border-color: rgba(212, 175, 55, 0.25);
+}
+
+.bottom-nav-item.active::before {
+  /* replace legacy top bar with subtle dot */
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(212,175,55,0.14);
+}
+
+/* Mobile menu: sharper, more compact */
+.mobile-menu {
+  width: min(88vw, 360px) !important;
+}
+.mobile-menu-header {
+  padding: 14px 14px !important;
+}
+.mobile-menu-header .logo {
+  font-size: 1.25rem !important;
+}
+.mobile-menu-item {
+  padding: 12px 14px !important;
+  border-radius: 14px;
+  margin: 2px 10px;
+  border-left: 0 !important;
+  border: 1px solid transparent;
+  background: transparent;
+}
+.mobile-menu-text {
+  font-size: 14px !important;
+}
+.mobile-menu-icon,
+.nav-icon {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* Unified SVG icon style across navs */
+.mobile-menu-icon svg,
+.nav-icon svg,
+.mobile-menu-close svg {
+  width: 22px !important;
+  height: 22px !important;
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.mobile-menu-close {
+  width: 38px !important;
+  height: 38px !important;
+  border-radius: 12px !important;
+  background: rgba(59, 130, 246, 0.14) !important;
+  border-color: rgba(59, 130, 246, 0.22) !important;
+}
+.mobile-menu-close:hover {
+  background: rgba(59, 130, 246, 0.22) !important;
+  transform: rotate(90deg);
+}
+
+.mobile-menu-item:hover,
+.mobile-menu-item.active {
+  background: rgba(59, 130, 246, 0.12) !important;
+  border-color: rgba(59, 130, 246, 0.18) !important;
+  color: var(--white) !important;
+}
+.mobile-menu-item.active {
+  background: linear-gradient(90deg, rgba(212,175,55,0.14), rgba(59,130,246,0.10)) !important;
+  border-color: rgba(212, 175, 55, 0.22) !important;
+  color: var(--gold) !important;
+}
+
+/* Sidebar nav: align density + icon look */
+.sidebar {
+  padding: 14px 0 !important;
+}
+.nav-item {
+  padding: 12px 14px !important;
+  margin: 4px 10px !important;
+  border-radius: 14px !important;
+}
+.nav-text {
+  font-size: 0.95rem !important;
+}
+.nav-item:hover,
+.nav-item.active {
+  transform: translateX(3px) !important;
+}
+
+/* Main layout spacing */
+.main-layout {
+  /* leave space for floating dock */
+  padding-bottom: calc(86px + env(safe-area-inset-bottom)) !important;
+}
+.main-content {
+  padding-bottom: 6px;
+}
+
+/* Cards / panels: unify to glass */
+.card,
+.game-container,
+.risk-free-banner,
+.recent-win-item,
+.live-win-item,
+.testimonial-card,
+.info-block {
+  border-radius: var(--ui-radius) !important;
+}
+
+/* Buttons: compact baseline */
+.btn {
+  padding: 10px 14px !important;
+  border-radius: 12px !important;
+  font-size: 14px !important;
+  line-height: 1.1 !important;
+}
+
+/* Messages: avoid covering too much screen */
+.messages {
+  top: 72px !important;
+  padding: 0 12px !important;
+}
+.message {
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  margin-bottom: 10px !important;
+}
+
+/* Home hero: reduce vertical height on mobile */
+.hero-section {
+  padding: 22px 12px !important;
+  min-height: 0 !important;
+}
+.hero-content {
+  padding: 10px !important;
+}
+.hero-title {
+  font-size: 1.55rem !important;
+  line-height: 1.15 !important;
+}
+.hero-subtitle {
+  font-size: 0.95rem !important;
+  margin-bottom: 14px !important;
+}
+.btn-offer {
+  padding: 10px 16px !important;
+  border-radius: 14px !important;
+}
+
+/* Game cards: mobile density */
+.games-section { padding: 18px 12px !important; }
+.games-title { font-size: 1.25rem !important; }
+.game-card { min-width: 155px !important; border-radius: 14px !important; }
+.game-image { height: 110px !important; }
+.game-info { padding: 10px !important; }
+.game-name { font-size: 0.95rem !important; margin-bottom: 6px !important; }
+.game-players { font-size: 0.8rem !important; }
+
+/* Desktop refinements */
+@media (min-width: 768px) {
+  body { font-size: 16px; }
+  .main-header { padding: 14px 20px !important; }
+  .user-greeting { display: inline-flex; }
+  .container, .container-fluid {
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+  }
+}
+
+/* Ultra small devices */
+@media (max-width: 360px) {
+  .bottom-nav-text { font-size: 10px !important; }
+  .logo { font-size: 1.1rem !important; }
+  .hero-title { font-size: 1.35rem !important; }
+  .game-card { min-width: 140px !important; }
+}
+

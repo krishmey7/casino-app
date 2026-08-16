@@ -1,0 +1,120 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}LUDO - Partie{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'ludo/css/game.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="ludo-game-container" data-game-id="{{ game.id }}" data-player-color="{{ player_color }}">
+  
+  <!-- BOARD SECTION -->
+  <div class="board-wrapper">
+    <!-- SVG Board - Responsive and scalable -->
+    <img 
+      src="{% static 'ludo/images/ludo-board.svg' %}" 
+      class="ludo-board" 
+      alt="Plateau LUDO"
+      loading="lazy"
+    />
+    
+    <!-- Tokens Layer - Dynamic token positioning -->
+    <div id="tokens-layer"></div>
+    
+    <!-- Effects Layer - Animations, particles, confetti -->
+    <div id="effects-layer"></div>
+  </div>
+
+  <!-- DICE SECTION -->
+  <div class="dice-container">
+    <button class="dice" id="dice-roller" title="Cliquez pour lancer les dés">
+      🎲
+    </button>
+  </div>
+
+  <!-- PLAYERS SECTION -->
+  <div class="players-container">
+    <!-- Player cards will be dynamically inserted here by JavaScript -->
+  </div>
+
+  <!-- GAME CONTROLS & STATUS -->
+  <div class="game-status">
+    <span id="status-text">En attente de connexion...</span>
+  </div>
+
+  <div class="game-controls">
+    <button class="btn btn-secondary" id="btn-settings" title="Paramètres">
+      ⚙️ Paramètres
+    </button>
+    <button class="btn btn-secondary" id="btn-sounds" title="Sons">
+      🔊 Sons
+    </button>
+    <button class="btn btn-secondary" id="btn-quit" title="Quitter">
+      🚪 Quitter
+    </button>
+  </div>
+
+</div>
+
+<!-- Hidden turn indicator (referenced by CSS) -->
+<div class="turn-indicator">
+  En attente de joueurs...
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- JavaScript Modules -->
+<script src="{% static 'ludo/js/board.js' %}"></script>
+<script src="{% static 'ludo/js/animations.js' %}"></script>
+<script src="{% static 'ludo/js/websocket.js' %}"></script>
+<script src="{% static 'ludo/js/ui.js' %}"></script>
+<script src="{% static 'ludo/js/game.js' %}"></script>
+
+<!-- Settings & Button Handlers -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Settings button
+  const settingsBtn = document.getElementById('btn-settings');
+  if (settingsBtn) {
+    settingsBtn.addEventListener('click', function() {
+      ludoUI.showNotification('Paramètres indisponibles', 'info', 2000);
+    });
+  }
+
+  // Sound toggle button
+  const soundBtn = document.getElementById('btn-sounds');
+  let soundEnabled = true;
+  if (soundBtn) {
+    soundBtn.addEventListener('click', function() {
+      soundEnabled = !soundEnabled;
+      if (window.ludoGame && window.ludoGame.animations) {
+        window.ludoGame.animations.setSoundEnabled(soundEnabled);
+      }
+      const label = soundEnabled ? '🔊 Sons' : '🔇 Sons off';
+      soundBtn.innerHTML = label;
+      ludoUI.showNotification(
+        soundEnabled ? 'Sons activés' : 'Sons désactivés',
+        'success',
+        1500
+      );
+    });
+  }
+
+  // Quit button
+  const quitBtn = document.getElementById('btn-quit');
+  if (quitBtn) {
+    quitBtn.addEventListener('click', function() {
+      if (confirm('Êtes-vous sûr de vouloir quitter la partie?')) {
+        if (window.ludoGame) {
+          window.ludoGame.destroy();
+        }
+        window.location.href = '/ludo/lobby/';
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

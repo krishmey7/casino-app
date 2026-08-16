@@ -1,0 +1,394 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}LUDO - Salle d'attente{% endblock %}
+
+{% block extra_css %}
+<style>
+    .waiting-room-hero {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 24px;
+        padding: 40px;
+        color: white;
+        margin-bottom: 32px;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+    }
+
+    .waiting-room-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+    }
+
+    .game-info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        border: none;
+        margin-bottom: 32px;
+    }
+
+    .game-info-card h5 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+    }
+
+    .game-info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .game-info-item:last-child {
+        border-bottom: none;
+    }
+
+    .game-info-item strong {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .section-title::before {
+        content: '';
+        width: 4px;
+        height: 32px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+    }
+
+    .player-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        border: 2px solid transparent;
+        transition: all 0.3s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .player-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .player-card.ready {
+        border-color: #22c55e;
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    }
+
+    .player-card .player-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .player-card .player-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        font-weight: 700;
+    }
+
+    .player-card .player-name {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 1.1rem;
+    }
+
+    .player-card .player-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .badge-custom {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .badge-red {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+    }
+
+    .badge-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        color: white;
+    }
+
+    .badge-green {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+    }
+
+    .badge-yellow {
+        background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        color: white;
+    }
+
+    .badge-success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        color: white;
+    }
+
+    .badge-warning {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+    }
+
+    .btn-ready {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 16px 24px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s;
+        box-shadow: 0 8px 20px rgba(34, 197, 94, 0.3);
+    }
+
+    .btn-ready:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-ready:disabled {
+        background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+        cursor: not-allowed;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 14px 24px;
+        font-weight: 600;
+        transition: all 0.3s;
+        box-shadow: 0 6px 16px rgba(107, 114, 128, 0.3);
+    }
+
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(107, 114, 128, 0.4);
+    }
+
+    .start-info {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border-radius: 16px;
+        padding: 20px;
+        border-left: 4px solid #3b82f6;
+        margin-bottom: 20px;
+    }
+
+    .start-info i {
+        color: #3b82f6;
+        margin-right: 8px;
+    }
+
+    .loading-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .waiting-room-hero {
+            padding: 24px;
+        }
+
+        .waiting-room-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .game-info-card {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+        }
+
+        .player-card {
+            padding: 16px;
+        }
+
+        .player-card .player-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .player-card .player-name {
+            font-size: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Hero Section -->
+    <div class="waiting-room-hero">
+        <h1>🎲 Salle d'attente</h1>
+        <p class="mb-0 opacity-90">Partie #{{ game.id|slice:":8" }}</p>
+    </div>
+
+    <!-- Game Info -->
+    <div class="game-info-card">
+        <h5>📋 Informations de la partie</h5>
+        <div class="game-info-item">
+            <span>Mise</span>
+            <strong>{{ game.stake }} €</strong>
+        </div>
+        <div class="game-info-item">
+            <span>Joueurs</span>
+            <strong>{{ players.count }}/4 (min {{ game.min_players }})</strong>
+        </div>
+        <div class="game-info-item">
+            <span>Status</span>
+            <span class="badge badge-custom badge-success">En attente</span>
+        </div>
+    </div>
+
+    <!-- Players List -->
+    <h3 class="section-title">👥 Joueurs dans la partie</h3>
+    <div class="mb-4">
+        {% for player in players %}
+            <div class="player-card {% if player.is_ready %}ready{% endif %}">
+                <div class="player-info">
+                    <div class="player-avatar">
+                        {{ player.user.username|first|upper }}
+                    </div>
+                    <div>
+                        <div class="player-name">
+                            {{ player.user.username }}
+                            {% if player.user == request.user %}
+                                <span class="badge badge-custom badge-warning ms-2">Vous</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ player.color|upper }}</small>
+                    </div>
+                </div>
+                <div class="player-status">
+                    <span class="badge badge-custom badge-{{ player.color }} me-2">{{ player.color|upper }}</span>
+                    {% if player.is_ready %}
+                        <span class="badge badge-custom badge-success">✓ Prêt</span>
+                    {% else %}
+                        <span class="badge badge-custom badge-warning loading-pulse">⏳ En attente</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Actions -->
+    {% if current_player and not current_player.is_ready %}
+        <button id="markReadyBtn" class="btn btn-ready w-100 mb-3">
+            <i class="fas fa-check-circle me-2"></i> Je suis prêt !
+        </button>
+
+        {% if players.count >= 2 %}
+            <div id="startGameInfo" class="start-info" style="display: none;">
+                <i class="fas fa-info-circle"></i> La partie démarrera automatiquement quand tous les joueurs seront prêts.
+            </div>
+        {% endif %}
+    {% endif %}
+
+    <a href="{% url 'ludo:lobby' %}" class="btn btn-back w-100">
+        <i class="fas fa-arrow-left me-2"></i> Retour au lobby
+    </a>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const markReadyBtn = document.getElementById('markReadyBtn');
+    const startGameInfo = document.getElementById('startGameInfo');
+    
+    if (markReadyBtn) {
+        markReadyBtn.addEventListener('click', async function() {
+            try {
+                const response = await fetch(`/ludo/game/{{ game.id }}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ type: 'mark_ready' })
+                });
+                
+                if (response.ok) {
+                    markReadyBtn.disabled = true;
+                    markReadyBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i> Prêt !';
+                    
+                    if (startGameInfo) {
+                        startGameInfo.style.display = 'block';
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        });
+    }
+    
+    // Vérifier périodiquement si la partie a démarré
+    const checkGameStatus = setInterval(async function() {
+        try {
+            const response = await fetch(`/ludo/api/state/{{ game.id }}/`);
+            const data = await response.json();
+            
+            if (data.game.status === 'active') {
+                clearInterval(checkGameStatus);
+                window.location.href = `/ludo/game/{{ game.id }}/`;
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+        }
+    }, 2000);
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}

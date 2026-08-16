@@ -1,0 +1,651 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Numbers - Jeu de Tirage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .game-info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .info-item {
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .label {
+            color: #666;
+            font-weight: bold;
+        }
+
+        .value {
+            color: #667eea;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .numbers-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .number-btn {
+            width: 100%;
+            aspect-ratio: 1;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: 3px solid #ddd;
+            background: white;
+            color: #333;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .number-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .bet-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+        }
+
+        .bet-label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .bet-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .bet-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .buttons-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-draw {
+            background: #27ae60;
+            color: white;
+            grid-column: 1 / -1;
+        }
+
+        .btn-draw:hover:not(:disabled) {
+            background: #229954;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(39, 174, 96, 0.3);
+        }
+
+        .btn-draw:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .result-section {
+            display: none;
+            padding: 30px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .result-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        .result-section.won {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+
+        .result-section.lost {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .result-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px 40px;
+            border-radius: 15px;
+        }
+
+        .result-amount {
+            font-size: 1.5em;
+            margin-top: 15px;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #c00;
+            border: 1px solid #fcc;
+        }
+
+        .message.success {
+            background: #efe;
+            color: #060;
+            border: 1px solid #cfc;
+        }
+
+        .message.info {
+            background: #eef;
+            color: #006;
+            border: 1px solid #ccf;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .history {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+        }
+
+        .history-title {
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item.won {
+            background: #efe;
+            color: #060;
+        }
+
+        .history-item.lost {
+            background: #fee;
+            color: #c00;
+        }
+
+        .error-text {
+            color: #c00;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .numbers-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .buttons-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/ui.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Lucky Numbers</h1>
+        <p class="subtitle">Choisissez un chiffre et gagnez 10x votre mise!</p>
+
+        <div class="game-info">
+            <div class="info-item">
+                <span class="label">Solde:</span>
+                <span class="value" id="balance">-</span>
+            </div>
+            <div class="info-item">
+                <span class="label">Numéro Gagnant:</span>
+                <span class="value" id="winning-number">?</span>
+            </div>
+        </div>
+
+        <div id="result-section" class="result-section">
+            <div class="result-title" id="result-title"></div>
+            <div class="result-number" id="result-number"></div>
+            <div class="result-amount" id="result-amount"></div>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+        </div>
+
+        <div id="game-form">
+            <h3 style="margin-bottom: 15px; color: #333;">Sélectionnez un chiffre (0-9)</h3>
+            <div class="numbers-grid">
+                <button class="number-btn" data-number="0">0</button>
+                <button class="number-btn" data-number="1">1</button>
+                <button class="number-btn" data-number="2">2</button>
+                <button class="number-btn" data-number="3">3</button>
+                <button class="number-btn" data-number="4">4</button>
+                <button class="number-btn" data-number="5">5</button>
+                <button class="number-btn" data-number="6">6</button>
+                <button class="number-btn" data-number="7">7</button>
+                <button class="number-btn" data-number="8">8</button>
+                <button class="number-btn" data-number="9">9</button>
+            </div>
+
+            <div class="bet-section">
+                <label class="bet-label">Montant de la mise:</label>
+                <input type="number" id="bet-amount" class="bet-input" value="100" min="1" placeholder="Entrez le montant">
+            </div>
+
+            <div class="buttons-section">
+                <button class="btn btn-primary" id="place-bet">Placer le pari</button>
+                <button class="btn btn-draw" id="draw-btn" style="display: none;">Générer le résultat</button>
+                <button class="btn btn-secondary" id="new-game">Nouveau Jeu</button>
+            </div>
+        </div>
+
+        <div class="history">
+            <div class="history-title">Historique des derniers paris:</div>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentGame = null;
+        let selectedNumber = null;
+        const apiBase = '/api/lucky_numbers';
+
+        // Récupérer le token CSRF
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        // Initialiser le jeu
+        async function initGame() {
+            try {
+                showMessage('Chargement...', 'info');
+                const response = await fetch(`${apiBase}/games/current/`);
+                const game = await response.json();
+                currentGame = game;
+                document.getElementById('winning-number').textContent = game.winning_number || '?';
+                showMessage('', '');
+                updateBalance();
+                loadHistory();
+            } catch (error) {
+                showMessage('Erreur lors du chargement du jeu', 'error');
+            }
+        }
+
+        // Mettre à jour le solde
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                if (!response.ok) throw new Error('Failed to fetch balance');
+                const data = await response.json();
+                document.getElementById('balance').textContent = parseFloat(data.balance).toLocaleString('fr-FR', { 
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2 
+                });
+            } catch (error) {
+                console.error('Erreur lors de la récupération du solde:', error);
+                document.getElementById('balance').textContent = 'Erreur';
+            }
+        }
+
+        // Afficher un message
+        function showMessage(text, type) {
+            const messageEl = document.getElementById('message');
+            if (!text) {
+                messageEl.classList.remove('show');
+                return;
+            }
+            messageEl.textContent = text;
+            messageEl.className = `message ${type} show`;
+        }
+
+        // Charger l'historique
+        async function loadHistory() {
+            try {
+                const response = await fetch(`${apiBase}/bets/my_bets/`);
+                const bets = await response.json();
+                const historyList = document.getElementById('history-list');
+                historyList.innerHTML = '';
+
+                if (bets.length === 0) {
+                    historyList.innerHTML = '<p style="color: #999; text-align: center;">Aucun pari pour le moment</p>';
+                    return;
+                }
+
+                const last5 = bets.slice(0, 5);
+                last5.forEach(bet => {
+                    const item = document.createElement('div');
+                    item.className = `history-item ${bet.status}`;
+                    const result = bet.status === 'pending' ? 'En attente' : 
+                                   bet.status === 'won' ? `✓ Gagné +${bet.winnings}` : 
+                                   '✗ Perdu';
+                    item.innerHTML = `
+                        <span>Chiffre: ${bet.chosen_number} | Mise: ${bet.bet_amount}</span>
+                        <span>${result}</span>
+                    `;
+                    historyList.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Erreur lors du chargement de l\'historique:', error);
+            }
+        }
+
+        // Gérer la sélection d'un nombre
+        document.querySelectorAll('.number-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.number-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedNumber = parseInt(btn.dataset.number);
+            });
+        });
+
+        // Placer un pari
+        document.getElementById('place-bet').addEventListener('click', async () => {
+            if (selectedNumber === null) {
+                showMessage('Veuillez sélectionner un chiffre!', 'error');
+                return;
+            }
+
+            const betAmount = document.getElementById('bet-amount').value;
+            if (!betAmount || betAmount <= 0) {
+                showMessage('Veuillez entrer un montant valide!', 'error');
+                return;
+            }
+
+            try {
+                showLoading(true);
+                const response = await fetch(`${apiBase}/bets/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken,
+                    },
+                    body: JSON.stringify({
+                        game: currentGame.id,
+                        chosen_number: selectedNumber,
+                        bet_amount: betAmount
+                    })
+                });
+
+                if (response.ok) {
+                    showMessage('Pari placé avec succès! Cliquez sur "Générer le résultat"', 'success');
+                    document.getElementById('place-bet').style.display = 'none';
+                    document.getElementById('draw-btn').style.display = 'block';
+                    updateBalance();
+                } else {
+                    const error = await response.json();
+                    showMessage(error.error || 'Erreur lors du placement du pari', 'error');
+                }
+            } catch (error) {
+                showMessage('Erreur lors du placement du pari', 'error');
+                console.error(error);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Générer le résultat
+        document.getElementById('draw-btn').addEventListener('click', async () => {
+            try {
+                showLoading(true);
+                const response = await fetch(`${apiBase}/games/${currentGame.id}/draw/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken,
+                    }
+                });
+
+                const game = await response.json();
+                currentGame = game;
+                document.getElementById('winning-number').textContent = game.winning_number;
+
+                // Récupérer les détails du pari
+                const betsResponse = await fetch(`${apiBase}/bets/game_bets/?game_id=${currentGame.id}`);
+                const bets = await betsResponse.json();
+
+                if (bets.length > 0) {
+                    const bet = bets[0];
+                    displayResult(bet, game.winning_number);
+                }
+
+                // Réinitialiser les boutons
+                setTimeout(() => {
+                    document.getElementById('draw-btn').style.display = 'none';
+                    document.getElementById('place-bet').style.display = 'block';
+                    selectedNumber = null;
+                    document.querySelectorAll('.number-btn').forEach(b => b.classList.remove('selected'));
+                    updateBalance();
+                    loadHistory();
+                    initGame();
+                }, 3000);
+            } catch (error) {
+                showMessage('Erreur lors du tirage', 'error');
+                console.error(error);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        // Afficher le résultat
+        function displayResult(bet, winningNumber) {
+            // Convertir en nombres pour s'assurer d'une comparaison correcte
+            const betNumber = parseInt(bet.chosen_number);
+            const winNumber = parseInt(winningNumber);
+            const isWon = betNumber === winNumber;
+            
+            console.log('DisplayResult - Bet:', betNumber, 'Winning:', winNumber, 'IsWon:', isWon);
+            
+            const resultEl = document.getElementById('result-section');
+            resultEl.className = `result-section show ${isWon ? 'won' : 'lost'}`;
+            document.getElementById('result-title').textContent = isWon ? '🎉 GAGNÉ!' : '😞 Perdu';
+            document.getElementById('result-number').textContent = winNumber;
+            document.getElementById('result-amount').innerHTML = 
+                isWon ? `<strong>+${bet.winnings}</strong>` : `-${bet.bet_amount}`;
+            
+            console.log('Classe CSS appliquée:', resultEl.className);
+        }
+
+        // Nouveau jeu
+        document.getElementById('new-game').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Utilitaires
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('show', show);
+        }
+
+        // Initialiser au chargement
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>

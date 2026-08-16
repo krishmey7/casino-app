@@ -1,0 +1,209 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card text-center">
+                <div class="card-body py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-hourglass-half fa-4x text-warning" id="spinner"></i>
+                    </div>
+                    <h4 class="card-title mb-3">En attente d'un adversaire</h4>
+                    <p class="text-muted mb-4">
+                        Partie #{{ game_id }}<br>
+                        Mise: {{ game.stake }} crédits
+                    </p>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Partagez ce lien avec un ami pour qu'il puisse rejoindre:
+                    </div>
+                    <div class="input-group mb-4">
+                        <input type="text" class="form-control" value="{{ request.scheme }}://{{ request.get_host }}{% url 'checkers:lobby' %}}" readonly>
+                        <button class="btn btn-outline-primary" onclick="copyLink()">
+                            <i class="fas fa-copy"></i> Copier
+                        </button>
+                    </div>
+                    <div id="status-message" class="text-success fw-bold" style="display: none;">
+                        Un joueur a rejoint! Redirection vers la partie...
+                    </div>
+                    <a href="{% url 'checkers:lobby' %}" class="btn btn-outline-secondary mt-3">
+                        <i class="fas fa-arrow-left"></i> Retour au lobby
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let checkInterval;
+let ws;
+
+function connectWebSocket() {
+    const wsUrl = `ws://${window.location.host}/ws/checkers/{{ game_id }}/`;
+    ws = new WebSocket(wsUrl);
+    
+    ws.onopen = function() {
+        console.log('WebSocket connected for waiting room');
+    };
+    
+    ws.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        console.log('WebSocket message received in waiting room:', data);
+        
+        if (data.type === 'player_joined') {
+            console.log('Player joined notification received');
+            showPlayerJoinedNotification(data.opponent_name);
+        } else if (data.type === 'game_update' && data.game_state.status === 'active') {
+            // La partie est active, rediriger vers le jeu
+            document.getElementById('status-message').style.display = 'block';
+            document.getElementById('spinner').classList.remove('fa-hourglass-half');
+            document.getElementById('spinner').classList.add('fa-check-circle', 'text-success');
+            clearInterval(checkInterval);
+            if (ws) ws.close();
+            setTimeout(() => {
+                window.location.href = `/checkers/game/{{ game_id }}/`;
+            }, 1000);
+        } else if (data.type === 'game_cancelled') {
+            // La partie a été annulée
+            clearInterval(checkInterval);
+            if (ws) ws.close();
+            window.location.href = '{% url "checkers:lobby" %}';
+        }
+    };
+    
+    ws.onclose = function() {
+        console.log('WebSocket disconnected from waiting room');
+        // Reconnecter après 5 secondes
+        setTimeout(connectWebSocket, 5000);
+    };
+    
+    ws.onerror = function(error) {
+        console.error('WebSocket error in waiting room:', error);
+    };
+}
+
+function showPlayerJoinedNotification(opponentName) {
+    console.log('Showing player joined notification for:', opponentName);
+    
+    // Créer la notification
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    notification.innerHTML = `
+        <div style="
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            max-width: 90vw;
+            animation: slideUp 0.3s ease-out;
+        ">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🎮</div>
+            <h3 style="margin-bottom: 1rem; font-size: 1.5rem;">
+                Un joueur a rejoint votre partie !
+            </h3>
+            <p style="margin-bottom: 1.5rem; opacity: 0.9;">
+                ${opponentName} est prêt à jouer contre vous
+            </p>
+            <button onclick="goToGame()" style="
+                background: white;
+                color: #059669;
+                border: none;
+                padding: 0.75rem 2rem;
+                border-radius: 8px;
+                font-weight: 600;
+                font-size: 1rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'" 
+               onmouseout="this.style.transform='translateY(0)'">
+                🚀 Aller dans la partie
+            </button>
+        </div>
+    `;
+    
+    // Ajouter les animations CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    document.body.appendChild(notification);
+}
+
+function goToGame() {
+    // Supprimer la notification
+    const notification = document.querySelector('div[style*="position: fixed"]');
+    if (notification) notification.remove();
+    
+    // Fermer le WebSocket
+    if (ws) ws.close();
+    clearInterval(checkInterval);
+    
+    // Rediriger vers le jeu
+    window.location.href = `/checkers/game/{{ game_id }}/`;
+}
+
+function checkGameStatus() {
+    fetch(`/checkers/api/game-state/{{ game_id }}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'active') {
+                // La partie est active, rediriger vers le jeu
+                document.getElementById('status-message').style.display = 'block';
+                document.getElementById('spinner').classList.remove('fa-hourglass-half');
+                document.getElementById('spinner').classList.add('fa-check-circle', 'text-success');
+                clearInterval(checkInterval);
+                if (ws) ws.close();
+                setTimeout(() => {
+                    window.location.href = `/checkers/game/{{ game_id }}/`;
+                }, 1000);
+            } else if (data.status === 'cancelled') {
+                // La partie a été annulée
+                clearInterval(checkInterval);
+                if (ws) ws.close();
+                window.location.href = '{% url "checkers:lobby" %}';
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+}
+
+function copyLink() {
+    const input = document.querySelector('.form-control');
+    input.select();
+    document.execCommand('copy');
+    alert('Lien copié!');
+}
+
+// Démarrer WebSocket et vérification
+connectWebSocket();
+checkInterval = setInterval(checkGameStatus, 5000); // Moins fréquent avec WebSocket
+checkGameStatus();
+</script>
+{% endblock %}

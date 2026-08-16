@@ -1,0 +1,1742 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>PIERRE • PAPIER • CISEAUX — Casino Royale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,500;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            height: 100dvh;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0;
+            position: relative;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(233, 69, 96, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(102, 252, 241, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            opacity: 1;
+        }
+
+        .glass-panel {
+            width: 100%;
+            height: 100dvh;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+
+        /* SECTION 1: HEADER & ADVERSAIRE (Top) */
+        .header-section {
+            flex: 0 0 auto;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+            z-index: 10;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .game-title-compact {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #66fcf1;
+            letter-spacing: -0.3px;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .balance-pill-compact {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: rgba(233, 69, 96, 0.2);
+            color: #fff;
+            border: 1px solid rgba(233, 69, 96, 0.4);
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .header-btn {
+            background: rgba(102, 252, 241, 0.15);
+            border: 1px solid rgba(102, 252, 241, 0.3);
+            color: #66fcf1;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+        }
+
+        .header-btn:hover {
+            background: rgba(102, 252, 241, 0.3);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.4);
+        }
+
+        /* SECTION 2: ARÈNE DE COMBAT (Center) */
+        .arena-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .opponent-card {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid rgba(233, 69, 96, 0.4);
+            backdrop-filter: blur(4px);
+            margin-bottom: 1rem;
+            max-width: 200px;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.2);
+        }
+
+        .opponent-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #e94560;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px rgba(233, 69, 96, 0.5);
+        }
+
+        .opponent-status {
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .battle-zone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .battle-choice {
+            width: 100px;
+            height: 100px;
+            background: rgba(102, 252, 241, 0.1);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px solid rgba(102, 252, 241, 0.3);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
+        }
+
+        .battle-choice img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .battle-vs {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #66fcf1;
+            text-shadow: 0 0 15px rgba(102, 252, 241, 0.7);
+        }
+
+        .game-status {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 1rem;
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-left: 4px solid #66fcf1;
+            color: #f6f1df;
+            text-align: center;
+            max-width: 300px;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+        }
+
+        /* SECTION 3: PROFIL JOUEUR (Mid-Bottom) */
+        .player-section {
+            flex: 0 0 auto;
+            padding: 0.8rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.4);
+            border-top: 1px solid rgba(102, 252, 241, 0.1);
+        }
+
+        .player-card-compact {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 2px solid rgba(102, 252, 241, 0.4);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 0 15px rgba(102, 252, 241, 0.2);
+        }
+
+        .player-avatar {
+            width: 45px;
+            height: 45px;
+            background: rgba(102, 252, 241, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #66fcf1;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.3);
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name-compact {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #66fcf1;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .player-choice-indicator {
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+
+        /* SECTION 4: DOCK D'ACTION (Bottom) */
+        .dock-section {
+            flex: 0 0 auto;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-top: 1px solid rgba(102, 252, 241, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .choice-dock {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .choice-btn {
+            flex: 1;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(22, 33, 62, 0.9));
+            border-radius: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(102, 252, 241, 0.3);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3), 0 0 10px rgba(102, 252, 241, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .choice-btn i {
+            font-size: 2rem;
+            color: #66fcf1;
+            text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+        }
+
+        .choice-btn span {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+
+        .choice-btn:active {
+            transform: scale(0.9);
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.4);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-4px);
+            background: rgba(22, 33, 62, 0.95);
+            border-color: rgba(102, 252, 241, 0.6);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4), 0 0 20px rgba(102, 252, 241, 0.3);
+        }
+
+        /* Menu principal compact */
+        .menu-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+            max-width: 300px;
+            padding: 1rem;
+        }
+
+        .luxe-input-compact {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(102, 252, 241, 0.3);
+            border-radius: 60px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #fff;
+            width: 100%;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.1);
+        }
+
+        .luxe-input-compact:focus {
+            border-color: rgba(102, 252, 241, 0.6);
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.3);
+        }
+
+        .btn-gold-compact {
+            background: linear-gradient(105deg, rgba(233, 69, 96, 0.8), rgba(233, 69, 96, 1));
+            border: none;
+            color: #fff;
+            font-weight: 800;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(233, 69, 96, 0.4), 0 0 15px rgba(233, 69, 96, 0.2);
+            width: 100%;
+        }
+
+        .btn-gold-compact:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(105deg, rgba(233, 69, 96, 1), rgba(255, 100, 120, 1));
+            box-shadow: 0 6px 15px rgba(233, 69, 96, 0.6), 0 0 25px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-dark-compact {
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(102, 252, 241, 0.4);
+            color: #66fcf1;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 0 10px rgba(102, 252, 241, 0.2);
+        }
+
+        .btn-dark-compact:hover {
+            background: rgba(102, 252, 241, 0.2);
+            border-color: rgba(102, 252, 241, 0.8);
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.4);
+        }
+
+        /* Sélecteur de mise */
+        .bet-selector {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(102, 252, 241, 0.2);
+        }
+
+        .bet-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #66fcf1;
+            margin-bottom: 0.8rem;
+            text-align: center;
+        }
+
+        .bet-quick-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .bet-quick-btn {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(233, 69, 96, 0.4);
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 0.8rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.2);
+        }
+
+        .bet-quick-btn:hover {
+            background: rgba(233, 69, 96, 0.4);
+            border-color: rgba(233, 69, 96, 0.8);
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.4);
+            transform: scale(1.05);
+        }
+
+        .bet-quick-btn.selected {
+            background: rgba(102, 252, 241, 0.3);
+            border-color: rgba(102, 252, 241, 0.8);
+            box-shadow: 0 0 20px rgba(102, 252, 241, 0.5);
+        }
+
+        .bet-custom {
+            margin-top: 0.5rem;
+        }
+
+        /* Affichage du pot */
+        .pot-display {
+            background: rgba(233, 69, 96, 0.2);
+            border: 2px solid rgba(233, 69, 96, 0.4);
+            border-radius: 1rem;
+            padding: 0.8rem 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #e94560;
+            text-align: center;
+            margin: 0.5rem 0;
+            box-shadow: 0 0 15px rgba(233, 69, 96, 0.3);
+            display: none;
+        }
+
+        .pot-display.active {
+            display: block;
+        }
+
+        /* Utility classes */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .w-full { width: 100%; }
+
+        /* Anciennes classes conservées pour compatibilité JS - FORCEMENT MASQUÉES */
+        .title-row { display: none !important; }
+        .status-card { display: none !important; }
+        .players-arena { display: none !important; }
+        .menu-group { display: none !important; }
+        .choices-arena { display: none !important; }
+        .game-info-lux { display: none !important; }
+        footer { display: none !important; }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 1.8rem;
+            padding: 1rem 1.3rem;
+            margin: 1rem 0 1.4rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-left: 5px solid #ffd966;
+            color: #f6f1df;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .choice-card {
+            background: linear-gradient(145deg, #161b33, #101324);
+            border-radius: 2rem;
+            padding: 1.6rem 1.2rem;
+            width: 140px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+            border: 1px solid rgba(255, 215, 0, 0.12);
+            box-shadow: 0 14px 25px rgba(0, 0, 0, 0.28);
+        }
+
+        .choice-card i {
+            font-size: 3.5rem;
+            color: #ffd966;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .choice-card span {
+            font-weight: 700;
+            font-size: 1.15rem;
+            letter-spacing: 0.15px;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-6px);
+            background: #1c2140;
+            border-color: #ffcd76;
+            box-shadow: 0 20px 35px rgba(255, 209, 96, 0.18);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.78rem;
+            opacity: 0.65;
+        }
+
+        .help-orb {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.6rem;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            width: 48px;
+            height: 48px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            border: 1px solid #ffd966;
+            color: #ffdf8c;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.2);
+            z-index: 15;
+        }
+
+        .help-orb:hover {
+            background: #ffd966;
+            color: #0a0c1a;
+            transform: scale(1.05);
+            border-color: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #FFE5A3, #FFB347);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            margin-bottom: 0.25rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h1 i {
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+            color: #FFD966;
+            font-size: 2rem;
+        }
+
+        .chip-balance {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            padding: 0.5rem 1.6rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 1.6rem;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            margin: 20px 0 18px;
+            color: #fff9d4;
+        }
+
+        .chip-balance i {
+            color: #F7C35C;
+            font-size: 1.8rem;
+        }
+
+        .chip-balance span {
+            font-weight: 800;
+            color: #FFE484;
+            letter-spacing: 1px;
+        }
+
+        .status-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            padding: 0.95rem 1.5rem;
+            margin: 20px 0 18px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-left: 6px solid #F5B041;
+            text-align: left;
+            word-break: break-word;
+            backdrop-filter: blur(6px);
+            color: #f2eddb;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .players-arena {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .player-card {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            text-align: center;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            backdrop-filter: blur(4px);
+            transition: all 0.3s;
+        }
+
+        .player-card.active {
+            border-color: #FFD966;
+            box-shadow: 0 0 20px rgba(255, 217, 0, 0.3);
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .player-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #FFD966;
+            margin-bottom: 1rem;
+        }
+
+        .player-choice-image {
+            width: 150px;
+            height: 150px;
+            margin: 1rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            padding: 1rem;
+        }
+
+        .player-choice-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s;
+        }
+
+        .player-choice-image img:hover {
+            transform: scale(1.05);
+        }
+
+        .choice-label {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+
+        /* Animation de dévoilement */
+        @keyframes revealChoice {
+            0% {
+                transform: scale(0) rotateY(180deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2) rotateY(90deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        .reveal-animation {
+            animation: revealChoice 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .player-choice-image.reveal-animation img {
+            animation: revealChoice 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #FFD966;
+            text-shadow: 0 0 10px rgba(255, 217, 0, 0.5);
+        }
+
+        .menu-group {
+            background: rgba(20, 22, 40, 0.6);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 18px;
+            align-items: flex-end;
+            border: 1px solid rgba(255,200,100,0.2);
+        }
+
+        .luxe-input {
+            background: #0e0f1c;
+            border: 1px solid #ffd966;
+            border-radius: 60px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #ffecb3;
+            width: 180px;
+            text-align: center;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .luxe-input:focus {
+            border-color: #FFBF40;
+            box-shadow: 0 0 0 2px rgba(255, 200, 80, 0.5);
+        }
+
+        .btn-gold {
+            background: linear-gradient(105deg, #d4af37, #ffdd77);
+            border: none;
+            color: #1E1A2F;
+            font-weight: 800;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-gold i {
+            font-size: 1.1rem;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(105deg, #e6c34b, #ffe6a3);
+            box-shadow: 0 12px 22px rgba(0,0,0,0.4);
+        }
+
+        .btn-dark {
+            background: rgba(30, 30, 55, 0.9);
+            border: 1px solid #ffd966;
+            color: #ffeaaf;
+            padding: 12px 28px;
+            border-radius: 60px;
+            font-weight: 600;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .btn-dark:hover {
+            background: #ffd966;
+            color: #0a0c1a;
+            border-color: #ffd966;
+        }
+
+        .game-list-modern {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            backdrop-filter: blur(8px);
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid rgba(102, 252, 241, 0.2);
+            display: block !important;
+        }
+
+        .game-item-premium {
+            background: rgba(15, 23, 42, 0.8);
+            margin: 8px 0;
+            padding: 10px 14px;
+            border-radius: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 2px solid rgba(233, 69, 96, 0.4);
+            transition: 0.15s;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.2);
+        }
+
+        .game-item-premium:hover {
+            background: rgba(22, 33, 62, 0.9);
+            border-color: rgba(233, 69, 96, 0.8);
+            transform: scale(0.99);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .game-badge {
+            background: rgba(102, 252, 241, 0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #66fcf1;
+            border: 1px solid rgba(102, 252, 241, 0.3);
+        }
+
+        .choices-arena {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 35px 0 15px;
+        }
+
+        .choice-card {
+            background: linear-gradient(145deg, #1b1e32, #111322);
+            border-radius: 2rem;
+            padding: 1.5rem 1rem;
+            width: 130px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid #ffcd7e;
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .choice-card i {
+            font-size: 3.5rem;
+            color: #FFD966;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .choice-card span {
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .choice-card:hover {
+            transform: translateY(-8px);
+            background: #252a49;
+            border-bottom-color: #FFB347;
+        }
+
+        .game-info-lux {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2rem;
+            padding: 0.9rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            margin: 10px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 28px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+
+        .modal-glass {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(6px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: rgba(15, 23, 42, 0.95);
+            border-radius: 2.5rem;
+            padding: 2.5rem;
+            max-width: 420px;
+            width: 90%;
+            border: 2px solid rgba(102, 252, 241, 0.4);
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(102, 252, 241, 0.2);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.5rem;
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid rgba(233, 69, 96, 0.4);
+            color: #e94560;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 10px rgba(233, 69, 96, 0.3);
+        }
+
+        .close-modal:hover {
+            background: rgba(233, 69, 96, 0.4);
+            transform: rotate(90deg);
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .title-row { flex-direction: column; align-items: stretch; }
+            .game-title { justify-content: center; font-size: 1.85rem; }
+            .balance-pill { justify-content: center; }
+            .players-arena { flex-direction: column; }
+            .vs-divider { justify-content: center; margin: 1rem 0; }
+            .player-choice-image { width: 100px; height: 100px; }
+            .choice-card { width: 110px; padding: 1rem 0.8rem; }
+            .choice-card i { font-size: 2.4rem; }
+            .menu-group { flex-direction: column; gap: 12px; }
+            .luxe-input { width: 100%; }
+            .btn-gold, .btn-dark { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 520px) {
+            .glass-panel { border-radius: 2rem; padding: 1rem; }
+            .game-title { font-size: 1.5rem; gap: 10px; }
+            .status-card { font-size: 0.95rem; padding: 0.9rem 1rem; }
+            .choice-card { width: 100%; max-width: 260px; }
+            .choices-arena { gap: 16px; margin: 24px 0 12px; }
+            .player-card { padding: 1.2rem; }
+            .player-choice-image { width: 90px; height: 90px; }
+            .player-name { font-size: 1.05rem; }
+            .chip-balance, .game-info-lux { font-size: 0.95rem; }
+            footer { font-size: 0.75rem; }
+            .modal-card { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="glass-panel">
+    {% csrf_token %}
+
+    <!-- SECTION 1: HEADER & ADVERSAIRE (Top) -->
+    <div class="header-section">
+        <div class="header-left">
+            <button class="header-btn" id="quitGameBtn" style="display: none;">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="game-title-compact"><i class="fas fa-hand-rock"></i> PIERRE • PAPIER • CISEAUX</div>
+        </div>
+        <div class="header-right">
+            <div class="balance-pill-compact"><i class="fas fa-coins"></i> <span id="balance">{{ balance }}</span></div>
+            <button class="header-btn" id="helpBtn">
+                <i class="fas fa-question"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- SECTION 2: ARÈNE DE COMBAT (Center) -->
+    <div class="arena-section">
+        <!-- Carte Adversaire -->
+        <div class="opponent-card" id="player2Card" style="display: none;">
+            <div class="opponent-name" id="player2Name">Adversaire</div>
+            <div class="opponent-status" id="player2Choice">En attente...</div>
+        </div>
+
+        <!-- Zone de combat -->
+        <div class="battle-zone" id="playersArena">
+            <div class="battle-choice" id="player1Image">
+                <img src="" alt="" style="display: none;">
+                <i class="fas fa-question-circle" style="font-size: 2rem; color: #666;"></i>
+            </div>
+            <div class="battle-vs">VS</div>
+            <div class="battle-choice" id="player2Image">
+                <img src="" alt="" style="display: none;">
+                <i class="fas fa-question-circle" style="font-size: 2rem; color: #666;"></i>
+            </div>
+        </div>
+
+        <!-- Affichage du pot -->
+        <div class="pot-display" id="potDisplay">
+            <i class="fas fa-coins"></i> POT: <span id="potAmount">0</span> FC
+        </div>
+
+        <!-- Status message -->
+        <div class="game-status" id="statusMsg">
+            <i class="fas fa-hand-peace"></i> Bienvenue en salle privée. Créez ou rejoignez un duel.
+        </div>
+
+        <!-- Menu principal (affiché dans l'arène quand pas de jeu actif) -->
+        <div class="menu-compact" id="mainMenuBlock">
+            <div class="bet-selector">
+                <div class="bet-label">Sélectionnez votre mise :</div>
+                <div class="bet-quick-buttons">
+                    <button class="bet-quick-btn" data-bet="100">100 FC</button>
+                    <button class="bet-quick-btn" data-bet="500">500 FC</button>
+                    <button class="bet-quick-btn" data-bet="1000">1000 FC</button>
+                    <button class="bet-quick-btn" data-bet="5000">5000 FC</button>
+                </div>
+                <div class="bet-custom">
+                    <input type="number" id="betAmountInput" class="luxe-input-compact" placeholder="MISE PERSONNALISÉE (FC)" min="0.5" step="0.5" value="10">
+                </div>
+            </div>
+            <button class="btn-gold-compact" id="createGameBtn"><i class="fas fa-crown"></i> CRÉER LA PARTIE</button>
+            <button class="btn-dark-compact" id="listGamesBtn"><i class="fas fa-list-ul"></i> PARTIES EN ATTENTE</button>
+        </div>
+
+        <!-- Liste des parties -->
+        <div class="menu-compact" id="gameListContainer" style="display: none;">
+            <div class="game-list-modern" id="gameListContent" style="display: block; max-height: 200px; overflow-y: auto;">
+                <div style="text-align:center; padding: 1rem;">Chargement ...</div>
+            </div>
+            <button class="btn-dark-compact" id="hideListBtn"><i class="fas fa-arrow-left"></i> Retour</button>
+        </div>
+
+        <!-- Zone de jeu active -->
+        <div class="menu-compact" id="activeGameArea" style="display: none;">
+            <div class="game-info-lux" id="gameDynamicInfo" style="display: block; margin-bottom: 0.5rem;"></div>
+            <div id="shareInvitePanel" style="display: none; flex-direction: column; gap: 8px;">
+                <div class="game-info-lux" style="margin:0; padding:0.6rem 1rem; border-radius:1rem;">🔗 Invitation disponible</div>
+                <div style="display:flex; gap:8px;">
+                    <input id="inviteLinkInput" class="luxe-input-compact" readonly style="flex:1;" value="" aria-label="Lien d'invitation">
+                    <button class="btn-dark-compact" id="copyLinkBtn" type="button" style="width: auto;"><i class="fas fa-copy"></i></button>
+                </div>
+            </div>
+            <button class="btn-dark-compact" id="cancelGameBtn" style="display: none;"><i class="fas fa-ban"></i> Annuler</button>
+        </div>
+    </div>
+
+    <!-- SECTION 3: PROFIL JOUEUR (Mid-Bottom) -->
+    <div class="player-section">
+        <div class="player-card-compact" id="player1Card">
+            <div class="player-avatar"><i class="fas fa-user"></i></div>
+            <div class="player-info">
+                <div class="player-name-compact" id="player1Name">Vous</div>
+                <div class="player-choice-indicator" id="player1Choice">En attente...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECTION 4: DOCK D'ACTION (Bottom) -->
+    <div class="dock-section">
+        <div class="choice-dock" id="choicesPanel" style="display: none;">
+            <div class="choice-btn" data-choice="rock">
+                <i class="fas fa-hand-rock"></i>
+                <span>PIERRE</span>
+            </div>
+            <div class="choice-btn" data-choice="paper">
+                <i class="fas fa-hand-paper"></i>
+                <span>PAPIER</span>
+            </div>
+            <div class="choice-btn" data-choice="scissors">
+                <i class="fas fa-hand-scissors"></i>
+                <span>CISEAUX</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL AIDE -->
+<div id="helpModal" class="modal-glass">
+    <div class="modal-card">
+        <button class="close-modal" id="closeModalBtn">&times;</button>
+        <h2 style="color: #66fcf1;"><i class="fas fa-question-circle"></i> Règles du jeu</h2>
+        <p><strong>Pierre</strong> écrase Ciseaux • <strong>Papier</strong> enveloppe Pierre • <strong>Ciseaux</strong> découpe Papier</p>
+        <hr>
+        <p>💰 Mise des deux joueurs = pot total.<br>
+        🏆 <strong>Gagnant</strong> remporte <span style="color:#e94560;">80% du pot</span>.<br>
+        🤝 En cas d'égalité → mises remboursées intégralement.<br>
+        🎲 Créez une partie avec une mise, ou rejoignez une partie en attente.</p>
+        <p style="margin-top: 12px;"><i class="fas fa-ticket-alt"></i> Le second joueur doit miser le même montant.</p>
+    </div>
+</div>
+
+<!-- MODAL RESULTAT -->
+<div id="resultModal" class="modal-glass">
+    <div class="modal-card">
+        <button class="close-modal" id="closeResultBtn">OK</button>
+        <h2 id="resultModalTitle" style="color: #66fcf1;"><i class="fas fa-trophy"></i> Résultat</h2>
+        <div id="resultModalBody" style="margin-top: 1rem; color: #f6f1df;"></div>
+    </div>
+</div>
+
+<script>
+    // Mapping des choix vers les images statiques Django
+    const choiceImages = {
+        rock: {
+            player1: "{% static 'images_jeux/pierre_jeux_1.gif' %}",
+            player2: "{% static 'images_jeux/pierre_jeux_2.gif' %}"
+        },
+        paper: {
+            player1: "{% static 'images_jeux/papier_jeux_1.gif' %}",
+            player2: "{% static 'images_jeux/papier_jeux_2.gif' %}"
+        },
+        scissors: {
+            player1: "{% static 'images_jeux/ciseaux_jeux_1.gif' %}",
+            player2: "{% static 'images_jeux/ciseaux_jeux_2.gif' %}"
+        }
+    };
+
+    let currentGameId = null;
+    let pollingInterval = null;
+    let currentUsername = null;
+
+    function getCSRFToken() {
+        const tokenElem = document.querySelector('[name=csrfmiddlewaretoken]');
+        return tokenElem ? tokenElem.value : '';
+    }
+
+    async function apiRequest(url, method = 'GET', data = null) {
+        const headers = {
+            'X-CSRFToken': getCSRFToken(),
+            'Content-Type': 'application/json'
+        };
+        
+        const options = {
+            method: method,
+            headers: headers,
+            credentials: 'same-origin'
+        };
+        
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+        
+        const response = await fetch(url, options);
+        
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `HTTP ${response.status}`);
+        }
+        
+        return await response.json();
+    }
+
+    const mainMenu = document.getElementById('mainMenuBlock');
+    const gameListContainer = document.getElementById('gameListContainer');
+    const activeGameArea = document.getElementById('activeGameArea');
+    const balanceSpan = document.getElementById('balance');
+    const statusDiv = document.getElementById('statusMsg');
+    const gameInfoSpan = document.getElementById('gameDynamicInfo');
+    const choicesPanel = document.getElementById('choicesPanel');
+    const betInput = document.getElementById('betAmountInput');
+    const shareInvitePanel = document.getElementById('shareInvitePanel');
+    const inviteLinkInput = document.getElementById('inviteLinkInput');
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    const cancelGameBtn = document.getElementById('cancelGameBtn');
+    const resultModal = document.getElementById('resultModal');
+    const resultModalTitle = document.getElementById('resultModalTitle');
+    const resultModalBody = document.getElementById('resultModalBody');
+    const closeResultBtn = document.getElementById('closeResultBtn');
+    const potDisplay = document.getElementById('potDisplay');
+    const potAmount = document.getElementById('potAmount');
+
+    function setStatus(msg, isError = false) {
+        statusDiv.innerHTML = `<i class="fas ${isError ? 'fa-exclamation-triangle' : 'fa-hand-peace'}"></i> ${msg}`;
+        if(isError) console.warn(msg);
+    }
+
+    async function refreshBalance() {
+        try {
+            const data = await apiRequest('/api/wallet/balance/');
+            balanceSpan.innerText = data.balance;
+        } catch(e) { 
+            console.warn('Erreur refresh balance:', e);
+        }
+    }
+
+    function fetchCurrentUser() {
+        // Utiliser directement la variable Django injectée dans le template
+        currentUsername = "{{ user.username|default:'joueur' }}";
+        console.log('Utilisateur courant:', currentUsername);
+    }
+
+    function updatePlayerImages(game) {
+        const player1HasChosen = game.player1_has_chosen;
+        const player2HasChosen = game.player2_has_chosen;
+        const bothChosen = game.both_chosen;
+        const isFinished = game.status === 'finished';
+        
+        // Joueur 1 (battle-choice dans l'arène)
+        const player1Img = document.querySelector('#player1Image img');
+        const player1Icon = document.querySelector('#player1Image i');
+        const player1ChoiceLabel = document.getElementById('player1Choice');
+        const player1ImageContainer = document.getElementById('player1Image');
+        
+        if(isFinished && game.player1_choice && choiceImages[game.player1_choice]) {
+            // Partie terminée : afficher le choix réel avec animation
+            player1Img.src = choiceImages[game.player1_choice].player1;
+            player1Img.style.display = 'block';
+            player1Icon.style.display = 'none';
+            const choiceName = game.player1_choice === 'rock' ? 'PIERRE' : (game.player1_choice === 'paper' ? 'PAPIER' : 'CISEAUX');
+            player1ChoiceLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${choiceName}`;
+            
+            // Retirer et réajouter l'animation pour la redéclencher
+            player1ImageContainer.classList.remove('reveal-animation');
+            void player1ImageContainer.offsetWidth;
+            player1ImageContainer.classList.add('reveal-animation');
+        } else if(player1HasChosen) {
+            // Choix fait mais partie pas terminée : afficher l'état "choix fait"
+            player1Img.style.display = 'none';
+            player1Icon.style.display = 'block';
+            player1ChoiceLabel.innerHTML = `<i class="fas fa-lock"></i> Choix validé 🔒`;
+            player1ImageContainer.classList.remove('reveal-animation');
+        } else {
+            // Pas encore choisi
+            player1Img.style.display = 'none';
+            player1Icon.style.display = 'block';
+            player1ChoiceLabel.innerHTML = 'En attente...';
+            player1ImageContainer.classList.remove('reveal-animation');
+        }
+        
+        // Joueur 2 (battle-choice dans l'arène)
+        const player2Img = document.querySelector('#player2Image img');
+        const player2Icon = document.querySelector('#player2Image i');
+        const player2ChoiceLabel = document.getElementById('player2Choice');
+        const player2ImageContainer = document.getElementById('player2Image');
+        
+        if(isFinished && game.player2_choice && choiceImages[game.player2_choice]) {
+            // Partie terminée : afficher le choix réel avec animation
+            player2Img.src = choiceImages[game.player2_choice].player2;
+            player2Img.style.display = 'block';
+            player2Icon.style.display = 'none';
+            const choiceName = game.player2_choice === 'rock' ? 'PIERRE' : (game.player2_choice === 'paper' ? 'PAPIER' : 'CISEAUX');
+            player2ChoiceLabel.innerHTML = `<i class="fas fa-check-circle"></i> ${choiceName}`;
+            
+            // Retirer et réajouter l'animation pour la redéclencher
+            player2ImageContainer.classList.remove('reveal-animation');
+            void player2ImageContainer.offsetWidth;
+            player2ImageContainer.classList.add('reveal-animation');
+        } else if(player2HasChosen) {
+            // Choix fait mais partie pas terminée : afficher l'état "choix fait"
+            player2Img.style.display = 'none';
+            player2Icon.style.display = 'block';
+            player2ChoiceLabel.innerHTML = `<i class="fas fa-lock"></i> Choix validé 🔒`;
+            player2ImageContainer.classList.remove('reveal-animation');
+        } else {
+            // Pas encore choisi
+            player2Img.style.display = 'none';
+            player2Icon.style.display = 'block';
+            player2ChoiceLabel.innerHTML = 'En attente...';
+            player2ImageContainer.classList.remove('reveal-animation');
+        }
+    }
+
+    function updatePlayerNames(game) {
+        const player1Name = document.getElementById('player1Name');
+        const player2Name = document.getElementById('player2Name');
+        const player1Card = document.getElementById('player1Card');
+        const player2Card = document.getElementById('player2Card');
+        
+        if(game.player1) {
+            player1Name.innerText = game.player1 === currentUsername ? 'Vous' : game.player1;
+            player1Card.classList.add('active');
+        }
+        
+        if(game.player2) {
+            player2Name.innerText = game.player2 === currentUsername ? 'Vous' : game.player2;
+            player2Card.classList.add('active');
+            document.getElementById('player2Card').style.display = 'block';
+        } else {
+            player2Name.innerText = 'En attente...';
+            player2Card.classList.remove('active');
+            document.getElementById('player2Card').style.display = 'none';
+        }
+    }
+
+    function stopPolling(){
+        if(pollingInterval){
+            clearInterval(pollingInterval);
+            pollingInterval = null;
+        }
+    }
+
+    function getQueryParam(name) {
+        return new URLSearchParams(window.location.search).get(name);
+    }
+
+    function makeInviteLink(gameId) {
+        return `${window.location.origin}${window.location.pathname}?invite=${gameId}`;
+    }
+
+    function updateShareLink(game) {
+        if(!game || !currentUsername || !currentGameId) {
+            shareInvitePanel.style.display = 'none';
+            return;
+        }
+
+        const isCreator = currentUsername === game.player1;
+        if(isCreator && game.status === 'waiting') {
+            inviteLinkInput.value = makeInviteLink(game.id);
+            shareInvitePanel.style.display = 'flex';
+            return;
+        }
+
+        shareInvitePanel.style.display = 'none';
+    }
+
+    async function joinGame(gameId) {
+        setStatus(`Tentative de connexion à la partie ${gameId}...`);
+        try {
+            const data = await apiRequest(`/api/rock_paper_scissors/games/${gameId}/join_game/`, 'POST');
+            currentGameId = gameId;
+            enterGameMode();
+            setStatus(`🤝 Partie ${currentGameId} rejointe. En attente du choix...`);
+            startPollingForGame();
+        } catch(err) { 
+            console.error('Exception joinGame:', err);
+            setStatus(`❌ ${err.message}`, true); 
+        }
+    }
+
+    function enterGameMode() {
+        mainMenu.style.display = 'none';
+        gameListContainer.style.display = 'none';
+        activeGameArea.style.display = 'block';
+        choicesPanel.style.display = 'none'; // Masquer par défaut, affiché seulement quand c'est le tour du joueur
+        document.getElementById('playersArena').style.display = 'flex';
+        document.getElementById('quitGameBtn').style.display = 'flex';
+        potDisplay.classList.add('active');
+    }
+
+    function exitGameMode() {
+        stopPolling();
+        currentGameId = null;
+        mainMenu.style.display = 'block';
+        gameListContainer.style.display = 'none';
+        activeGameArea.style.display = 'none';
+        setStatus("🏮 Retour au lobby. Créez ou rejoignez un duel.");
+        refreshBalance();
+        if(resultModal) resultModal.style.display = 'none';
+        resultModalShown = false; // Réinitialiser le flag du modal
+        isRevealing = false; // Réinitialiser l'état de révélation
+        document.getElementById('quitGameBtn').style.display = 'none';
+        potDisplay.classList.remove('active');
+
+        // Reset des images
+        const player1Img = document.querySelector('#player1Image img');
+        const player1Icon = document.querySelector('#player1Image i');
+        const player2Img = document.querySelector('#player2Image img');
+        const player2Icon = document.querySelector('#player2Image i');
+
+        if(player1Img) player1Img.style.display = 'none';
+        if(player1Icon) player1Icon.style.display = 'block';
+        if(player2Img) player2Img.style.display = 'none';
+        if(player2Icon) player2Icon.style.display = 'block';
+
+        document.getElementById('player1Choice').innerHTML = 'En attente...';
+        document.getElementById('player2Choice').innerHTML = 'En attente...';
+        document.getElementById('player2Card').style.display = 'none';
+    }
+
+    async function fetchGameAndUpdate() {
+        if(!currentGameId) return;
+        try{
+            const game = await apiRequest(`/api/rock_paper_scissors/games/${currentGameId}/`);
+            updateGamePanel(game);
+            // Mettre à jour le pot affiché
+            const potTotal = game.player2 ? (game.bet_amount * 2) : game.bet_amount;
+            potAmount.innerText = potTotal.toFixed(2);
+        } catch(e){
+            console.error('Erreur fetchGameAndUpdate:', e);
+        }
+    }
+
+    function updateGamePanel(game) {
+        if(!game) return;
+        cancelGameBtn.style.display = 'none';
+        
+        updatePlayerNames(game);
+        updatePlayerImages(game);
+        
+        const player1 = game.player1 || "?";
+        const player2 = game.player2 || "en attente...";
+        let infoText = `👤 ${player1}  VS  ${player2 !== "en attente..." ? player2 : '⌛ adversaire'}`;
+        infoText += `  |  Mise: ${game.bet_amount}FC  |  Statut: ${game.status === 'waiting' ? '⏳ en attente' : (game.status === 'playing' ? '⚔️ en cours' : '🏁 terminée')}`;
+        gameInfoSpan.innerText = infoText;
+
+        const isPlayer1 = (currentUsername === game.player1);
+        const isPlayer2 = (currentUsername === game.player2);
+        const userHasChosen = (isPlayer1 && game.player1_has_chosen) || (isPlayer2 && game.player2_has_chosen);
+        
+        if(game.status === 'playing') {
+            if(game.both_chosen) {
+                // Les deux ont choisi mais la partie n'est pas encore terminée
+                choicesPanel.style.display = 'none';
+                setStatus("⏳ Les deux choix sont validés. Dévoilement imminent...");
+            } else if(userHasChosen){
+                choicesPanel.style.display = 'none';
+                setStatus("✨ Votre geste est scellé. Attente de l'adversaire...");
+            } else {
+                if((isPlayer1 || isPlayer2)){
+                    choicesPanel.style.display = 'flex';
+                    setStatus("🔮 Choisissez votre symbole : Pierre, Papier ou Ciseaux");
+                } else {
+                    choicesPanel.style.display = 'none';
+                    setStatus("👀 Vous n'êtes pas joueur dans cette partie ?");
+                }
+            }
+        } else if(game.status === 'finished') {
+            console.log("🎮 Game status = finished, isRevealing:", isRevealing);
+            
+            // Si déjà en cours de révélation, ne pas relancer
+            if(isRevealing) {
+                console.log("⚠️ Déjà en cours de révélation, skip handleGameCompletion");
+                return;
+            }
+            
+            // Utiliser la nouvelle fonction async avec délai forcé
+            refreshBalance();
+            stopPolling();
+            resultModalShown = false; // Réinitialiser pour permettre l'affichage
+            handleGameCompletion(game);
+        } else if(game.status === 'waiting') {
+            choicesPanel.style.display = 'none';
+            setStatus(`🎲 En attente d'un adversaire... (ID: ${game.id})`);
+            if(currentUsername === game.player1) {
+                cancelGameBtn.style.display = 'block';
+            } else {
+                cancelGameBtn.style.display = 'none';
+            }
+        }
+        updateShareLink(game);
+    }
+
+    async function sendChoice(choice){
+        if(!currentGameId) return;
+        try{
+            const data = await apiRequest(`/api/rock_paper_scissors/games/${currentGameId}/make_choice/`, 'POST', { choice: choice });
+            setStatus(`✅ ${choice.toUpperCase()} enregistré. Attente résultat...`);
+            choicesPanel.style.display = 'none';
+            
+            console.log("📤 Choix envoyé, statut reçu:", data.status);
+            
+            // Si le jeu est terminé, laisser updateGamePanel gérer via handleGameCompletion
+            updateGamePanel(data);
+        } catch(e){ 
+            console.error('Erreur sendChoice:', e);
+            setStatus(`⚠️ ${e.message}`, true); 
+        }
+    }
+
+    // Variable pour éviter que le modal ne s'affiche plusieurs fois
+    let resultModalShown = false;
+    let isRevealing = false; // État intermédiaire pour la phase de révélation
+
+    async function handleGameCompletion(game) {
+        console.log("1. Résultat reçu, début de l'animation...");
+        
+        // Si déjà en cours de révélation, ne pas relancer
+        if(isRevealing) {
+            console.log("⚠️ Déjà en cours de révélation, ignoré");
+            return;
+        }
+        
+        isRevealing = true;
+        
+        // 1. Afficher les vrais symboles joués (immédiat)
+        updatePlayerImages(game);
+        setStatus("✨ Dévoilement des choix en cours...");
+        choicesPanel.style.display = 'none';
+        
+        console.log("2. Attente de 2000ms...");
+        
+        // 2. BLOQUER pendant 2 secondes pour laisser l'animation jouer
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        console.log("3. Affichage de la modale de victoire !");
+        
+        // 3. SEULEMENT MAINTENANT : Afficher le message de victoire/défaite
+        if(!resultModalShown) {
+            resultModalShown = true;
+            showResultModal(game);
+        }
+        
+        isRevealing = false;
+    }
+
+    function showResultModal(game) {
+        if(!resultModal || !resultModalTitle || !resultModalBody) return;
+        const bet = parseFloat(game.bet_amount) || 0;
+        const totalPot = bet * 2;
+        let title = 'Résultat de la partie';
+        let body = '';
+        let net = 0;
+        const isPlayer = currentUsername === game.player1 || currentUsername === game.player2;
+
+        if(game.result === 'draw') {
+            title = 'Égalité';
+            body = `Les mises sont remboursées à tous les joueurs.`;
+            net = 0;
+        } else if(game.winner) {
+            const winnerName = game.winner === currentUsername ? 'Vous' : game.winner;
+            if(game.winner === currentUsername) {
+                title = 'Victoire !';
+                body = `Félicitations, ${winnerName} remporte 80% du pot !`;
+                net = totalPot * 0.8 - bet;
+            } else if(isPlayer) {
+                title = 'Défaite';
+                body = `Dommage, ${winnerName} gagne cette partie.`;
+                net = -bet;
+            } else {
+                title = 'Partie terminée';
+                body = `Le vainqueur est ${winnerName}.`;
+                net = 0;
+            }
+        }
+
+        const netLabel = net >= 0 ? `+${net.toFixed(2)}FC` : `${net.toFixed(2)}FC`;
+        const details = `Mise: ${bet.toFixed(2)}FC · Pot total: ${totalPot.toFixed(2)}FC · Gain net: ${netLabel}`;
+
+        resultModalTitle.innerText = title;
+        resultModalBody.innerHTML = `
+            <p style="margin-bottom: 1rem; font-size: 1rem; line-height: 1.5;">${body}</p>
+            <p style="margin:0; font-size: 0.95rem; color:#ffd966;">${details}</p>
+        `;
+        resultModal.style.display = 'flex';
+    }
+
+    function closeResultModal() {
+        if(resultModal) {
+            resultModal.style.display = 'none';
+        }
+        exitGameMode();
+    }
+
+    closeResultBtn.addEventListener('click', () => {
+        closeResultModal();
+    });
+
+    resultModal.addEventListener('click', (e) => {
+        if(e.target === resultModal) {
+            closeResultModal();
+        }
+    });
+
+    cancelGameBtn.addEventListener('click', async () => {
+        if(!currentGameId) return;
+        try {
+            await apiRequest(`/api/rock_paper_scissors/games/${currentGameId}/cancel_game/`, 'POST');
+            setStatus('🗑️ Partie annulée. Retour au lobby.');
+            exitGameMode();
+        } catch (err) {
+            console.error('Erreur cancelGame:', err);
+            setStatus(`⚠️ ${err.message}`, true);
+        }
+    });
+
+    copyLinkBtn.addEventListener('click', async () => {
+        const link = inviteLinkInput.value;
+        if(!link) return;
+        try {
+            await navigator.clipboard.writeText(link);
+            setStatus('✅ Lien d’invitation copié dans le presse-papier.');
+        } catch (error) {
+            inviteLinkInput.select();
+            document.execCommand('copy');
+            setStatus('✅ Lien copié avec la méthode de secours.');
+        }
+    });
+
+    function startPollingForGame(){
+        if(pollingInterval) clearInterval(pollingInterval);
+        pollingInterval = setInterval(() => {
+            fetchGameAndUpdate();
+        }, 1800);
+        fetchGameAndUpdate();
+    }
+
+    // Boutons de mise rapide
+    document.querySelectorAll('.bet-quick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const bet = btn.getAttribute('data-bet');
+            betInput.value = bet;
+            document.querySelectorAll('.bet-quick-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+    });
+
+    // Créer une partie
+    document.getElementById('createGameBtn').addEventListener('click', async () => {
+        let bet = betInput.value;
+        if(!bet || parseFloat(bet) <= 0){
+            setStatus("💰 Entrez une mise valide (minimum 0.5FC)", true);
+            return;
+        }
+        try{
+            const data = await apiRequest('/api/rock_paper_scissors/games/create_game/', 'POST', { bet_amount: parseFloat(bet) });
+            currentGameId = data.id;
+            enterGameMode();
+            setStatus(`🎰 Partie créée (ID ${currentGameId}). Mise ${bet}FC. En attente d'un rival...`);
+            startPollingForGame();
+        } catch(e){
+            console.error('Erreur createGame:', e);
+            setStatus(`❌ ${e.message}`, true);
+        }
+    });
+
+    // Afficher la liste des parties
+    document.getElementById('listGamesBtn').addEventListener('click', async () => {
+        try{
+            const games = await apiRequest('/api/rock_paper_scissors/games/');
+            const waiting = games.filter(g => g.status === 'waiting');
+            const listDiv = document.getElementById('gameListContent');
+            if(waiting.length === 0){
+                listDiv.innerHTML = `<div style="padding:1rem; text-align:center;">✨ Aucune partie en attente pour le moment ✨</div>`;
+            } else {
+                listDiv.innerHTML = waiting.map(game => `
+                    <div class="game-item-premium" data-gameid="${game.id}">
+                        <div><i class="fas fa-dice"></i> Partie #${game.id}</div>
+                        <div><i class="fas fa-coins"></i> Mise: ${game.bet_amount}FC</div>
+                        <div><i class="fas fa-user"></i> Créateur: ${game.player1}</div>
+                        <div class="game-badge"><i class="fas fa-hourglass-half"></i> En attente</div>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.game-item-premium').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        const gid = parseInt(el.dataset.gameid);
+                        if(gid) joinGame(gid);
+                    });
+                });
+            }
+            mainMenu.style.display = 'none';
+            gameListContainer.style.display = 'block';
+            activeGameArea.style.display = 'none';
+            if(pollingInterval) clearInterval(pollingInterval);
+        } catch(e){
+            console.error('Erreur listGames:', e);
+            setStatus("Erreur lors du chargement des parties", true);
+        }
+    });
+
+    document.getElementById('hideListBtn').addEventListener('click', () => {
+        mainMenu.style.display = 'block';
+        gameListContainer.style.display = 'none';
+        activeGameArea.style.display = 'none';
+        setStatus("Retour au menu principal.");
+    });
+
+    document.getElementById('quitGameBtn').addEventListener('click', () => {
+        if(currentGameId){
+            setStatus("Vous avez quitté la partie.");
+            exitGameMode();
+        } else {
+            exitGameMode();
+        }
+    });
+
+    document.querySelectorAll('.choice-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const choice = btn.getAttribute('data-choice');
+            if(choice && currentGameId) {
+                // Feedback visuel immédiat
+                document.querySelectorAll('.choice-btn').forEach(b => b.style.opacity = '0.5');
+                btn.style.opacity = '1';
+                btn.style.transform = 'scale(1.1)';
+                btn.style.boxShadow = '0 0 30px rgba(102, 252, 241, 0.6)';
+                sendChoice(choice);
+            } else if(!currentGameId) {
+                setStatus("Aucune partie active", true);
+            }
+        });
+    });
+
+    const helpModal = document.getElementById('helpModal');
+    document.getElementById('helpBtn').addEventListener('click', () => {
+        helpModal.style.display = 'flex';
+    });
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+        helpModal.style.display = 'none';
+    });
+    helpModal.addEventListener('click', (e) => {
+        if(e.target === helpModal) helpModal.style.display = 'none';
+    });
+
+    async function init(){
+        await fetchCurrentUser();
+        const inviteId = getQueryParam('invite');
+        if(inviteId) {
+            setStatus(`🔗 Invitation détectée : connexion à la partie ${inviteId}...`);
+            try {
+                await joinGame(inviteId);
+            } catch (e) {
+                console.warn('Impossible de rejoindre via invitation :', e);
+                await refreshBalance();
+                setStatus("👑 Prêt pour le duel. Créez une table ou rejoignez un adversaire.");
+            }
+        } else {
+            await refreshBalance();
+            setStatus("👑 Prêt pour le duel. Créez une table ou rejoignez un adversaire.");
+        }
+        document.getElementById('playersArena').style.display = 'flex';
+    }
+    init();
+</script>
+</body>
+</html>

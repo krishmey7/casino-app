@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three Card Poker - Jeu de Casino</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 15px 25px;
+            backdrop-filter: blur(10px);
+        }
+        .header h1 { font-size: 2.5em; margin-bottom: 15px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .header-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .header-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .info-item { padding: 10px 20px; background: rgba(0,0,0,0.3); border-radius: 8px; }
+        .info-item strong { color: #00d4ff; }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 30px;
+        }
+        .game-section {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        .game-title { font-size: 1.3em; margin-bottom: 25px; color: #00d4ff; }
+        .hands-display {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+        .hand-section {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+        .hand-title { color: #00d4ff; font-weight: bold; margin-bottom: 15px; }
+        .cards-display {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .card {
+            width: 60px;
+            height: 90px;
+            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .hand-rank {
+            font-size: 1.1em;
+            color: #90EE90;
+            font-weight: bold;
+        }
+        .result-message {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .result-win {
+            background: rgba(40, 167, 69, 0.3);
+            border: 2px solid #28a745;
+            color: #90EE90;
+        }
+        .result-lose {
+            background: rgba(220, 53, 69, 0.3);
+            border: 2px solid #dc3545;
+            color: #ff6b6b;
+        }
+        .control-panel {
+            background: rgba(15, 52, 96, 0.8);
+            border: 2px solid #0f3460;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            height: fit-content;
+        }
+        .control-title { color: #00d4ff; font-size: 1.1em; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; }
+        .control-group { margin-bottom: 20px; }
+        .control-label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 8px;
+            font-size: 0.85em;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            background: #1a3a52;
+            border: 2px solid #0f3460;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 0.9em;
+        }
+        button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #0056b3, #003580);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 123, 255, 0.4);
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .help-button {
+            background: rgba(0, 212, 255, 0.8);
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .help-button:hover {
+            background: #00d4ff;
+            transform: scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #00d4ff;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #fff;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #00d4ff;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #0099cc;
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            color: #00d4ff;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section-title {
+            color: #ff6b00;
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 8px;
+        }
+
+        .modal-section-content {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .hands-display { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-title">🃏 THREE CARD POKER</div>
+            <div class="header-info">
+                <div class="info-item">Solde: <strong id="balance">0.00 CDF</strong></div>
+            </div>
+            <button class="help-button" id="helpButton" title="Aide">?</button>
+        </div>
+
+        <div id="helpModal" class="modal">
+            <div class="modal-content">
+                <button class="modal-close" id="closeModal">&times;</button>
+                <div class="modal-title">📋 Comment Jouer au Three Card Poker</div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🎮 Objectif du Jeu</div>
+                    <div class="modal-section-content">
+                        Obtenir une meilleure main de poker à 3 cartes que le croupier. Les mains sont évaluées selon les règles du poker.
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🃏 Hiérarchie des Mains</div>
+                    <div class="modal-section-content">
+                        Straight Flush > Three of a Kind > Straight > Flush > Pair > High Card
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">💰 Comment Jouer</div>
+                    <div class="modal-section-content">
+                        1. Placez votre mise<br>
+                        2. Recevez 3 cartes<br>
+                        3. Le croupier reçoit aussi 3 cartes<br>
+                        4. Comparez les mains<br>
+                        5. La meilleure main gagne !
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="game-section">
+                <div class="game-title">🎰 Mains</div>
+                
+                <div class="hands-display">
+                    <div class="hand-section">
+                        <div class="hand-title">Votre Main</div>
+                        <div class="cards-display" id="playerCards">
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                        </div>
+                        <div class="hand-rank" id="playerRank">-</div>
+                    </div>
+                    
+                    <div class="hand-section">
+                        <div class="hand-title">Main du Dealer</div>
+                        <div class="cards-display" id="dealerCards">
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                            <div class="card">?</div>
+                        </div>
+                        <div class="hand-rank" id="dealerRank">-</div>
+                    </div>
+                </div>
+
+                <div class="result-message" id="resultMessage" style="display: none;"></div>
+            </div>
+
+            <div class="control-panel">
+                <div class="control-title">⚙️ Contrôles</div>
+
+                <div class="control-group">
+                    <label class="control-label" for="anteBet">Mise Ante</label>
+                    <input type="number" id="anteBet" value="50" min="1" max="10000" step="10">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" for="playBet">Mise Play</label>
+                    <input type="number" id="playBet" value="50" min="0" max="10000" step="10">
+                </div>
+
+                <button id="playBtn">Jouer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiBase = '/api/three_card_poker';
+        let currentBalance = 0;
+
+        const rankNames = {
+            'high_card': 'Carte Haute',
+            'pair': 'Paire',
+            'flush': 'Flush',
+            'straight': 'Suite',
+            'three_of_a_kind': 'Brelan',
+            'straight_flush': 'Suite Flush'
+        };
+
+        async function updateBalance() {
+            try {
+                const response = await fetch('/api/wallet/balance/');
+                const data = await response.json();
+                currentBalance = parseFloat(data.balance);
+                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+                document.getElementById('anteBet').max = Math.floor(currentBalance);
+                document.getElementById('playBet').max = Math.floor(currentBalance);
+            } catch (error) {
+                console.error('Erreur:', error);
+            }
+        }
+
+        document.getElementById('playBtn').addEventListener('click', async () => {
+            const ante = parseFloat(document.getElementById('anteBet').value);
+            const play = parseFloat(document.getElementById('playBet').value);
+            
+            if (ante <= 0 || (ante + play) > currentBalance) {
+                alert('Mises invalides');
+                return;
+            }
+
+            try {
+                document.getElementById('playBtn').disabled = true;
+
+                const response = await fetch(`${apiBase}/games/start_game/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ ante_bet: ante, play_bet: play })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    alert(data.error || 'Erreur serveur');
+                    document.getElementById('playBtn').disabled = false;
+                    return;
+                }
+
+                displayResult(data);
+                updateBalance();
+
+            } catch (error) {
+                alert('Erreur: ' + error.message);
+                document.getElementById('playBtn').disabled = false;
+            }
+        });
+
+        function displayResult(game) {
+            const playerDisplay = document.getElementById('playerCards');
+            playerDisplay.innerHTML = game.player_cards.map(card => `<div class="card">${card}</div>`).join('');
+            
+            const dealerDisplay = document.getElementById('dealerCards');
+            dealerDisplay.innerHTML = game.dealer_cards.map(card => `<div class="card">${card}</div>`).join('');
+            
+            document.getElementById('playerRank').textContent = rankNames[game.player_hand_rank] || game.player_hand_rank;
+            document.getElementById('dealerRank').textContent = rankNames[game.dealer_hand_rank] || game.dealer_hand_rank;
+
+            const msg = document.getElementById('resultMessage');
+            if (game.result === 'win') {
+                msg.textContent = `🎉 Gagné! Gain: ${parseFloat(game.winnings).toFixed(2)} CDF`;
+                msg.className = 'result-message result-win';
+            } else {
+                msg.textContent = 'Perdu!';
+                msg.className = 'result-message result-lose';
+            }
+            msg.style.display = 'block';
+            document.getElementById('playBtn').disabled = false;
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        updateBalance();
+
+        // Modal help functionality
+        const helpButton = document.getElementById('helpButton');
+        const helpModal = document.getElementById('helpModal');
+        const closeModal = document.getElementById('closeModal');
+
+        helpButton.addEventListener('click', () => {
+            helpModal.classList.add('show');
+        });
+
+        closeModal.addEventListener('click', () => {
+            helpModal.classList.remove('show');
+        });
+
+        helpModal.addEventListener('click', (e) => {
+            if (e.target === helpModal) {
+                helpModal.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
