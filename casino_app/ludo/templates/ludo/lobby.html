@@ -230,7 +230,7 @@
             <div class="col-md-4">
                 <div class="wallet-card">
                     <div class="text-white-50 small mb-1">Solde actuel</div>
-                    <div class="balance">{{ user_wallet.balance }} €</div>
+                    <div class="balance">{{ user_wallet.balance }} FC</div>
                 </div>
             </div>
         </div>
@@ -243,7 +243,7 @@
             {% csrf_token %}
             <div class="row g-3">
                 <div class="col-md-4">
-                    <label for="stake" class="form-label fw-semibold">Mise (€)</label>
+                    <label for="stake" class="form-label fw-semibold">Mise (FC)</label>
                     <input type="number" class="form-control" id="stake" name="stake" 
                            min="1" step="1" value="10" required placeholder="10">
                 </div>
@@ -274,7 +274,7 @@
                     <div class="game-card">
                         <h5>Partie #{{ game.id|slice:":8" }}</h5>
                         <div class="game-info">
-                            <div><strong>Mise:</strong> {{ game.stake }} €</div>
+                            <div><strong>Mise:</strong> {{ game.stake }} FC</div>
                             <div><strong>Joueurs:</strong> {{ game.get_player_count }}/4</div>
                         </div>
                         <form method="post" action="{% url 'ludo:join_game' game.id %}">
@@ -303,7 +303,7 @@
                     <div class="game-card">
                         <h5>Partie #{{ game.id|slice:":8" }}</h5>
                         <div class="game-info">
-                            <div><strong>Mise:</strong> {{ game.stake }} €</div>
+                            <div><strong>Mise:</strong> {{ game.stake }} FC</div>
                             <div><strong>Status:</strong> 
                                 {% if game.status == 'active' %}
                                     <span class="badge badge-custom badge-success">En cours</span>
