@@ -295,17 +295,24 @@
 .toggle-password {
     position: absolute;
     right: 0.5rem;
-    background: none;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
-    color: rgba(212, 175, 55, 0.5);
+    color: rgba(212, 175, 55, 0.6);
     cursor: pointer;
     padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s ease;
-    z-index: 5;
+    transition: color 0.2s ease, background 0.2s ease;
+    z-index: 10;
     border-radius: 8px;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto !important;
 }
 
 .toggle-password:hover {
@@ -313,8 +320,13 @@
     background: rgba(6, 182, 212, 0.08);
 }
 
+.toggle-password:active {
+    transform: translateY(-50%) scale(0.92);
+}
+
 .toggle-password.active {
     color: var(--gold);
+    background: rgba(212, 175, 55, 0.1);
 }
 
 .toggle-password .icon-eye-off {
@@ -327,6 +339,13 @@
 
 .toggle-password.active .icon-eye-off {
     display: block;
+}
+
+.toggle-password svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
 /* ==================== SIGNUP LINK (CTA) ==================== */

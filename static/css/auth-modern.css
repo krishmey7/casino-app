@@ -299,25 +299,59 @@
 /* ==================== TOGGLE PASSWORD ==================== */
 .toggle-password {
     position: absolute;
-    right: 0.75rem;
-    background: none;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
     border: none;
-    color: rgba(212, 175, 55, 0.5);
+    color: rgba(212, 175, 55, 0.6);
     cursor: pointer;
     padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: color 0.3s ease;
-    z-index: 5;
+    transition: color 0.2s ease, background 0.2s ease;
+    z-index: 10;
+    border-radius: 8px;
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto !important;
 }
 
 .toggle-password:hover {
     color: var(--cyan-glow);
+    background: rgba(6, 182, 212, 0.08);
+}
+
+.toggle-password:active {
+    transform: translateY(-50%) scale(0.92);
 }
 
 .toggle-password.active {
     color: var(--gold);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Cacher l'icône "œil barré" par défaut, l'afficher quand le bouton est actif */
+.toggle-password .icon-eye-off {
+    display: none;
+}
+
+.toggle-password.active .icon-eye {
+    display: none;
+}
+
+.toggle-password.active .icon-eye-off {
+    display: block;
+}
+
+.toggle-password svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    pointer-events: none;
 }
 
 /* ==================== FIELD HINT ==================== */
@@ -379,7 +413,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.875rem 1.5rem;
+    padding: 0.875rem 1.25rem;
     border: none;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -391,6 +425,21 @@
     outline: none;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.btn .btn-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.btn .btn-icon {
+    flex-shrink: 0;
 }
 
 .btn::before {
