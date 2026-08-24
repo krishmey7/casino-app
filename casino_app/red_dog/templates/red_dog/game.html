@@ -349,15 +349,35 @@
         const apiBase = '/api/red_dog';
         let currentBalance = 0;
 
+        // Met à jour l'affichage de la balance
+        function setBalance(newBalance) {
+            currentBalance = parseFloat(newBalance);
+            if (isNaN(currentBalance)) currentBalance = 0;
+            document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
+            const betInput = document.getElementById('betAmount');
+            betInput.max = Math.max(0, Math.floor(currentBalance));
+            if (parseFloat(betInput.value) > currentBalance) {
+                betInput.value = Math.max(0, Math.floor(currentBalance));
+            }
+        }
+
+        // Récupère la balance depuis l'API wallet (avec credentials pour l'authentification)
         async function updateBalance() {
             try {
-                const response = await fetch('/api/wallet/balance/');
+                const response = await fetch('/api/wallet/balance/', {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                if (!response.ok) {
+                    console.warn('Impossible de récupérer la balance:', response.status);
+                    return;
+                }
                 const data = await response.json();
-                currentBalance = parseFloat(data.balance);
-                document.getElementById('balance').textContent = currentBalance.toFixed(2) + ' CDF';
-                document.getElementById('betAmount').max = Math.floor(currentBalance);
+                setBalance(data.balance);
             } catch (error) {
-                console.error('Erreur:', error);
+                console.error('Erreur updateBalance:', error);
             }
         }
 
@@ -375,9 +395,11 @@
 
                 const response = await fetch(`${apiBase}/games/start_game/`, {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({ bet_amount: bet, bet_type: betType })
                 });
@@ -391,7 +413,15 @@
                 }
 
                 displayResult(data);
-                updateBalance();
+
+                // Mise à jour de la balance : on utilise la valeur retournée par l'API
+                // (plus fiable qu'un second appel à /api/wallet/balance/)
+                if (data.new_balance !== undefined && data.new_balance !== null) {
+                    setBalance(data.new_balance);
+                } else {
+                    // Fallback : on tente de récupérer la balance via l'API wallet
+                    await updateBalance();
+                }
 
             } catch (error) {
                 alert('Erreur: ' + error.message);
@@ -433,6 +463,7 @@
             return cookieValue;
         }
 
+        // Chargement initial de la balance
         updateBalance();
 
         // Modal help functionality

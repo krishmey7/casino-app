@@ -1,0 +1,449 @@
+/* ===================================================
+   INSCRIPTION - STEPPER & MULTI-STEP FORM
+   Dépend de auth-modern.css (chargé via base_auth.html)
+   =================================================== */
+
+/* ==================== WRAPPER ==================== */
+.signup-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    animation: fadeInUp 0.5s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==================== STEPPER ==================== */
+.stepper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    padding: 0.5rem 0 0.5rem;
+    position: relative;
+}
+
+.stepper-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 2;
+    flex-shrink: 0;
+}
+
+.stepper-circle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(212, 175, 55, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(232, 232, 232, 0.5);
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+}
+
+.stepper-item.active .stepper-circle {
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    border-color: var(--gold);
+    color: var(--darker-blue);
+    box-shadow:
+        0 0 0 4px rgba(212, 175, 55, 0.15),
+        0 4px 12px rgba(212, 175, 55, 0.3);
+    transform: scale(1.1);
+}
+
+.stepper-item.completed .stepper-circle {
+    background: linear-gradient(135deg, #10b981, #34d399);
+    border-color: #10b981;
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+}
+
+.stepper-number {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.stepper-check {
+    position: absolute;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.stepper-item.completed .stepper-number {
+    opacity: 0;
+    transform: scale(0.5);
+}
+
+.stepper-item.completed .stepper-check {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.stepper-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: rgba(232, 232, 232, 0.5);
+    letter-spacing: 0.3px;
+    transition: color 0.3s ease;
+    white-space: nowrap;
+}
+
+.stepper-item.active .stepper-label {
+    color: var(--gold);
+    font-weight: 600;
+}
+
+.stepper-item.completed .stepper-label {
+    color: #10b981;
+}
+
+.stepper-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(212, 175, 55, 0.2);
+    margin: 0 -2px 22px;
+    position: relative;
+    z-index: 1;
+    max-width: 60px;
+    transition: background 0.4s ease;
+}
+
+.stepper-line.completed {
+    background: linear-gradient(90deg, #10b981, var(--gold));
+}
+
+/* ==================== FORM STEPS ==================== */
+.form-step {
+    display: none;
+    flex-direction: column;
+    gap: 1rem;
+    animation: stepIn 0.4s ease-out;
+}
+
+.form-step.active {
+    display: flex;
+}
+
+.form-step.exiting {
+    animation: stepOut 0.25s ease-in forwards;
+}
+
+@keyframes stepIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes stepOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+}
+
+/* ==================== STEP ACTIONS ==================== */
+.step-actions {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.step-actions .btn-signup-secondary {
+    flex-shrink: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+/* ==================== FIELD HINT ==================== */
+.field-hint {
+    font-size: 0.8rem;
+    color: rgba(232, 232, 232, 0.6);
+    margin: 0;
+    font-weight: 400;
+    line-height: 1.3;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.field-hint::before {
+    content: 'ⓘ';
+    color: var(--gold);
+    font-size: 0.9rem;
+}
+
+/* ==================== FIELD ERROR ==================== */
+.field-error {
+    font-size: 0.8rem;
+    color: #fca5a5;
+    margin: 0;
+    font-weight: 500;
+    line-height: 1.3;
+    display: none;
+    padding-left: 0.25rem;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.field-error::before {
+    content: '⚠';
+    font-size: 0.9rem;
+}
+
+.field-error.visible {
+    display: flex;
+    animation: shake 0.4s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+}
+
+.form-input.error {
+    border-color: #ef4444 !important;
+    background: rgba(239, 68, 68, 0.08) !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+    animation: shake 0.4s ease-in-out;
+}
+
+/* ==================== PASSWORD STRENGTH ==================== */
+.password-strength {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.strength-bars {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+}
+
+.strength-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(212, 175, 55, 0.15);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-bar.active-weak {
+    background: #ef4444;
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+.strength-bar.active-fair {
+    background: #f59e0b;
+    box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.strength-bar.active-good {
+    background: #10b981;
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.strength-bar.active-strong {
+    background: linear-gradient(90deg, #10b981, var(--gold));
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.strength-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(232, 232, 232, 0.6);
+    min-width: 70px;
+    text-align: right;
+    transition: color 0.3s ease;
+}
+
+.strength-label.weak { color: #fca5a5; }
+.strength-label.fair { color: #fbbf24; }
+.strength-label.good { color: #6ee7b7; }
+.strength-label.strong { color: var(--gold); }
+
+/* ==================== TOGGLE PASSWORD ==================== */
+.toggle-password {
+    position: absolute;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    color: rgba(212, 175, 55, 0.5);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+    z-index: 5;
+    border-radius: 8px;
+}
+
+.toggle-password:hover {
+    color: var(--cyan-glow);
+    background: rgba(6, 182, 212, 0.08);
+}
+
+.toggle-password.active {
+    color: var(--gold);
+}
+
+.toggle-password .icon-eye-off {
+    display: none;
+}
+
+.toggle-password.active .icon-eye {
+    display: none;
+}
+
+.toggle-password.active .icon-eye-off {
+    display: block;
+}
+
+/* ==================== SIGNUP LINK (CTA) ==================== */
+.signup-link {
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ==================== AUTH FOOTER ==================== */
+.auth-footer-text {
+    text-align: center;
+    font-size: 0.78rem;
+    color: rgba(232, 232, 232, 0.55);
+    line-height: 1.5;
+    margin: 0.5rem 0 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(212, 175, 55, 0.08);
+}
+
+.footer-link {
+    color: var(--cyan-glow);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--gold);
+    text-decoration: underline;
+}
+
+/* ==================== FORM DIVIDER ==================== */
+.form-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem 0;
+}
+
+.form-divider::before,
+.form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(212, 175, 55, 0.3), transparent);
+}
+
+.divider-text {
+    font-size: 0.85rem;
+    color: rgba(232, 232, 232, 0.6);
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+/* TABLET (768px+) */
+@media (min-width: 768px) {
+    .signup-wrapper {
+        gap: 1.75rem;
+    }
+
+    .stepper-circle {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+
+    .stepper-label {
+        font-size: 0.8rem;
+    }
+
+    .stepper-line {
+        margin-bottom: 26px;
+    }
+
+    .field-hint,
+    .field-error {
+        font-size: 0.85rem;
+    }
+}
+
+/* DESKTOP (1024px+) */
+@media (min-width: 1024px) {
+    .stepper-circle {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stepper-label {
+        font-size: 0.85rem;
+    }
+}
+
+/* ==================== ACCESSIBILITY ==================== */
+@media (prefers-reduced-motion: reduce) {
+    .form-step,
+    .signup-wrapper,
+    .field-error.visible,
+    .form-input.error {
+        animation: none !important;
+    }
+
+    .stepper-circle,
+    .strength-bar,
+    .stepper-label {
+        transition: none !important;
+    }
+}
+
+/* Focus visible pour l'accessibilité clavier */
+.btn:focus-visible,
+.form-input:focus-visible,
+.toggle-password:focus-visible {
+    outline: 2px solid var(--cyan-glow);
+    outline-offset: 2px;
+}
