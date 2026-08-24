@@ -3,414 +3,153 @@
 
 {% block title %}Inscription - Bet'A Casino{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/inscription-modern.css' %}">
+{% endblock %}
+
 {% block content %}
-<style>
-/* Bet'A Casino Dark Theme - Full Screen Mobile First */
-body {
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
-    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
-    background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
-    margin: 0;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    position: relative;
-}
+<div class="signup-wrapper">
 
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-}
-
-@keyframes gradientShift {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
-.auth-container {
-    width: 100%;
-    max-width: 380px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    z-index: 1;
-}
-
-.auth-header {
-    text-align: center;
-    margin-bottom: 0.75rem;
-}
-
-.auth-title {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: #ffffff;
-    margin: 0 0 0.125rem 0;
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
-}
-
-.auth-subtitle {
-    font-size: 0.75rem;
-    color: #e0e0e0;
-    margin: 0;
-}
-
-/* Progress Dots */
-.progress-dots {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.progress-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-}
-
-.progress-dot.active {
-    background: #d4af37;
-    transform: scale(1.2);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-}
-
-.progress-dot.completed {
-    background: #d4af37;
-}
-
-/* Error Messages */
-.auth-messages {
-    margin-bottom: 0.75rem;
-}
-
-.auth-message {
-    padding: 0.5rem;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.auth-message.error {
-    background: rgba(239, 68, 68, 0.15);
-    color: #ef4444;
-    border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.auth-message.success {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-/* Form Steps */
-.form-step {
-    display: none;
-    animation: fadeIn 0.3s ease;
-}
-
-.form-step.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.step-header {
-    margin-bottom: 0.75rem;
-}
-
-.step-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #ffffff;
-    margin: 0 0 0.125rem 0;
-}
-
-.step-subtitle {
-    font-size: 0.7rem;
-    color: #e0e0e0;
-    margin: 0;
-}
-
-/* Form Groups */
-.form-group {
-    margin-bottom: 0.75rem;
-}
-
-.form-label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #e0e0e0;
-    margin-bottom: 0.25rem;
-}
-
-.form-input-wrapper {
-    position: relative;
-}
-
-.form-input {
-    width: 100%;
-    height: 40px;
-    padding: 0 0.875rem 0 2.25rem;
-    font-size: 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    background: rgba(255, 255, 255, 0.08);
-    color: #ffffff !important;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #d4af37;
-    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
-}
-
-.form-input::placeholder {
-    color: #e0e0e0;
-}
-
-.input-icon {
-    position: absolute;
-    left: 0.625rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #d4af37;
-    pointer-events: none;
-}
-
-.toggle-password {
-    position: absolute;
-    right: 0.625rem;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0.125rem;
-    color: #d4af37;
-    transition: color 0.2s ease;
-}
-
-.toggle-password:hover {
-    color: #f4d03f;
-}
-
-.field-error {
-    font-size: 0.75rem;
-    color: #dc2626;
-    margin-top: 0.25rem;
-    display: none;
-}
-
-.form-input.error {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.1);
-}
-
-.form-input.error + .field-error {
-    display: block;
-}
-
-/* Buttons */
-.btn {
-    width: 100%;
-    min-height: 44px;
-    padding: 0.625rem 1.25rem;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border: none;
-}
-
-.btn:active {
-    transform: scale(0.98);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #d4af37 0%, #f4d03f 100%);
-    color: #020617;
-}
-
-.btn-primary:hover {
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
-}
-
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-}
-
-.btn-link {
-    background: none;
-    color: #d4af37;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.5rem;
-    margin-top: 1rem;
-    display: block;
-    text-align: center;
-}
-
-.btn-link:hover {
-    text-decoration: underline;
-    color: #f4d03f;
-}
-
-.step-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.75rem;
-}
-
-.step-buttons .btn {
-    flex: 1;
-}
-
-.divider {
-    text-align: center;
-    margin: 0.875rem 0;
-    position: relative;
-}
-
-.divider::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 100%;
-    height: 1px;
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.divider-text {
-    background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e293b 100%);
-    padding: 0 0.75rem;
-    color: #e0e0e0;
-    font-size: 0.875rem;
-    position: relative;
-}
-</style>
-
-<div class="auth-container">
-    <div class="auth-header">
-        <h1 class="auth-title">Créer un compte</h1>
-        <p class="auth-subtitle">Rejoignez Bet'A Casino</p>
+    <!-- En-tête -->
+    <div class="auth-form-header">
+        <h1 class="auth-form-title">Créer un compte</h1>
+        <p class="auth-form-subtitle">Rejoignez Bet'A Casino en quelques secondes</p>
     </div>
 
-    <!-- Progress Dots -->
-    <div class="progress-dots">
-        <div class="progress-dot active" data-step="1"></div>
-        <div class="progress-dot" data-step="2"></div>
-        <div class="progress-dot" data-step="3"></div>
+    <!-- Indicateur d'étapes -->
+    <div class="stepper" aria-label="Progression de l'inscription">
+        <div class="stepper-item active" data-step="1">
+            <div class="stepper-circle">
+                <span class="stepper-number">1</span>
+                <svg class="stepper-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <span class="stepper-label">Prénom</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="2">
+            <div class="stepper-circle">
+                <span class="stepper-number">2</span>
+                <svg class="stepper-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <span class="stepper-label">Téléphone</span>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item" data-step="3">
+            <div class="stepper-circle">
+                <span class="stepper-number">3</span>
+                <svg class="stepper-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <span class="stepper-label">Mot de passe</span>
+        </div>
     </div>
 
-    <!-- Messages -->
+    <!-- Messages Django -->
     {% if messages %}
     <div class="auth-messages">
         {% for message in messages %}
-        <div class="auth-message {% if message.tags == 'error' %}error{% else %}success{% endif %}">
-            {{ message }}
+        <div class="auth-message {% if message.tags == 'error' %}auth-message-error{% else %}auth-message-success{% endif %}">
+            <span class="message-icon">
+                {% if message.tags == 'error' %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                {% else %}
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+                {% endif %}
+            </span>
+            <span class="message-text">{{ message }}</span>
         </div>
         {% endfor %}
     </div>
     {% endif %}
 
-    <!-- Signup Form -->
+    <!-- Formulaire d'inscription -->
     <form method="POST" class="auth-form" novalidate id="signupForm">
         {% csrf_token %}
 
-        <!-- Step 1: Name -->
+        <!-- ====== ÉTAPE 1 : Prénom ====== -->
         <div class="form-step active" data-step="1">
-            <div class="step-header">
-                <h2 class="step-title">Votre prénom</h2>
-                <p class="step-subtitle">Comment devrions-nous vous appeler ?</p>
-            </div>
             <div class="form-group">
-                <label for="first_name" class="form-label">Prénom</label>
+                <label for="first_name" class="form-label">
+                    <span class="label-text">Votre prénom</span>
+                    <span class="label-hint">✱</span>
+                </label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    <input type="text" name="first_name" id="first_name" class="form-input" placeholder="Jean" required autofocus>
-                    <div class="field-error">Ce champ est requis</div>
+                    <input
+                        type="text"
+                        name="first_name"
+                        id="first_name"
+                        class="form-input"
+                        placeholder="Jean"
+                        required
+                        autocomplete="given-name"
+                        autofocus>
                 </div>
+                <p class="field-hint">Comment devrions-nous vous appeler&nbsp;?</p>
+                <p class="field-error" data-error-for="first_name">Ce champ est requis</p>
             </div>
-            <button type="button" class="btn btn-primary btn-step-next" data-next="2">
-                Suivant
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+            <button type="button" class="btn btn-signup-primary" data-action="next" data-next="2">
+                <span class="btn-text">Continuer</span>
+                <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
             </button>
         </div>
 
-        <!-- Step 2: Phone -->
+        <!-- ====== ÉTAPE 2 : Téléphone ====== -->
         <div class="form-step" data-step="2">
-            <div class="step-header">
-                <h2 class="step-title">Votre téléphone</h2>
-                <p class="step-subtitle">Votre identifiant de connexion</p>
-            </div>
             <div class="form-group">
-                <label for="phone" class="form-label">Numéro de téléphone</label>
+                <label for="phone" class="form-label">
+                    <span class="label-text">Numéro de téléphone</span>
+                    <span class="label-hint">✱</span>
+                </label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                     </svg>
-                    <input type="tel" name="phone" id="phone" class="form-input" placeholder="+33 6 12 34 56 78" required pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$">
-                    <div class="field-error">Numéro invalide</div>
+                    <input
+                        type="tel"
+                        name="phone"
+                        id="phone"
+                        class="form-input"
+                        placeholder="+33 6 12 34 56 78"
+                        required
+                        autocomplete="tel"
+                        inputmode="tel"
+                        pattern="^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$">
                 </div>
+                <p class="field-hint">Servira d'identifiant de connexion</p>
+                <p class="field-error" data-error-for="phone">Numéro de téléphone invalide</p>
             </div>
-            <div class="step-buttons">
-                <button type="button" class="btn btn-secondary btn-step-back" data-prev="1">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+            <div class="step-actions">
+                <button type="button" class="btn btn-signup-secondary" data-action="prev" data-prev="1">
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    Retour
+                    <span class="btn-text">Retour</span>
                 </button>
-                <button type="button" class="btn btn-primary btn-step-next" data-next="3">
-                    Suivant
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button type="button" class="btn btn-signup-primary" data-action="next" data-next="3">
+                    <span class="btn-text">Continuer</span>
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
@@ -418,134 +157,93 @@ body::before {
             </div>
         </div>
 
-        <!-- Step 3: Password -->
+        <!-- ====== ÉTAPE 3 : Mot de passe ====== -->
         <div class="form-step" data-step="3">
-            <div class="step-header">
-                <h2 class="step-title">Mot de passe</h2>
-                <p class="step-subtitle">Minimum 8 caractères</p>
-            </div>
             <div class="form-group">
-                <label for="password" class="form-label">Mot de passe</label>
+                <label for="password" class="form-label">
+                    <span class="label-text">Mot de passe</span>
+                    <span class="label-hint">✱</span>
+                </label>
                 <div class="form-input-wrapper">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
-                    <input type="password" name="password" id="password" class="form-input" placeholder="••••••••" required autocomplete="new-password" minlength="8">
-                    <button type="button" class="toggle-password" id="togglePassword">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <input
+                        type="password"
+                        name="password"
+                        id="password"
+                        class="form-input"
+                        placeholder="Minimum 8 caractères"
+                        required
+                        autocomplete="new-password"
+                        minlength="8">
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Afficher le mot de passe">
+                        <svg class="icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                             <circle cx="12" cy="12" r="3"></circle>
                         </svg>
+                        <svg class="icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                        </svg>
                     </button>
-                    <div class="field-error">Minimum 8 caractères</div>
                 </div>
+
+                <!-- Indicateur de force du mot de passe -->
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bars">
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                        <div class="strength-bar"></div>
+                    </div>
+                    <span class="strength-label">Trop court</span>
+                </div>
+
+                <p class="field-error" data-error-for="password">Le mot de passe doit contenir au minimum 8 caractères</p>
             </div>
-            <div class="step-buttons">
-                <button type="button" class="btn btn-secondary btn-step-back" data-prev="2">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+            <div class="step-actions">
+                <button type="button" class="btn btn-signup-secondary" data-action="prev" data-prev="2">
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="19" y1="12" x2="5" y2="12"></line>
                         <polyline points="12 19 5 12 12 5"></polyline>
                     </svg>
-                    Retour
+                    <span class="btn-text">Retour</span>
                 </button>
-                <button type="submit" class="btn btn-primary">
-                    Créer mon compte
+                <button type="submit" class="btn btn-signup-primary">
+                    <span class="btn-text">Créer mon compte</span>
+                    <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
                 </button>
             </div>
         </div>
     </form>
 
-    <div class="divider">
+    <div class="form-divider">
         <span class="divider-text">Déjà inscrit ?</span>
     </div>
 
-    <a href="{% url 'connexion' %}" class="btn-link">Se connecter</a>
+    <a href="{% url 'connexion' %}" class="btn btn-signup-secondary signup-link">
+        <svg class="btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+        </svg>
+        <span class="btn-text">Se connecter</span>
+    </a>
+
+    <p class="auth-footer-text">
+        En créant un compte, vous acceptez nos
+        <a href="#" class="footer-link">conditions d'utilisation</a>
+        et notre
+        <a href="#" class="footer-link">politique de confidentialité</a>.
+    </p>
 </div>
+{% endblock %}
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('signupForm');
-    const steps = document.querySelectorAll('.form-step');
-    const dots = document.querySelectorAll('.progress-dot');
-    const nextButtons = document.querySelectorAll('.btn-step-next');
-    const backButtons = document.querySelectorAll('.btn-step-back');
-    let currentStep = 1;
-
-    function showStep(stepNumber) {
-        steps.forEach(step => {
-            step.classList.remove('active');
-            if (parseInt(step.dataset.step) === stepNumber) {
-                step.classList.add('active');
-            }
-        });
-
-        dots.forEach(dot => {
-            const dotStep = parseInt(dot.dataset.step);
-            dot.classList.remove('active', 'completed');
-            if (dotStep === stepNumber) {
-                dot.classList.add('active');
-            } else if (dotStep < stepNumber) {
-                dot.classList.add('completed');
-            }
-        });
-
-        currentStep = stepNumber;
-    }
-
-    function validateCurrentStep() {
-        const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
-        const input = currentStepEl.querySelector('input');
-        let isValid = true;
-
-        if (input && !input.value.trim()) {
-            isValid = false;
-            input.classList.add('error');
-        } else if (input) {
-            input.classList.remove('error');
-        }
-
-        if (input && input.minLength && input.value.length < input.minLength) {
-            isValid = false;
-            input.classList.add('error');
-        }
-
-        return isValid;
-    }
-
-    nextButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            if (validateCurrentStep()) {
-                const nextStep = parseInt(this.dataset.next);
-                showStep(nextStep);
-            }
-        });
-    });
-
-    backButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const prevStep = parseInt(this.dataset.prev);
-            showStep(prevStep);
-        });
-    });
-
-    document.getElementById('togglePassword')?.addEventListener('click', function() {
-        const input = document.getElementById('password');
-        input.type = input.type === 'password' ? 'text' : 'password';
-    });
-
-    form.addEventListener('submit', function(e) {
-        if (!validateCurrentStep()) {
-            e.preventDefault();
-        }
-    });
-
-    // Remove error on input
-    document.querySelectorAll('.form-input').forEach(input => {
-        input.addEventListener('input', function() {
-            this.classList.remove('error');
-        });
-    });
-});
-</script>
+{% block extra_js %}
+<script src="{% static 'js/inscription-modern.js' %}" defer></script>
 {% endblock %}

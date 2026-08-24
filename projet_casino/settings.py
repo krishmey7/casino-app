@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-t4g&1@lha&=%soyy4!!bk*g^=pdyajx2hod-od4hc^1v=pbjfp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*", 'casino-app-7rts.onrender.com']
 
 # CSRF Trusted Origins for Render deployment
 CSRF_TRUSTED_ORIGINS = [
